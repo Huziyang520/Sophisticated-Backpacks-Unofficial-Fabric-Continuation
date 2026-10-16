@@ -1,0 +1,96 @@
+package net.p3pp3rf1y.sophisticatedbackpacks.compat.rei;
+
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackScreen;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackSettingsScreen;
+import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
+import net.p3pp3rf1y.sophisticatedbackpacks.compat.jei.DyeRecipesMaker;
+import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.REIStorageGhostIngredientHandler;
+import net.p3pp3rf1y.sophisticatedcore.compat.rei.SophisticatedTransferHandler;
+import net.p3pp3rf1y.sophisticatedcore.crafting.UpgradeNextTierRecipe;
+import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
+import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
+import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.client.registry.screen.ExclusionZones;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
+import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.display.Display;
+import me.shedaniel.rei.api.common.util.EntryStacks;
+import me.shedaniel.rei.plugin.common.BuiltinPlugin;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+
+public class REIClientCompat implements REIClientPlugin {
+	private static Consumer<CategoryRegistry> additionalCategories = registration -> {};
+	public static void setAdditionalCategories(Consumer<CategoryRegistry> additionalCategories) {
+		REIClientCompat.additionalCategories = additionalCategories;
+	}
+
+	@Override
+    public void registerExclusionZones(ExclusionZones zones) {
+        zones.register(BackpackScreen.class, screen -> {
+            List<Rect2i> ret = new ArrayList<>();
+            screen.getUpgradeSlotsRectangle().ifPresent(ret::add);
+            ret.addAll(screen.getUpgradeSettingsControl().getTabRectangles());
+            screen.getSortButtonsRectangle().ifPresent(ret::add);
+            return ret.stream().map(r -> new Rectangle(r.getX(), r.getY(), r.getWidth(), r.getHeight())).toList();
+        });
+
+        zones.register(BackpackSettingsScreen.class, screen -> {
+			if (screen == null || screen.getSettingsTabControl() == null) {
+				return List.of();
+			}
+
+			return screen.getSettingsTabControl().getTabRectangles().stream().map(r -> new Rectangle(r.getX(), r.getY(), r.getWidth(), r.getHeight())).toList();
+		});
+    }
+
+	@Override
+	public void registerTransferHandlers(TransferHandlerRegistry registry) {
+		registry.register(SophisticatedTransferHandler.crafting(BackpackContainer.class));
+	}
+
+	@Override
+	public void registerCategories(CategoryRegistry registry) {
+		registry.addWorkstations(BuiltinPlugin.CRAFTING, EntryStacks.of(ModItems.CRAFTING_UPGRADE.get()));
+		registry.addWorkstations(BuiltinPlugin.STONE_CUTTING, EntryStacks.of(ModItems.STONECUTTER_UPGRADE.get()));
+		additionalCategories.accept(registry);
+	}
+
+    @Override
+    public void registerScreens(ScreenRegistry registry) {
+        registry.registerDraggableStackVisitor(new REIStorageGhostIngredientHandler<>() {
+            @Override
+            public <R extends Screen> boolean isHandingScreen(R screen) {
+                return screen instanceof BackpackScreen;
+            }
+        });
+    }
+
+    @Override
+    public void registerDisplays(DisplayRegistry registry) {
+        registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
+        registerRecipes(registry, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, UpgradeNextTierRecipe.class, ClientRecipeHelper::copyShapedRecipe), BuiltinPlugin.CRAFTING);
+    }
+
+    public static void registerRecipes(DisplayRegistry registry, Collection<?> recipes, CategoryIdentifier<?> identifier) {
+        recipes.forEach(recipe -> {
+            Collection<Display> displays = registry.tryFillDisplay(recipe);
+            for (Display display : displays) {
+                if (Objects.equals(display.getCategoryIdentifier(), identifier)) {
+                    registry.add(display, recipe);
+                }
+            }
+        });
+    }
+}

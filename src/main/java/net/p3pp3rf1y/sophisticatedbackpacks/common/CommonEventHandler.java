@@ -1,0 +1,294 @@
+package net.p3pp3rf1y.sophisticatedbackpacks.common;
+
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
+import net.p3pp3rf1y.sophisticatedbackpacks.Config;
+import net.p3pp3rf1y.sophisticatedbackpacks.api.IAttackEntityResponseUpgrade;
+import net.p3pp3rf1y.sophisticatedbackpacks.api.IBlockClickResponseUpgrade;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.SBPTranslationHelper;
+import net.p3pp3rf1y.sophisticatedbackpacks.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedbackpacks.init.ModCompat;
+import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
+import net.p3pp3rf1y.sophisticatedbackpacks.init.ModPayloads;
+import net.p3pp3rf1y.sophisticatedbackpacks.mixin.common.CreeperMixin;
+import net.p3pp3rf1y.sophisticatedbackpacks.network.AnotherPlayerBackpackOpenPayload;
+import net.p3pp3rf1y.sophisticatedbackpacks.settings.BackpackMainSettingsCategory;
+import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
+import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
+import net.p3pp3rf1y.sophisticatedcore.event.common.EntityEvents;
+import net.p3pp3rf1y.sophisticatedcore.event.common.ItemEntityEvents;
+import net.p3pp3rf1y.sophisticatedcore.event.common.LivingEntityEvents;
+import net.p3pp3rf1y.sophisticatedcore.event.common.MobSpawnEvents;
+import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
+import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPayload;
+import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem;
+import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks.MOD_ID;
+
+public class CommonEventHandler {
+	public void registerHandlers() {
+		ModCompat.register();
+		CompatRegistry.getRegistry(MOD_ID).initCompats();
+
+		ModItems.registerHandlers();
+		ModBlocks.registerHandlers();
+		ModPayloads.registerPayloads();
+		ItemEntityEvents.CAN_PICKUP.register(this::onItemPickup);
+		MobSpawnEvents.AFTER_FINALIZE_SPAWN.register(this::onLivingSpecialSpawn);
+		LivingEntityEvents.DROPS.register(this::onLivingDrops);
+		// eventBus.addListener(this::onEntityMobGriefing); // Handled with CreeperMixin
+		EntityTrackingEvents.STOP_TRACKING.register(this::onEntityLeaveWorld);
+		AttackBlockCallback.EVENT.register(this::onBlockClick);
+		AttackEntityCallback.EVENT.register(this::onAttackEntity);
+		LivingEntityEvents.TICK.register(EntityBackpackAdditionHandler::onLivingUpdate);
+		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register(this::onPlayerChangedDimension);
+		ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
+		ServerTickEvents.END_WORLD_TICK.register(this::onWorldTick);
+		UseEntityCallback.EVENT.register(this::interactWithEntity);
+		PlayerBlockBreakEvents.BEFORE.register(this::handleBreakBackpackWithInfinityUpgrade);
+
+		EntityEvents.ON_JOIN_WORLD.register((entity, world, loadedFromDisk) -> {
+			if (entity.getClass().equals(ItemEntity.class) && ((ItemEntity)entity).getItem().getItem() instanceof BackpackItem backpack) {
+				Entity newEntity = backpack.createEntity(world, entity, ((ItemEntity)entity).getItem());
+				if (newEntity != null) {
+					entity.discard();
+					world.addFreshEntity(newEntity);
+					return false;
+				}
+			}
+			return true;
+		});
+	}
+
+	private static final int BACKPACK_CHECK_COOLDOWN = 40;
+	private final Map<ResourceLocation, Long> nextBackpackCheckTime = new HashMap<>();
+
+	private InteractionResult interactWithEntity(Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) {
+		if (!(entity instanceof Player targetPlayer) || hitResult == null || Boolean.FALSE.equals(Config.SERVER.allowOpeningOtherPlayerBackpacks.get())) {
+			return InteractionResult.PASS;
+		}
+
+		Vec3 targetPlayerViewVector = Vec3.directionFromRotation(new Vec2(targetPlayer.getXRot(), targetPlayer.yBodyRot));
+
+		Vec3 hitVector = hitResult.getLocation();
+		Vec3 vec31 = player.position().vectorTo(targetPlayer.position()).normalize();
+		vec31 = new Vec3(vec31.x, 0.0D, vec31.z);
+		boolean isPointingAtBody = hitVector.y >= 0.9D && hitVector.y < 1.6D;
+		boolean isPointingAtBack = vec31.dot(targetPlayerViewVector) > 0.0D;
+		if (!isPointingAtBody || !isPointingAtBack) {
+			return InteractionResult.PASS;
+		}
+		if (targetPlayer.level().isClientSide) {
+			PacketDistributor.sendToServer(new AnotherPlayerBackpackOpenPayload(targetPlayer.getId()));
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.PASS;
+	}
+
+	private void onWorldTick(ServerLevel level) {
+		ResourceLocation dimensionKey = level.dimension().location();
+		boolean runSlownessLogic = Boolean.TRUE.equals(Config.SERVER.nerfsConfig.tooManyBackpacksSlowness.get());
+		boolean runDedupeLogic = Boolean.FALSE.equals(Config.SERVER.tickDedupeLogicDisabled.get());
+		if ((!runSlownessLogic && !runDedupeLogic)
+				|| nextBackpackCheckTime.getOrDefault(dimensionKey, 0L) > level.getGameTime()) {
+			return;
+		}
+		nextBackpackCheckTime.put(dimensionKey, level.getGameTime() + BACKPACK_CHECK_COOLDOWN);
+
+		Set<UUID> backpackIds = new HashSet<>();
+
+		level.players().forEach(player -> {
+			AtomicInteger numberOfBackpacks = new AtomicInteger(0);
+			PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, handlerName, identifier, slot) -> {
+				if (runSlownessLogic) {
+					numberOfBackpacks.incrementAndGet();
+				}
+				if (runDedupeLogic) {
+					addBackpackIdIfUniqueOrDedupe(backpackIds, BackpackWrapper.fromStack(backpack));
+				}
+				return false;
+			});
+			if (runSlownessLogic) {
+				int maxNumberOfBackpacks = Config.SERVER.nerfsConfig.maxNumberOfBackpacks.get();
+				if (numberOfBackpacks.get() > maxNumberOfBackpacks) {
+					int numberOfSlownessLevels = Math.min(10, (int) Math.ceil((numberOfBackpacks.get() - maxNumberOfBackpacks) * Config.SERVER.nerfsConfig.slownessLevelsPerAdditionalBackpack.get()));
+					player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, BACKPACK_CHECK_COOLDOWN * 2, numberOfSlownessLevels - 1, false, false));
+				}
+			}
+		});
+	}
+
+	private static void addBackpackIdIfUniqueOrDedupe(Set<UUID> backpackIds, IBackpackWrapper backpackWrapper) {
+		backpackWrapper.getContentsUuid().ifPresent(backpackId -> {
+			if (backpackIds.contains(backpackId)) {
+				backpackWrapper.removeContentsUUIDTag();
+				backpackWrapper.onContentsNbtUpdated();
+			} else {
+				backpackIds.add(backpackId);
+			}
+		});
+	}
+
+	private void onPlayerChangedDimension(ServerPlayer player, ServerLevel origin, ServerLevel destination) {
+		sendPlayerSettingsToClient(player);
+	}
+
+	private void sendPlayerSettingsToClient(Player player) {
+		if (player instanceof ServerPlayer serverPlayer) {
+			String playerTagName = BackpackMainSettingsCategory.SOPHISTICATED_BACKPACK_SETTINGS_PLAYER_TAG;
+			PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerSettingsPayload(playerTagName, SettingsManager.getPlayerSettingsTag(player, playerTagName)));
+		}
+	}
+
+	private void onPlayerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
+		sendPlayerSettingsToClient(newPlayer);
+	}
+
+	private InteractionResult onBlockClick(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) {
+		if (world.isClientSide) {
+			return InteractionResult.PASS;
+		}
+		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
+			IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+			for (IBlockClickResponseUpgrade upgrade : wrapper.getUpgradeHandler().getWrappersThatImplement(IBlockClickResponseUpgrade.class)) {
+				if (upgrade.onBlockClick(player, pos)) {
+					return true;
+				}
+			}
+			return false;
+		});
+		return InteractionResult.PASS;
+	}
+
+	private InteractionResult onAttackEntity(Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) {
+		if (level.isClientSide) {
+			return InteractionResult.PASS;
+		}
+		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
+			IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+			for (IAttackEntityResponseUpgrade upgrade : wrapper.getUpgradeHandler().getWrappersThatImplement(IAttackEntityResponseUpgrade.class)) {
+				if (upgrade.onAttackEntity(player)) {
+					return true;
+				}
+			}
+			return false;
+		});
+		return InteractionResult.PASS;
+	}
+
+	private void onLivingSpecialSpawn(MobSpawnEvents.FinalizeSpawn event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof Monster monster && monster.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
+			EntityBackpackAdditionHandler.addBackpack(monster, event.getLevel(), event.getDifficulty());
+		}
+	}
+
+	private boolean onLivingDrops(LivingEntity target, DamageSource damageSource, Collection<ItemEntity> drops, boolean recentlyHit) {
+		EntityBackpackAdditionHandler.handleBackpackDrop(target, damageSource, drops);
+		return false;
+	}
+
+	/// Handled in {@link CreeperMixin#sophisticatedBackpacks$explodeCreeper(CallbackInfo)}
+	/*private void onEntityMobGriefing(EntityMobGriefingEvent event) {
+		if (event.getEntity() instanceof Creeper creeper) {
+			EntityBackpackAdditionHandler.removeBeneficialEffects(creeper);
+		}
+	}*/
+
+	private void onEntityLeaveWorld(Entity trackedEntity, ServerPlayer player) {
+		if (!(trackedEntity instanceof Monster monster)) {
+			return;
+		}
+		EntityBackpackAdditionHandler.removeBackpackUuid(monster, player.level());
+	}
+
+	private InteractionResult onItemPickup(Player player, ItemEntity itemEntity, ItemStack stack) {
+		if (itemEntity.getItem().isEmpty() || itemEntity.pickupDelay > 0) {
+			return InteractionResult.PASS;
+		}
+
+		AtomicReference<ItemStack> remainingStackSimulated = new AtomicReference<>(itemEntity.getItem().copy());
+		Level level = player.getCommandSenderWorld();
+		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
+					IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+					remainingStackSimulated.set(InventoryHelper.runPickupOnPickupResponseUpgrades(level, wrapper.getUpgradeHandler(), remainingStackSimulated.get(), true));
+					return remainingStackSimulated.get().isEmpty();
+				}, Config.SERVER.nerfsConfig.onlyWornBackpackTriggersUpgrades.get()
+		);
+
+		if (remainingStackSimulated.get().getCount() != itemEntity.getItem().getCount()) {
+			AtomicReference<ItemStack> remainingStack = new AtomicReference<>(itemEntity.getItem().copy());
+			PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
+						IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+						remainingStack.set(InventoryHelper.runPickupOnPickupResponseUpgrades(level, player, wrapper.getUpgradeHandler(), remainingStack.get(), false));
+						return remainingStack.get().isEmpty();
+					}
+					, Config.SERVER.nerfsConfig.onlyWornBackpackTriggersUpgrades.get()
+			);
+			itemEntity.setItem(remainingStack.get());
+			return InteractionResult.SUCCESS; //cancelling even when the stack isn't empty at this point to prevent full stack from before pickup to be picked up by player
+		}
+		return InteractionResult.PASS;
+	}
+
+	private boolean handleBreakBackpackWithInfinityUpgrade(Level world, Player player, BlockPos pos, BlockState state, @org.jetbrains.annotations.Nullable BlockEntity blockEntity) {
+		if (!(state.getBlock() instanceof BackpackBlock)) {
+			return true;
+		}
+
+		if (WorldHelper.getBlockEntity(world, pos, BackpackBlockEntity.class)
+				.map(backpackBlockEntity -> backpackBlockEntity.getStorageWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE)
+						.stream().anyMatch(w -> !player.hasPermissions(w.getPermissionLevel())))
+				.orElse(false)) {
+			player.displayClientMessage(SBPTranslationHelper.INSTANCE.translStatusMessage("infinity_upgrade_only_admin_break").withStyle(ChatFormatting.RED), true);
+			return false;
+		}
+
+		return true;
+	}
+}
