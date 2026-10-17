@@ -40,12 +40,15 @@ public class KeybindHandler {
 	private KeybindHandler() {
 	}
 
-	private static final int KEY_B = 66;
-	private static final int KEY_C = 67;
-	private static final int KEY_Z = 90;
-	private static final int KEY_X = 88;
-	private static final int KEY_UNKNOWN = -1;
-	private static final int MIDDLE_BUTTON = 2;
+	// 26.3 把键码换成了 SDL scancode（KEY_B=5、KEY_C=6、KEY_X=27、KEY_Z=29），不再是 ASCII 值；
+	// 未绑定键必须是 InputConstants.UNKNOWN（值为 0），传 -1 会让 KeyMapping.setAll 里的
+	// SDL_GetKeyboardState().get(-1) 抛 IndexOutOfBoundsException，进世界时鼠标一抓取就崩
+	private static final int KEY_B = InputConstants.KEY_B;
+	private static final int KEY_C = InputConstants.KEY_C;
+	private static final int KEY_Z = InputConstants.KEY_Z;
+	private static final int KEY_X = InputConstants.KEY_X;
+	private static final int KEY_UNKNOWN = InputConstants.UNKNOWN.getValue();
+	private static final int MIDDLE_BUTTON = InputConstants.MOUSE_BUTTON_MIDDLE;
 	private static final int CHEST_SLOT_INDEX = 38;
 	private static final int OFFHAND_SLOT_INDEX = 40;
 

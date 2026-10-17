@@ -15,7 +15,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
+        "recipes": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

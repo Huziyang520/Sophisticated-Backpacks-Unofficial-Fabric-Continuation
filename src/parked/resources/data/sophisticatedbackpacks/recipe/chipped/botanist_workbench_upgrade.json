@@ -2,7 +2,7 @@
   "fabric:load_conditions": [
     {
       "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedbackpacks:chipped/glassblower_upgrade"
+      "itemRegistryName": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
     },
     {
       "condition": "fabric:all_mods_loaded",
@@ -14,18 +14,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "sophisticatedbackpacks:upgrade_base"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "R": {
-      "tag": "c:dusts/redstone"
-    },
-    "W": {
-      "item": "chipped:glassblower"
-    }
+    "B": "sophisticatedbackpacks:upgrade_base",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone",
+    "W": "chipped:botanist_workbench"
   },
   "pattern": [
     " W ",
@@ -34,6 +26,6 @@
   ],
   "result": {
     "count": 1,
-    "id": "sophisticatedbackpacks:chipped/glassblower_upgrade"
+    "id": "sophisticatedbackpacks:chipped/botanist_workbench_upgrade"
   }
 }

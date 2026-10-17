@@ -12,9 +12,7 @@
   "license": "${mod_license}",
   "icon": "${mod_logo_file}",
   "contact": {
-    "homepage": "${mod_display_url}",
-    "issues": "${mod_issue_tracker_url}",
-    "sources": "${mod_sources_url}"
+    "issues": "${mod_issue_tracker_url}"
   },
   "environment": "*",
   "entrypoints": {
@@ -27,8 +25,9 @@
     "jei_mod_plugin": [
       "net.p3pp3rf1y.sophisticatedbackpacks.compat.jei.SBPPlugin"
     ],
-    "rei_common": [],
-    "rei_client": []
+    "modmenu": [
+      "net.p3pp3rf1y.sophisticatedbackpacks.client.compat.ModMenuIntegration"
+    ]
   },
   "mixins": [
     "${mod_id}.mixins.json"
@@ -47,9 +46,6 @@
   },
   "custom": {
     "modmenu": {
-      "links": {
-        "modmenu.feedback": "${mod_issue_tracker_url}"
-      },
       "badges": []
     },
     "loom:injected_interfaces": {
