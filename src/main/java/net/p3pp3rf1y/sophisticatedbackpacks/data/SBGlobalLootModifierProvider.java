@@ -20,7 +20,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.github.fabricators_of_create.porting_lib.conditions.ICondition;
 import io.github.fabricators_of_create.porting_lib.conditions.WithConditions;
 
@@ -67,21 +67,21 @@ public abstract class SBGlobalLootModifierProvider implements DataProvider {
 
 		Path forgePath = this.output.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("neoforge").resolve("loot_modifiers").resolve("global_loot_modifiers.json");
 		Path modifierFolderPath = this.output.getOutputFolder(PackOutput.Target.DATA_PACK).resolve(this.modid).resolve("loot_modifiers");
-		List<ResourceLocation> entries = new ArrayList<>();
+		List<Identifier> entries = new ArrayList<>();
 
 		ImmutableList.Builder<CompletableFuture<?>> futuresBuilder = new ImmutableList.Builder<>();
 
 		for (var entry : toSerialize.entrySet()) {
 			var name = entry.getKey();
 			var lootModifier = entry.getValue();
-			entries.add(ResourceLocation.fromNamespaceAndPath(modid, name));
+			entries.add(Identifier.fromNamespaceAndPath(modid, name));
 			Path modifierPath = modifierFolderPath.resolve(name + ".json");
 			futuresBuilder.add(DataProvider.saveStable(cache, registries, IGlobalLootModifier.CONDITIONAL_CODEC, Optional.of(lootModifier), modifierPath));
 		}
 
 		JsonObject forgeJson = new JsonObject();
 		forgeJson.addProperty("replace", this.replace);
-		forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(ResourceLocation::toString).collect(Collectors.toList())));
+		forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(Identifier::toString).collect(Collectors.toList())));
 
 		futuresBuilder.add(DataProvider.saveStable(cache, forgeJson, forgePath));
 

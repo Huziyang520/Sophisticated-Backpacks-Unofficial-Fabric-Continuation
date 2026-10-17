@@ -3,7 +3,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.fml.config.ModConfig;
 import net.p3pp3rf1y.sophisticatedbackpacks.command.SBPCommand;
@@ -39,8 +39,8 @@ public class SophisticatedBackpacks implements ModInitializer {
 		ModItems.registerCauldronInteractions();
 	}
 
-	public static ResourceLocation getRL(String regName) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, regName);
+	public static Identifier getRL(String regName) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, regName);
 	}
 
 	public static String getRegistryName(String regName) {

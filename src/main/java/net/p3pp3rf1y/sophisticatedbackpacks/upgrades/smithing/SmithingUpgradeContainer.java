@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.smithing;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -101,7 +101,7 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 	}
 
 	@Override
-	public void setRecipeUsed(ResourceLocation recipeId) {
+	public void setRecipeUsed(Identifier recipeId) {
 		smithingMenuDelegate.setSelectedRecipe(recipeId);
 	}
 
@@ -187,7 +187,7 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 			return inputSlots;
 		}
 
-		public void setSelectedRecipe(ResourceLocation recipeId) {
+		public void setSelectedRecipe(Identifier recipeId) {
 			SmithingRecipeInput smithingRecipeInput = new SmithingRecipeInput(getTemplateSlot().getItem(), getBaseSlot().getItem(), getAdditionalSlot().getItem());
 			RecipeHelper.safeGetRecipeFor(RecipeType.SMITHING, smithingRecipeInput, recipeId).ifPresent(recipe -> selectedRecipe = recipe);
 		}

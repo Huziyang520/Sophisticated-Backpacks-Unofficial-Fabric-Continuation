@@ -11,7 +11,7 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.ITrackedContentsItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,13 +65,13 @@ public class InceptionInventoryHandler implements ITrackedContentsItemHandler {
 		return combinedInventories.getSlotCount();
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public ItemStack getStackInSlot(int slot) {
 		return combinedInventories.getStackInSlot(slot);
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 		return combinedInventories.insertItem(slot, stack, simulate);
@@ -82,7 +82,7 @@ public class InceptionInventoryHandler implements ITrackedContentsItemHandler {
 		return combinedInventories.insertSlot(slot, resource, maxAmount, ctx);
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public ItemStack extractItem(int slot, int amount, boolean simulate) {
 		return combinedInventories.extractItem(slot, amount, simulate);

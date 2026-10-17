@@ -31,8 +31,8 @@ import net.p3pp3rf1y.sophisticatedcore.util.CodecHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.StreamCodecHelper;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -107,7 +107,7 @@ public class RefillUpgradeWrapper extends UpgradeWrapperBase<RefillUpgradeWrappe
 		setCooldown(level, COOLDOWN);
 	}
 
-	private void tryRefillFilter(@Nonnull Entity entity, IInventoryHandlerHelper playerInvHandler, ItemStack filter, TargetSlot targetSlot) {
+	private void tryRefillFilter(@NotNull Entity entity, IInventoryHandlerHelper playerInvHandler, ItemStack filter, TargetSlot targetSlot) {
 		if (!(entity instanceof Player player)) {
 			return;
 		}

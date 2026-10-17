@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -42,7 +42,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.LootHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
 import team.reborn.energy.api.EnergyStorage;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.IntConsumer;
 
@@ -428,7 +428,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	@Override
-	public void setLoot(ResourceLocation lootTableName, float lootFactor) {
+	public void setLoot(Identifier lootTableName, float lootFactor) {
 		getBackpackStack().sophisticatedCore_set(ModDataComponents.LOOT_TABLE, lootTableName);
 		getBackpackStack().sophisticatedCore_set(ModDataComponents.LOOT_FACTOR, lootFactor);
 		backpackSaveHandler.run();
@@ -463,7 +463,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	private void fillWithLoot(Level level, BlockPos pos) {
-		ResourceLocation lootTable = getBackpackStack().sophisticatedCore_get(ModDataComponents.LOOT_TABLE);
+		Identifier lootTable = getBackpackStack().sophisticatedCore_get(ModDataComponents.LOOT_TABLE);
 		if (lootTable == null) {
 			return;
 		}
@@ -528,7 +528,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 		return getBackpackStack().sophisticatedCore_getOrDefault(ModDataComponents.COLUMNS_TAKEN, 0);
 	}
 
-	private void fillWithLootFromTable(Level level, BlockPos pos, ResourceLocation lootTable) {
+	private void fillWithLootFromTable(Level level, BlockPos pos, Identifier lootTable) {
 		MinecraftServer server = level.getServer();
 		if (server == null || !(level instanceof ServerLevel serverLevel)) {
 			return;

@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.registry;
 
 import com.google.gson.JsonObject;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface IRegistryDataLoader {
 	String getName();

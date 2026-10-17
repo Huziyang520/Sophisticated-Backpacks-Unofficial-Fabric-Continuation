@@ -3,7 +3,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +30,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeConfig;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -226,7 +226,7 @@ public class Config {
 			public final ModConfigSpec.ConfigValue<List<? extends String>> entityLootTableList;
 			public final ModConfigSpec.ConfigValue<List<? extends String>> discBlockList;
 			@Nullable
-			private Map<EntityType<?>, ResourceLocation> entityLootTables = null;
+			private Map<EntityType<?>, Identifier> entityLootTables = null;
 
 			public EntityBackpackAdditionsConfig(ModConfigSpec.Builder builder) {
 				builder.comment("Settings for Spawning Entities with Backpack").push("entityBackpackAdditions");
@@ -249,7 +249,7 @@ public class Config {
 				builder.pop();
 			}
 
-			public Optional<ResourceLocation> getLootTableName(EntityType<?> entityType) {
+			public Optional<Identifier> getLootTableName(EntityType<?> entityType) {
 				if (entityLootTables == null) {
 					initEntityLootTables();
 				}
@@ -273,8 +273,8 @@ public class Config {
 					String entityRegistryName = entityLoot[0];
 					String lootTableName = entityLoot[1];
 
-					BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(entityRegistryName))
-							.ifPresent(entityType -> entityLootTables.put(entityType, lootTableName.equals("null") ? null : ResourceLocation.parse(lootTableName)));
+					BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse(entityRegistryName))
+							.ifPresent(entityType -> entityLootTables.put(entityType, lootTableName.equals("null") ? null : Identifier.parse(lootTableName)));
 				}
 			}
 
@@ -362,7 +362,7 @@ public class Config {
 				noInteractionBlocksSet = new HashSet<>();
 
 				for (String disallowedItemName : noInteractionBlocksList.get()) {
-					ResourceLocation registryName = ResourceLocation.parse(disallowedItemName);
+					Identifier registryName = Identifier.parse(disallowedItemName);
 					if (BuiltInRegistries.BLOCK.containsKey(registryName)) {
 						noInteractionBlocksSet.add(BuiltInRegistries.BLOCK.get(registryName));
 					}
@@ -395,7 +395,7 @@ public class Config {
 				noConnnectionBlocksSet = new HashSet<>();
 
 				for (String disallowedItemName : noConnectionBlocksList.get()) {
-					ResourceLocation registryName = ResourceLocation.parse(disallowedItemName);
+					Identifier registryName = Identifier.parse(disallowedItemName);
 					if (BuiltInRegistries.BLOCK.containsKey(registryName)) {
 						noConnnectionBlocksSet.add(BuiltInRegistries.BLOCK.get(registryName));
 					}
@@ -436,7 +436,7 @@ public class Config {
 				disallowedItemsSet = new HashSet<>();
 
 				for (String disallowedItemName : disallowedItemsList.get()) {
-					ResourceLocation registryName = ResourceLocation.parse(disallowedItemName);
+					Identifier registryName = Identifier.parse(disallowedItemName);
 					BuiltInRegistries.ITEM.getOptional(registryName).ifPresent(disallowedItemsSet::add);
 				}
 			}
@@ -462,7 +462,7 @@ public class Config {
 			}
 
 			@Override
-			public int getMaxUpgradesPerStorage(String storageType, @org.jetbrains.annotations.Nullable ResourceLocation upgradeRegistryName) {
+			public int getMaxUpgradesPerStorage(String storageType, @org.jetbrains.annotations.Nullable Identifier upgradeRegistryName) {
 				if (maxUpgradesPerStorage == null) {
 					initMaxUpgradesPerStorage();
 				}

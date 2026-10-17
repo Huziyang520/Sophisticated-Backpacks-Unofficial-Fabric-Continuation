@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface SophisticatedShearable {
 	default boolean sophisticatedBackpacks_isShearable(@Nullable Player player, ItemStack item, Level level, BlockPos pos) {

@@ -16,7 +16,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedcore.util.StreamCodecHelper;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public record SyncClientInfoPayload(int slotIndex, @Nullable CompoundTag renderInfoNbt,
 									int columnsTaken) implements CustomPacketPayload {

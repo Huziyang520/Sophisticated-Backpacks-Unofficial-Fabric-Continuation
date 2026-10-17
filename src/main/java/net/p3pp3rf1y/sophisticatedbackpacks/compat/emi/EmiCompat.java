@@ -11,7 +11,7 @@ import dev.emi.emi.api.widget.Bounds;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -41,7 +41,7 @@ public class EmiCompat implements EmiPlugin {
 		}
 	});
 
-	public record WorkstationEntry(ResourceLocation id, Block icon, Item workstation) {}
+	public record WorkstationEntry(Identifier id, Block icon, Item workstation) {}
 
 	public interface WorkstationCallback {
 		void additionalWorkstations(Consumer<WorkstationEntry> consumer);

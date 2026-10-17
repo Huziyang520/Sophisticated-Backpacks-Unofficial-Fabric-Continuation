@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -35,7 +35,7 @@ import net.p3pp3rf1y.sophisticatedcore.renderdata.TankPosition;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedBatteryUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedTankUpgrade;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class BackpackModel extends AgeableListModel<LivingEntity> implements IBackpackModel {
@@ -46,8 +46,8 @@ public class BackpackModel extends AgeableListModel<LivingEntity> implements IBa
 		entityTranslations.put(EntityType.ENDERMAN, new Vec3(0, -0.8, 0));
 	}
 
-	private static final ResourceLocation BACKPACK_ENTITY_TEXTURE = ResourceLocation.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "textures/entity/backpack.png");
-	private static final ResourceLocation TANK_GLASS_TEXTURE = ResourceLocation.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "textures/entity/tank_glass.png");
+	private static final Identifier BACKPACK_ENTITY_TEXTURE = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "textures/entity/backpack.png");
+	private static final Identifier TANK_GLASS_TEXTURE = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "textures/entity/tank_glass.png");
 	public static final float CHILD_Y_OFFSET = 0.3F;
 	public static final float CHILD_Z_OFFSET = 0.1F;
 	public static final float CHILD_SCALE = 0.55F;
@@ -159,7 +159,7 @@ public class BackpackModel extends AgeableListModel<LivingEntity> implements IBa
 		rightTankGlass = modelPart.getChild(RIGHT_TANK_GLASS_PART);
 	}
 
-	@Nonnull
+	@NotNull
 	private ModelPart getGlassModelPart() {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partDefinition = meshdefinition.getRoot();
@@ -416,7 +416,7 @@ public class BackpackModel extends AgeableListModel<LivingEntity> implements IBa
 
 		/*
 		IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-		ResourceLocation texture = renderProperties.getStillTexture(fluidStack);
+		Identifier texture = renderProperties.getStillTexture(fluidStack);
 		TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
 		*/
 		FluidVariant fluidVariant = FluidVariant.of(fluidStack.getFluid());

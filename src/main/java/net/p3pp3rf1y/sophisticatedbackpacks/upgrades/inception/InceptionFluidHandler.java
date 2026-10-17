@@ -10,8 +10,8 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageFluidHandler;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -105,7 +105,7 @@ public class InceptionFluidHandler implements IStorageFluidHandler {
 		return drained == 0 ? FluidStack.EMPTY : new FluidStack(resource.getFluid(), drained);
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public FluidStack extract(int maxDrain, TransactionContext ctx, boolean ignoreInOutLimit) {
 		for (IStorageFluidHandler fluidHandler : fluidHandlers) {
@@ -130,7 +130,7 @@ public class InceptionFluidHandler implements IStorageFluidHandler {
 		return maxDrain - remaining;
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
 		return extract(resource, maxAmount, transaction, false);

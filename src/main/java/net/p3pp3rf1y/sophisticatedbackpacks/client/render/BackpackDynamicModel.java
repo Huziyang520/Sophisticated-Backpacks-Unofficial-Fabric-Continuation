@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,8 +38,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
@@ -65,7 +65,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 	}
 
 	@Override
-	public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
+	public void resolveParents(Function<Identifier, UnbakedModel> modelGetter, IGeometryBakingContext context) {
 		modelParts.values().forEach(model -> model.resolveParents(modelGetter));
 	}
 
@@ -79,7 +79,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 		public static final Vector3f DEFAULT_ROTATION = new Vector3f(0.0F, 0.0F, 0.0F);
 		*/
 		private static final ItemTransforms ITEM_TRANSFORMS = createItemTransforms();
-		private static final ResourceLocation BACKPACK_MODULES_TEXTURE = ResourceLocation.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "block/backpack_modules");
+		private static final Identifier BACKPACK_MODULES_TEXTURE = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "block/backpack_modules");
 
 		@SuppressWarnings("java:S4738")
 		//ItemTransforms require Guava ImmutableMap to be passed in so no way to change that to java Map
@@ -138,7 +138,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 			this.modelTransform = modelTransform;
 		}
 
-		@Nonnull
+		@NotNull
 		@Override
 		public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
 			List<BakedQuad> ret = new ArrayList<>(models.get(ModelPart.BASE).getQuads(state, side, rand));
@@ -214,7 +214,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 
 			/*
 			IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-			ResourceLocation texture = renderProperties.getStillTexture(fluidStack);
+			Identifier texture = renderProperties.getStillTexture(fluidStack);
 			int color = renderProperties.getTintColor(fluidStack);
 			float[] cols = new float[]{(color >> 24 & 0xFF) / 255F, (color >> 16 & 0xFF) / 255F, (color >> 8 & 0xFF) / 255F, (color & 0xFF) / 255F};
 			TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
@@ -428,7 +428,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 
 			ImmutableMap.Builder<String, Either<Material, String>> texturesBuilder = ImmutableMap.builder();
 			if (modelContents.has("clipsTexture")) {
-				ResourceLocation clipsTexture = ResourceLocation.tryParse(modelContents.get("clipsTexture").getAsString());
+				Identifier clipsTexture = Identifier.tryParse(modelContents.get("clipsTexture").getAsString());
 				if (clipsTexture != null) {
 					texturesBuilder.put("clips", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, clipsTexture)));
 				}

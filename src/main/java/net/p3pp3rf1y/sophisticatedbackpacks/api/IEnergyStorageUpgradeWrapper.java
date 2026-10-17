@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.api;
 
 import team.reborn.energy.api.EnergyStorage;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface IEnergyStorageUpgradeWrapper {
 	@Nullable

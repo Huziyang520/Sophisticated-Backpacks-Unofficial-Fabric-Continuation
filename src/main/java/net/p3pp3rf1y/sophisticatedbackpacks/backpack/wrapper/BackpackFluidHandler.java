@@ -12,7 +12,7 @@ import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeWrapper;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class BackpackFluidHandler implements IStorageFluidHandler {
 		this.backpackWrapper = backpackWrapper;
 	}
 
-	@Nonnull
+	@NotNull
 	private List<TankUpgradeWrapper> getAllTanks() {
 		return backpackWrapper.getUpgradeHandler().getTypeWrappers(TankUpgradeItem.TYPE);
 	}

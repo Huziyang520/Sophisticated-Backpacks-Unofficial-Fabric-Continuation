@@ -1,12 +1,12 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 
 public class AccessLogRecord {
-	private final ResourceLocation backpackItemRegistryName;
+	private final Identifier backpackItemRegistryName;
 	private final UUID backpackUuid;
 	private final String playerName;
 	private final String backpackName;
@@ -15,7 +15,7 @@ public class AccessLogRecord {
 	private final long accessTime;
 	private final int columnsTaken;
 
-	public AccessLogRecord(ResourceLocation backpackItemRegistryName, UUID backpackUuid, String playerName, String backpackName, int clothColor, int trimColor, long accessTime, int columnsTaken) {
+	public AccessLogRecord(Identifier backpackItemRegistryName, UUID backpackUuid, String playerName, String backpackName, int clothColor, int trimColor, long accessTime, int columnsTaken) {
 		this.backpackItemRegistryName = backpackItemRegistryName;
 		this.backpackUuid = backpackUuid;
 		this.playerName = playerName;
@@ -54,7 +54,7 @@ public class AccessLogRecord {
 		return columnsTaken;
 	}
 
-	public ResourceLocation getBackpackItemRegistryName() {
+	public Identifier getBackpackItemRegistryName() {
 		return backpackItemRegistryName;
 	}
 
@@ -73,7 +73,7 @@ public class AccessLogRecord {
 
 	public static AccessLogRecord deserializeFromNBT(CompoundTag nbt) {
 		return new AccessLogRecord(
-				ResourceLocation.parse(nbt.getString("backpackItemRegistryName")),
+				Identifier.parse(nbt.getString("backpackItemRegistryName")),
 				nbt.getUUID("backpackUuid"),
 				nbt.getString("playerName"),
 				nbt.getString("backpackName"),
