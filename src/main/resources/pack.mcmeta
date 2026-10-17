@@ -1,6 +1,8 @@
 {
   "pack": {
+    "description": "Sophisticated Backpacks resources",
     "pack_format": 97,
-    "description": "Sophisticated Backpacks resources"
+    "min_format": 97,
+    "max_format": 97
   }
 }
