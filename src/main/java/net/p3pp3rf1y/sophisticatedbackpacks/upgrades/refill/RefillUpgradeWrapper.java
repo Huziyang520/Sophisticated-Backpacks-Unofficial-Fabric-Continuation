@@ -166,7 +166,7 @@ public class RefillUpgradeWrapper extends UpgradeWrapperBase<RefillUpgradeWrappe
 					player.getInventory().add(mainHandItem);
 					return true;
 				} else {
-					player.displayClientMessage(Component.translatable("gui.sophisticatedbackpacks.status.no_space_for_mainhand_item"), true);
+					player.sendOverlayMessage(Component.translatable("gui.sophisticatedbackpacks.status.no_space_for_mainhand_item"));
 					return false;
 				}
 			} else {

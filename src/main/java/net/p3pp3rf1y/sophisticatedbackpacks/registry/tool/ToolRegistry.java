@@ -8,7 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.util.Tuple;
+import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -101,8 +101,8 @@ public class ToolRegistry {
 		}
 
 		private void parseFromArrays(JsonArray blocksArray, JsonArray toolsArray) {
-			Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(toolsArray);
-			if (tools.getA().isEmpty() && tools.getB().isEmpty()) {
+			Pair<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(toolsArray);
+			if (tools.getLeft().isEmpty() && tools.getRight().isEmpty()) {
 				return;
 			}
 			for (JsonElement jsonElement : blocksArray) {
@@ -114,7 +114,7 @@ public class ToolRegistry {
 			}
 		}
 
-		private void parseObjectPredicateEntry(Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools, JsonElement jsonElement) {
+		private void parseObjectPredicateEntry(Pair<Set<Item>, Set<Predicate<ItemStack>>> tools, JsonElement jsonElement) {
 			for (IMatcherFactory<C> blockMatcherFactory : objectMatcherFactories) {
 				if (blockMatcherFactory.appliesTo(jsonElement)) {
 					blockMatcherFactory.getPredicate(jsonElement).ifPresent(predicate -> toolMapping.addObjectPredicateTools(tools, predicate));
@@ -123,7 +123,7 @@ public class ToolRegistry {
 			}
 		}
 
-		private void parseObjectEntry(Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools, String objectName) {
+		private void parseObjectEntry(Pair<Set<Item>, Set<Predicate<ItemStack>>> tools, String objectName) {
 			Identifier registryName = Identifier.parse(objectName);
 			Optional<V> objectOptional = getObjectFromRegistry.apply(registryName);
 			if (objectOptional.isPresent()) {
@@ -149,16 +149,16 @@ public class ToolRegistry {
 				SophisticatedBackpacks.LOGGER.debug("{} mod isn't loaded, skipping ... {} ", modId, property);
 				return;
 			}
-			Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(property);
-			if (tools.getA().isEmpty() && tools.getB().isEmpty()) {
+			Pair<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(property);
+			if (tools.getLeft().isEmpty() && tools.getRight().isEmpty()) {
 				return;
 			}
 			toolMapping.addModPredicateTools(modId, tools);
 		}
 
 		private void parseObjectTools(Map.Entry<String, JsonElement> property) {
-			Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(property);
-			if (tools.getA().isEmpty() && tools.getB().isEmpty()) {
+			Pair<Set<Item>, Set<Predicate<ItemStack>>> tools = getItemsAndItemPredicates(property);
+			if (tools.getLeft().isEmpty() && tools.getRight().isEmpty()) {
 				return;
 			}
 			parseObjectEntry(tools, property.getKey());
@@ -166,17 +166,17 @@ public class ToolRegistry {
 
 	}
 
-	protected static Tuple<Set<Item>, Set<Predicate<ItemStack>>> getItemsAndItemPredicates(Map.Entry<String, JsonElement> property) {
+	protected static Pair<Set<Item>, Set<Predicate<ItemStack>>> getItemsAndItemPredicates(Map.Entry<String, JsonElement> property) {
 		if (property.getValue().isJsonArray()) {
 			JsonArray toolArray = GsonHelper.convertToJsonArray(property.getValue(), "");
 			return getItemsAndItemPredicates(toolArray);
 		} else {
 			SophisticatedBackpacks.LOGGER.error("Invalid tools list - needs to be an array {}", property.getValue());
-			return new Tuple<>(Collections.emptySet(), Collections.emptySet());
+			return new Pair<>(Collections.emptySet(), Collections.emptySet());
 		}
 	}
 
-	protected static Tuple<Set<Item>, Set<Predicate<ItemStack>>> getItemsAndItemPredicates(JsonArray toolArray) {
+	protected static Pair<Set<Item>, Set<Predicate<ItemStack>>> getItemsAndItemPredicates(JsonArray toolArray) {
 		Set<Item> items = new HashSet<>();
 		Set<Predicate<ItemStack>> itemPredicates = new HashSet<>();
 		for (JsonElement jsonElement : toolArray) {
@@ -185,13 +185,13 @@ public class ToolRegistry {
 				if (!BuiltInRegistries.ITEM.containsKey(itemName)) {
 					SophisticatedBackpacks.LOGGER.debug("{} isn't loaded in item registry, skipping ...", itemName);
 				}
-				Item item = BuiltInRegistries.ITEM.get(itemName);
+				Item item = BuiltInRegistries.ITEM.getValue(itemName);
 				items.add(item);
 			} else if (jsonElement.isJsonObject()) {
 				Matchers.getItemMatcher(jsonElement).ifPresent(itemPredicates::add);
 			}
 		}
-		return new Tuple<>(items, itemPredicates);
+		return new Pair<>(items, itemPredicates);
 	}
 
 	public static class BlockToolsLoader extends ToolsLoaderBase<Block, BlockContext> {
@@ -225,14 +225,14 @@ public class ToolRegistry {
 			this.getObjectFromContext = getObjectFromContext;
 		}
 
-		private void addObjectPredicateTools(Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools, Predicate<C> predicate) {
-			tools.getA().forEach(t -> objectPredicateTools.computeIfAbsent(predicate, p -> new HashSet<>()).add(t));
-			tools.getB().forEach(tp -> objectPredicateToolPredicates.computeIfAbsent(predicate, p -> new HashSet<>()).add(tp));
+		private void addObjectPredicateTools(Pair<Set<Item>, Set<Predicate<ItemStack>>> tools, Predicate<C> predicate) {
+			tools.getLeft().forEach(t -> objectPredicateTools.computeIfAbsent(predicate, p -> new HashSet<>()).add(t));
+			tools.getRight().forEach(tp -> objectPredicateToolPredicates.computeIfAbsent(predicate, p -> new HashSet<>()).add(tp));
 		}
 
-		private void addObjectTools(Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools, V object) {
-			tools.getA().forEach(t -> objectTools.computeIfAbsent(object, b -> new HashSet<>()).add(t));
-			tools.getB().forEach(tp -> objectToolPredicates.computeIfAbsent(object, b -> new HashSet<>()).add(tp));
+		private void addObjectTools(Pair<Set<Item>, Set<Predicate<ItemStack>>> tools, V object) {
+			tools.getLeft().forEach(t -> objectTools.computeIfAbsent(object, b -> new HashSet<>()).add(t));
+			tools.getRight().forEach(tp -> objectToolPredicates.computeIfAbsent(object, b -> new HashSet<>()).add(tp));
 		}
 
 		public void clear() {
@@ -337,7 +337,7 @@ public class ToolRegistry {
 			return objectTools;
 		}
 
-		public void addModPredicateTools(String modId, Tuple<Set<Item>, Set<Predicate<ItemStack>>> tools) {
+		public void addModPredicateTools(String modId, Pair<Set<Item>, Set<Predicate<ItemStack>>> tools) {
 			addObjectPredicateTools(tools, new ModMatcher<>(registry, modId, getObjectFromContext));
 		}
 	}

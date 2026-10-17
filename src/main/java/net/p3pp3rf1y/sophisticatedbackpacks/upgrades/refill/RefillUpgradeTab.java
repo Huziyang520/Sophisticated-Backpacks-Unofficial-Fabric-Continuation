@@ -1,9 +1,9 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -51,11 +51,11 @@ public abstract class RefillUpgradeTab extends UpgradeSettingsTab<RefillUpgradeC
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		if (!shouldRender.getAsBoolean()) {
 			return;
 		}
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		if (!filterLogicControl.isMouseOver(mouseX, mouseY)) {
 			resetAdditionalTooltip();
@@ -103,8 +103,8 @@ public abstract class RefillUpgradeTab extends UpgradeSettingsTab<RefillUpgradeC
 		}
 
 		@Override
-		protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-			super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+		protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+			super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 			if (!getContainer().allowsTargetSlotSelection()) {
 				return;
 			}
@@ -127,21 +127,21 @@ public abstract class RefillUpgradeTab extends UpgradeSettingsTab<RefillUpgradeC
 			}
 		}
 
-		private void renderTargetSlotAcronyms(GuiGraphics guiGraphics) {
-			PoseStack poseStack = guiGraphics.pose();
-			poseStack.pushPose();
+		private void renderTargetSlotAcronyms(GuiGraphicsExtractor guiGraphics) {
+			Matrix3x2fStack poseStack = guiGraphics.pose();
+			poseStack.pushMatrix();
 			poseStack.translate(0, 0, 300);
 			getContainer().getSlots().forEach(slot -> {
 				if (!slot.getItem().isEmpty()) {
 					int slotIndex = slot.sophisticatedCore_getSlotIndex();
 					RefillUpgradeWrapper.TargetSlot ts = getContainer().getTargetSlot(slotIndex);
 					RefillUpgradeWrapper.TargetSlot targetSlot = slotBeingChanged == slotIndex ? targetSlotBeingChanged : ts;
-					guiGraphics.drawString(font, targetSlot.getAcronym(),
+					guiGraphics.text(font, targetSlot.getAcronym(),
 							getX() + (slotIndex % slotsInRow) * 18 + 10, getY() + (slotIndex / slotsInRow) * 18 + 2, DyeColor.GREEN.getTextColor());
 				}
 			});
 
-			poseStack.popPose();
+			poseStack.popMatrix();
 		}
 
 		private void updateTooltip(RefillUpgradeWrapper.TargetSlot targetSlot) {
@@ -151,8 +151,8 @@ public abstract class RefillUpgradeTab extends UpgradeSettingsTab<RefillUpgradeC
 		}
 
 		@Override
-		public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-			super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+			super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 			int slot = getSlot(mouseX, mouseY);
 

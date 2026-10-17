@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -11,7 +12,7 @@ public class BackpackItemClient {
 	@Nullable
 	public static TooltipComponent getTooltipImage(ItemStack stack) {
 		Minecraft mc = Minecraft.getInstance();
-		if (Screen.hasShiftDown() || (mc.player != null && !mc.player.containerMenu.getCarried().isEmpty())) {
+		if (GuiHelper.isShiftDown() || (mc.player != null && !mc.player.containerMenu.getCarried().isEmpty())) {
 			return new BackpackItem.BackpackContentsTooltip(stack);
 		}
 		return null;

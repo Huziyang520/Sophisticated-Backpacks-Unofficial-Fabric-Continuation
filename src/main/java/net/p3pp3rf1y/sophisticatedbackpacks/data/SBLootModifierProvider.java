@@ -9,7 +9,7 @@ import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootTableIdCondition;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 public class SBLootModifierProvider extends GlobalLootModifierProvider {
 
-	SBLootModifierProvider(FabricDataOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+	SBLootModifierProvider(FabricPackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
 		super(packOutput, registries, SophisticatedBackpacks.MOD_ID);
 	}
 
@@ -48,7 +48,7 @@ public class SBLootModifierProvider extends GlobalLootModifierProvider {
 	}
 
 	private void addInjectLootTableModifier(ResourceKey<LootTable> lootTable, ResourceKey<LootTable> lootTableToInjectInto) {
-		add(lootTableToInjectInto.location().getPath(), new InjectLootModifier(lootTable, lootTableToInjectInto));
+		add(lootTableToInjectInto.identifier().getPath(), new InjectLootModifier(lootTable, lootTableToInjectInto));
 	}
 
 	public static class InjectLootModifier extends LootModifier {
@@ -70,7 +70,7 @@ public class SBLootModifierProvider extends GlobalLootModifierProvider {
 
 		protected InjectLootModifier(ResourceKey<LootTable> lootTable, ResourceKey<LootTable> lootTableToInjectInto) {
 			this(new LootItemCondition[]{SBLootEnabledCondition.builder().build(),
-					LootTableIdCondition.builder(lootTableToInjectInto.location()).build()}, lootTable, lootTableToInjectInto);
+					LootTableIdCondition.builder(lootTableToInjectInto.identifier()).build()}, lootTable, lootTableToInjectInto);
 		}
 
 		@Override

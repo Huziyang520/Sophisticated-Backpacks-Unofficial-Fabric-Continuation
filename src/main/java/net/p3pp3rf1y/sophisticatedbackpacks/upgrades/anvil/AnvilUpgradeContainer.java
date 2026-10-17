@@ -41,7 +41,7 @@ public class AnvilUpgradeContainer extends UpgradeContainerBase<AnvilUpgradeWrap
 		if (data.contains(DATA_SHIFT_CLICK_INTO_STORAGE)) {
 			setShiftClickIntoStorage(data.getBoolean(DATA_SHIFT_CLICK_INTO_STORAGE));
 		} else if (data.contains("itemName")) {
-			setItemName(data.getString("itemName"));
+			setItemName(data.getStringOr("itemName", ""));
 		}
 	}
 

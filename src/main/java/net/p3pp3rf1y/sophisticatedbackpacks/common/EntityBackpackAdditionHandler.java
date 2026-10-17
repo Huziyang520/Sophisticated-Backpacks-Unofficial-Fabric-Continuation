@@ -267,7 +267,7 @@ public class EntityBackpackAdditionHandler {
 
 	@SuppressWarnings("unused")
 	static void handleBackpackDrop(LivingEntity mob, DamageSource source, Collection<ItemEntity> drops) {
-		if (mob.getTags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (mob.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
 			ItemStack backpack = mob.getItemBySlot(EquipmentSlot.CHEST);
 			Config.Server.EntityBackpackAdditionsConfig additionsConfig = Config.SERVER.entityBackpackAdditions;
 			if (shouldDropBackpack(source, additionsConfig, mob, backpack)) {
@@ -275,7 +275,7 @@ public class EntityBackpackAdditionHandler {
 				ItemEntity backpackEntity = new ItemEntity(mob.level(), mob.getX(), mob.getY(), mob.getZ(), backpack);
 				drops.add(backpackEntity);
 				mob.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
-				mob.getTags().remove(SPAWNED_WITH_BACKPACK);
+				mob.getItem().builtInRegistryHolder().tags().remove(SPAWNED_WITH_BACKPACK);
 			} else {
 				removeContentsUuid(backpack);
 			}
@@ -283,7 +283,7 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	private static void putJukeboxItemsInContainerAndRemoveStorageUuid(DamageSource source, LivingEntity mob, ItemStack backpack) {
-		if (mob.getTags().remove(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
+		if (mob.getItem().builtInRegistryHolder().tags().remove(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
 			List<ItemStack> inventoryItems = new ArrayList<>();
 			IBackpackWrapper backpackwrapper = BackpackWrapper.fromStack(backpack);
 			backpackwrapper.getUpgradeHandler().getTypeWrappers(JukeboxUpgradeItem.TYPE).forEach(wrapper -> {
@@ -327,13 +327,13 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	public static void removeBeneficialEffects(Creeper creeper) {
-		if (creeper.getTags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (creeper.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
 			creeper.getActiveEffects().removeIf(e -> e.getEffect().value().isBeneficial());
 		}
 	}
 
 	public static void removeBackpackUuid(Monster entity, Level level) {
-		if (level.isClientSide() || !entity.getTags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (level.isClientSide() || !entity.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
 			return;
 		}
 
@@ -346,7 +346,7 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	public static void onLivingUpdate(LivingEntity livingEntity) {
-		if (!livingEntity.getTags().contains(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
+		if (!livingEntity.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
 			return;
 		}
 		IBackpackWrapper backpackWrapper = BackpackWrapper.fromStack(livingEntity.getItemBySlot(EquipmentSlot.CHEST));

@@ -35,7 +35,7 @@ public class RefillUpgradeItem extends UpgradeItemBase<RefillUpgradeWrapper> {
 	}
 
 	public int getFilterSlotCount() {
-		return filterSlotCount.getAsInt();
+		return filterSlotCount.intValue();
 	}
 
 	public boolean allowsTargetSlotSelection() {

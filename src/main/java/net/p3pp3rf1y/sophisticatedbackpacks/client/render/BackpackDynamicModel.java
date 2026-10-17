@@ -298,7 +298,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 		private BakedQuad createQuad(List<Vector3f> vecs, float[] colors, TextureAtlasSprite sprite, Direction face, float u1, float u2, float v1, float v2) {
 			QuadBakingVertexConsumer quadBaker = new QuadBakingVertexConsumer();
 			quadBaker.setSprite(sprite);
-			Vec3i dirVec = face.getNormal();
+			Vec3i dirVec = face.getStep();
 			quadBaker.setDirection(face);
 			/*quadBaker.setTintIndex(-1);*/
 			quadBaker.setTintIndex((int) colors[4]);

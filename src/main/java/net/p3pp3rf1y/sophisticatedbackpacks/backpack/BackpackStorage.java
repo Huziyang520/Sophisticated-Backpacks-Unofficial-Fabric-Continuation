@@ -51,17 +51,17 @@ public class BackpackStorage extends SavedData {
 	}
 
 	private static void readAccessLogs(CompoundTag nbt, BackpackStorage storage) {
-		for (Tag n : nbt.getList("accessLogRecords", Tag.TAG_COMPOUND)) {
+		for (Tag n : nbt.getListOrEmpty("accessLogRecords")) {
 			AccessLogRecord alr = AccessLogRecord.deserializeFromNBT((CompoundTag) n);
 			storage.accessLogRecords.put(alr.getBackpackUuid(), alr);
 		}
 	}
 
 	private static void readBackpackContents(CompoundTag nbt, BackpackStorage storage) {
-		for (Tag n : nbt.getList("backpackContents", Tag.TAG_COMPOUND)) {
+		for (Tag n : nbt.getListOrEmpty("backpackContents")) {
 			CompoundTag uuidContentsPair = (CompoundTag) n;
 			UUID uuid = NbtUtils.loadUUID(Objects.requireNonNull(uuidContentsPair.get("uuid")));
-			CompoundTag contents = uuidContentsPair.getCompound("contents");
+			CompoundTag contents = uuidContentsPair.getCompoundOrEmpty("contents");
 			storage.backpackContents.put(uuid, contents);
 		}
 	}
@@ -116,7 +116,7 @@ public class BackpackStorage extends SavedData {
 			updatedBackpackSettingsFlags.add(backpackUuid);
 		} else {
 			CompoundTag currentContents = backpackContents.get(backpackUuid);
-			for (String key : contents.getAllKeys()) {
+			for (String key : contents.keySet()) {
 				//noinspection ConstantConditions - the key is one of the tag keys so there's no reason it wouldn't exist here
 				currentContents.put(key, contents.get(key));
 

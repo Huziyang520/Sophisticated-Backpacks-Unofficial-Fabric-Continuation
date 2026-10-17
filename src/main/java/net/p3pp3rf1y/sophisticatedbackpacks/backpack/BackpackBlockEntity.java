@@ -70,7 +70,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 
 		// If updateBlockRender exists we are in an update packet load
 		if (tag.contains("updateBlockRender")) {
-			if (tag.getBoolean("updateBlockRender")) {
+			if (tag.getBooleanOr("updateBlockRender", false)) {
 				WorldHelper.notifyBlockUpdate(this);
 			}
 		} else {
@@ -92,7 +92,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	private void setBackpackFromNbt(CompoundTag nbt) {
-		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> setBackpack(ItemStack.parseOptional(registryAccess, nbt.getCompound("backpackData"))));
+		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> setBackpack(ItemStack.parseOptional(registryAccess, nbt.getCompoundOrEmpty("backpackData"))));
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		}
 
 		setBackpackFromNbt(tag);
-		if (tag.getBoolean("updateBlockRender")) {
+		if (tag.getBooleanOr("updateBlockRender", false)) {
 			WorldHelper.notifyBlockUpdate(this);
 		}
 	}*/

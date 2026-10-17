@@ -73,14 +73,14 @@ public class AccessLogRecord {
 
 	public static AccessLogRecord deserializeFromNBT(CompoundTag nbt) {
 		return new AccessLogRecord(
-				Identifier.parse(nbt.getString("backpackItemRegistryName")),
+				Identifier.parse(nbt.getStringOr("backpackItemRegistryName", "")),
 				nbt.getUUID("backpackUuid"),
-				nbt.getString("playerName"),
-				nbt.getString("backpackName"),
-				nbt.getInt("clothColor"),
-				nbt.getInt("trimColor"),
-				nbt.getLong("accessTime"),
-				nbt.getInt("columnsTaken")
+				nbt.getStringOr("playerName", ""),
+				nbt.getStringOr("backpackName", ""),
+				nbt.getIntOr("clothColor", 0),
+				nbt.getIntOr("trimColor", 0),
+				nbt.getLongOr("accessTime", 0L),
+				nbt.getIntOr("columnsTaken", 0)
 		);
 	}
 }

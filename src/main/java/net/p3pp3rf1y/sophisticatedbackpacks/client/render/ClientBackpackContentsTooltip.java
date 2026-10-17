@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
@@ -22,7 +22,7 @@ public class ClientBackpackContentsTooltip extends ClientStorageContentsTooltipB
 	}
 
 	@Override
-	public void renderImage(Font font, int leftX, int topY, GuiGraphics guiGraphics) {
+	public void renderImage(Font font, int leftX, int topY, GuiGraphicsExtractor guiGraphics) {
 		renderTooltip(BackpackWrapper.fromStack(backpack), font, leftX, topY, guiGraphics);
 	}
 

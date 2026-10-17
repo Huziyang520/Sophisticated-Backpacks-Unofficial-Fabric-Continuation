@@ -89,6 +89,6 @@ public class EverlastingBackpackItemEntity extends ItemEntity {
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
-		this.age = compound.getInt("EverlastingAge");
+		this.age = compound.getIntOr("EverlastingAge", 0);
 	}
 }

@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
@@ -120,7 +121,7 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 			BackpackWrapper.fromStack(stack).getContentsUuid()
 					.ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
 		}
-		if (!Screen.hasShiftDown()) {
+		if (!GuiHelper.isShiftDown()) {
 			tooltip.add(Component.translatable(
 					TranslationHelper.INSTANCE.translItemTooltip("storage") + ".press_for_contents",
 					Component.translatable(TranslationHelper.INSTANCE.translItemTooltip("storage") + ".shift").withStyle(ChatFormatting.AQUA)
@@ -271,11 +272,11 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	public int getNumberOfSlots() {
-		return numberOfSlots.getAsInt();
+		return numberOfSlots.intValue();
 	}
 
 	public int getNumberOfUpgradeSlots() {
-		return numberOfUpgradeSlots.getAsInt();
+		return numberOfUpgradeSlots.intValue();
 	}
 
 	@Override

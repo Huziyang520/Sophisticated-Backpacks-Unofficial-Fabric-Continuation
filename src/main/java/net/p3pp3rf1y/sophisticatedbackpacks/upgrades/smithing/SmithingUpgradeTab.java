@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.smithing;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -68,7 +68,7 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+	protected void extractContents(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
 		super.renderBg(guiGraphics, minecraft, mouseX, mouseY);
 
 		if (getContainer().isOpen()) {
@@ -83,19 +83,19 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 		}
 	}
 
-	private void renderSlotBg(GuiGraphics guiGraphics, Slot slot) {
+	private void renderSlotBg(GuiGraphicsExtractor guiGraphics, Slot slot) {
 		GuiHelper.renderSlotsBackground(guiGraphics, slot.x + screen.sophisticatedCore_getGuiLeft() - 1, slot.y + screen.sophisticatedCore_getGuiTop() - 1, 1, 1);
 	}
 
 	@Override
-	public void renderTooltip(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-		super.renderTooltip(screen, guiGraphics, mouseX, mouseY);
+	public void renderTooltip(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+		super.setTooltipForNextFrame(screen, guiGraphics, mouseX, mouseY);
 		renderOnboardingTooltips(guiGraphics, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+	protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		if (!isOpen) {
 			return;
@@ -170,7 +170,7 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 		return mouseX >= slot.x + screen.sophisticatedCore_getGuiLeft() && mouseX < slot.x + screen.sophisticatedCore_getGuiLeft() + 16 && mouseY >= slot.y + screen.sophisticatedCore_getGuiTop() && mouseY < slot.y + screen.sophisticatedCore_getGuiTop() + 16 && slot.getItem().isEmpty();
 	}
 
-	private void renderOnboardingTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+	private void renderOnboardingTooltips(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
 		if (this.hasRecipeError() && isHoveringRedCross(mouseX, mouseY)) {
 			Component tooltip = SmithingScreen.ERROR_TOOLTIP;
 			renderOnboardingTooltip(guiGraphics, mouseX, mouseY, tooltip);
@@ -188,11 +188,11 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 		}
 	}
 
-	private void renderOnboardingTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, Component tooltip) {
-		guiGraphics.pose().pushPose();
+	private void renderOnboardingTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, Component tooltip) {
+		guiGraphics.pose().pushMatrix();
 		guiGraphics.pose().translate(0, 0, 410);
-		guiGraphics.renderTooltip(font, font.split(tooltip, 115), mouseX, mouseY);
-		guiGraphics.pose().popPose();
+		guiGraphics.setTooltipForNextFrame(font, font.split(tooltip, 115), mouseX, mouseY);
+		guiGraphics.pose().popMatrix();
 	}
 
 	private boolean hasRecipeError() {

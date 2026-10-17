@@ -286,7 +286,7 @@ public class Config {
 			}
 
 			private List<String> getDefaultEntityLootTableList() {
-				return getDefaultEntityLootMapping().entrySet().stream().map(e -> BuiltInRegistries.ENTITY_TYPE.getKey(e.getKey()) + "|" + e.getValue().location()).collect(Collectors.toList());
+				return getDefaultEntityLootMapping().entrySet().stream().map(e -> BuiltInRegistries.ENTITY_TYPE.getKey(e.getKey()) + "|" + e.getValue().identifier()).collect(Collectors.toList());
 			}
 
 			private Map<EntityType<?>, ResourceKey<LootTable>> getDefaultEntityLootMapping() {

@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class LitematicaPayloads {
 	public static void registerPackets() {
-		PayloadTypeRegistry.playS2C().register(LitematicaBackpackContentsPayload.TYPE, LitematicaBackpackContentsPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(LitematicaBackpackContentsPayload.TYPE, LitematicaBackpackContentsPayload.STREAM_CODEC);
 
 		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			ClientPlayNetworking.registerGlobalReceiver(LitematicaBackpackContentsPayload.TYPE, LitematicaBackpackContentsPayload::handlePayload);

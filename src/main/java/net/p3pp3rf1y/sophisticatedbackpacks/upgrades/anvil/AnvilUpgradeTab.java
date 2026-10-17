@@ -1,8 +1,9 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil;
 
+import net.minecraft.client.input.MouseButtonEvent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
@@ -29,16 +30,19 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		openTabDimension = new Dimension(103, 92);
 		itemNameTextBox = new TextBox(new Position(x + 5, y + 25), new Dimension(90, 14)) {
 			@Override
-			public boolean mouseClicked(double mouseX, double mouseY, int button) {
+			public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 				if (isEditable()) {
 					setFocused(true);
 					screen.setFocused(itemNameTextBox);
 				}
-				return super.mouseClicked(mouseX, mouseY, button);
+				return super.mouseClicked(event, isDoubleClick);
 			}
 
 			@Override
-			protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+			protected void extractContents(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
 				super.renderBg(guiGraphics, minecraft, mouseX, mouseY);
 				TextureBlitData textureBlitData = getContainer().getSlots().get(0).hasItem() ? EDIT_ITEM_NAME_BACKGROUND : EDIT_ITEM_NAME_BACKGROUND_DISABLED;
 
@@ -69,7 +73,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
+	protected void extractContents(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
 		super.renderBg(guiGraphics, minecraft, mouseX, mouseY);
 
 		if (getContainer().isOpen()) {
@@ -79,13 +83,13 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		}
 	}
 
-	private void renderSlotBg(GuiGraphics guiGraphics, Slot slot) {
+	private void renderSlotBg(GuiGraphicsExtractor guiGraphics, Slot slot) {
 		GuiHelper.renderSlotsBackground(guiGraphics, slot.x + screen.sophisticatedCore_getGuiLeft() - 1, slot.y + screen.sophisticatedCore_getGuiTop() - 1, 1, 1);
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+	protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		if (!isOpen) {
 			return;
@@ -125,8 +129,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		resultSlot.y = y + 42 - screen.sophisticatedCore_getGuiTop() + 1;
 	}
 
-	protected void renderCost(GuiGraphics guiGraphics, int x, int y) {
-		RenderSystem.disableBlend();
+	protected void renderCost(GuiGraphicsExtractor guiGraphics, int x, int y) {
 		int i = getContainer().getCost();
 		if (i > 0) {
 			int color = 8453920;
@@ -151,7 +154,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 				int yOffset = 0;
 				for (FormattedCharSequence line : lines) {
 					int width = font.width(line);
-					guiGraphics.drawString(font, line, x + 2 + (maxWidth - width) / 2, y + 2 + yOffset, color, true);
+					guiGraphics.text(font, line, x + 2 + (maxWidth - width) / 2, y + 2 + yOffset, color, true);
 					yOffset += 12;
 				}
 			}
