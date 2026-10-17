@@ -20,12 +20,4 @@ public abstract class EnderDragonMixin extends Mob {
 		super(entityType, level);
 	}
 
-	@Redirect(method = "checkWalls", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/tags/TagKey;)Z"))
-	public boolean sophisticatedBackpacks$checkWalls(BlockState blockState, TagKey<Block> tagKey, @Local BlockPos blockPos) {
-		if (blockState.getBlock() instanceof BlockInterfaceHelper bih) {
-			return !bih.canEntityDestroy(blockState, this.level(), blockPos, this);
-		}
-
-		return blockState.is(tagKey);
-	}
 }
