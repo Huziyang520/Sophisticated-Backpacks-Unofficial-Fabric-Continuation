@@ -4,11 +4,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.AtomicDouble;
-import io.github.fabricators_of_create.porting_lib.tool.ItemAbilities;
-import io.github.fabricators_of_create.porting_lib.tool.ItemAbility;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -21,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BeehiveBlock;
 import net.minecraft.world.level.block.Block;
@@ -48,8 +48,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static io.github.fabricators_of_create.porting_lib.tool.ItemAbilities.*;
 
 public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpgradeWrapper, ToolSwapperUpgradeItem>
 		implements IBlockClickResponseUpgrade, IAttackEntityResponseUpgrade, IBlockToolSwapUpgrade, IEntityToolSwapUpgrade {
@@ -168,18 +166,10 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 	}
 
 	private static boolean canPerformToolAction(ItemStack stack) {
-		return canPerformAnyAction(stack, ItemAbilities.DEFAULT_AXE_ACTIONS) || canPerformAnyAction(stack, ItemAbilities.DEFAULT_HOE_ACTIONS)
-				|| canPerformAnyAction(stack, ItemAbilities.DEFAULT_PICKAXE_ACTIONS) || canPerformAnyAction(stack, ItemAbilities.DEFAULT_SHOVEL_ACTIONS)
-				|| canPerformAnyAction(stack, ItemAbilities.DEFAULT_SHEARS_ACTIONS);
-	}
-
-	private static boolean canPerformAnyAction(ItemStack stack, Set<ItemAbility> toolActions) {
-		for (ItemAbility toolAction : toolActions) {
-			if (stack.canPerformAction(toolAction)) {
-				return true;
-			}
-		}
-		return false;
+		// 26.3 移除了 porting lib 的 ItemAbility 概念，工具能力改由数据组件表达
+		return stack.is(ItemTags.AXES) || stack.is(ItemTags.HOES) || stack.is(ItemTags.PICKAXES) || stack.is(ItemTags.SHOVELS)
+				|| stack.getItem() instanceof ShearsItem || stack.is(ConventionalItemTags.SHEAR_TOOLS)
+				|| stack.has(DataComponents.TOOL) || stack.has(DataComponents.BLOCK_TRANSFORMER);
 	}
 
 	private boolean isSword(ItemStack stack, Player player) {
@@ -188,7 +178,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		}
 
 		AttributeInstance attackDamage = player.getAttribute(Attributes.ATTACK_DAMAGE);
-		if (!stack.isEmpty() && stack.canPerformAction(ItemAbilities.SWORD_SWEEP)) {
+		if (!stack.isEmpty() && stack.has(DataComponents.WEAPON)) {
 			return attackDamage != null && attackDamage.getModifier(Item.BASE_ATTACK_DAMAGE_ID) != null;
 		}
 		return false;
@@ -229,12 +219,12 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		});
 
 		double damageValue = attribute.getValue();
-		if (stack.canPerformAction(ItemAbilities.AXE_DIG)) {
+		if (stack.is(ItemTags.AXES) && !stack.is(ItemTags.SWORDS)) {
 			if (damageValue > bestAxeDamage.get()) {
 				bestAxe.set(stack);
 				bestAxeDamage.set(damageValue);
 			}
-		} else if ((SwordRegistry.isSword(stack) || stack.canPerformAction(ItemAbilities.SWORD_SWEEP)) && damageValue > bestSwordDamage.get()) {
+		} else if ((SwordRegistry.isSword(stack) || stack.has(DataComponents.WEAPON)) && damageValue > bestSwordDamage.get()) {
 			bestSword.set(stack);
 			bestSwordDamage.set(damageValue);
 		}
@@ -381,14 +371,11 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		return false;
 	}
 
-	private static final Set<ItemAbility> BLOCK_MODIFICATION_ACTIONS = Set.of(AXE_STRIP, AXE_SCRAPE, AXE_WAX_OFF, SHOVEL_FLATTEN, SHEARS_CARVE, SHEARS_HARVEST);
-
 	private boolean itemWorksOnBlock(Level level, BlockPos pos, BlockState blockState, Player player, ItemStack stack) {
-		for (ItemAbility action : BLOCK_MODIFICATION_ACTIONS) {
-			if (stack.canPerformAction(action) && blockState.getToolModifiedState(
-					new UseOnContext(level, player, InteractionHand.MAIN_HAND, stack, new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, true)), action, true) != null) {
-				return true;
-			}
+		// 26.3：剥离/刮削/去蜡/平整等“工具改造方块”行为改为 BlockTransformer 组件驱动，
+		// 无法再逐种 ItemAbility 探测，这里退化为“物品带有方块改造能力即视为可用”
+		if (stack.has(DataComponents.BLOCK_TRANSFORMER)) {
+			return true;
 		}
 		Block block = blockState.getBlock();
 		if (isShearInteractionBlock(level, pos, stack, block) && isShearsItem(stack)) {

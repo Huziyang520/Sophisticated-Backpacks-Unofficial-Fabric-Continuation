@@ -27,7 +27,6 @@ import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.CraftingContainerRecipeTransferHandlerBase;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.SettingsGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.StorageGhostIngredientHandler;
-import net.p3pp3rf1y.sophisticatedcore.compat.jei.subtypes.PropertyBasedSubtypeInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +47,11 @@ public class SBPPlugin implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		PropertyBasedSubtypeInterpreter backpackSubTypeInterpreter = new PropertyBasedSubtypeInterpreter() {{
-			addProperty(s -> BackpackWrapper.fromStack(s).getMainColor(), "clothColor", String::valueOf);
-			addProperty(s -> BackpackWrapper.fromStack(s).getAccentColor(), "borderColor", String::valueOf);
-		}};
+		// 核心库不再提供 PropertyBasedSubtypeInterpreter，这里直接用 JEI 的 ISubtypeInterpreter 拼接颜色
+		mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter<ItemStack> backpackSubTypeInterpreter = (stack, uidContext) -> {
+			net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
+			return wrapper.getMainColor() + "/" + wrapper.getAccentColor();
+		};
 
 		ModItems.BACKPACKS.forEach(backpack -> registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, backpack.get(), backpackSubTypeInterpreter));
 	}
@@ -87,7 +87,9 @@ public class SBPPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
 		registration.addRecipes(RecipeTypes.CRAFTING, DyeRecipesMaker.getRecipes());
-		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, BackpackUpgradeRecipe.class, ClientRecipeHelper::copyShapedRecipe));
+		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.<CraftingRecipe, BackpackUpgradeRecipe>transformAllRecipesOfType(RecipeType.CRAFTING,
+				BackpackUpgradeRecipe.class,
+				recipe -> ClientRecipeHelper.copyShapedRecipe(((net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe<net.minecraft.world.item.crafting.ShapedRecipe>) recipe).getCompose())));
 	}
 
 	@Override
@@ -110,7 +112,7 @@ public class SBPPlugin implements IModPlugin {
 
 			@Override
 			public mezz.jei.api.recipe.RecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
-				return RecipeTypes.CRAFTING;
+				return mezz.jei.api.recipe.RecipeType.createFromVanilla(RecipeType.CRAFTING);
 			}
 		}, RecipeTypes.CRAFTING);
 
@@ -122,7 +124,7 @@ public class SBPPlugin implements IModPlugin {
 
 			@Override
 			public mezz.jei.api.recipe.RecipeType<RecipeHolder<SmithingRecipe>> getRecipeType() {
-				return RecipeTypes.SMITHING;
+				return mezz.jei.api.recipe.RecipeType.createFromVanilla(RecipeType.SMITHING);
 			}
 		}, RecipeTypes.SMITHING);
 	}

@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
-import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -17,11 +16,11 @@ public class BackpackAccessLogger {
 	private static final Map<String, Set<AccessLogRecord>> playerLogCache = new HashMap<>();
 
 	public static void logPlayerAccess(Player player, Item backpackItem, UUID backpackUuid, String backpackName, int clothColor, int trimColor, int columnsTaken) {
-		if (player.level().isClientSide) {
+		if (player.level().isClientSide()) {
 			return;
 		}
 		//noinspection ConstantConditions - at this point the registry name of item exists for sure otherwise the player wouldn't be able to open the backpack
-		BackpackStorage.get().putAccessLog(new AccessLogRecord(BuiltInRegistries.ITEM.getKey(backpackItem), backpackUuid, player.getGameProfile().getName(), backpackName, clothColor, trimColor, Util.getEpochMillis(), columnsTaken));
+		BackpackStorage.get().putAccessLog(new AccessLogRecord(BuiltInRegistries.ITEM.getKey(backpackItem), backpackUuid, player.getGameProfile().name(), backpackName, clothColor, trimColor, System.currentTimeMillis(), columnsTaken));
 	}
 
 	public static Set<String> getPlayerNames() {
@@ -35,10 +34,10 @@ public class BackpackAccessLogger {
 	}
 
 	private static void initPlayerBackpackCache() {
-		if (lastCacheRefresh + (REFRESH_INTERVAL_SECONDS * 1000) >= Util.getEpochMillis()) {
+		if (lastCacheRefresh + (REFRESH_INTERVAL_SECONDS * 1000) >= System.currentTimeMillis()) {
 			return;
 		}
-		lastCacheRefresh = Util.getEpochMillis();
+		lastCacheRefresh = System.currentTimeMillis();
 
 		playerLogCache.clear();
 		BackpackStorage.get().getAccessLogs().values().forEach(alr -> playerLogCache.computeIfAbsent(alr.getPlayerName(), name -> new HashSet<>()).add(alr));

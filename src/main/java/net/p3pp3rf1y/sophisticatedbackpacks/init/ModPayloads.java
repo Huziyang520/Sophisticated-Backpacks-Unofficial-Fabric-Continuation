@@ -8,7 +8,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.litematica.LitematicaPayloads;
 import net.p3pp3rf1y.sophisticatedbackpacks.network.*;
 
 public class ModPayloads {
@@ -35,7 +34,7 @@ public class ModPayloads {
 			ClientPlayNetworking.registerGlobalReceiver(SyncClientInfoPayload.TYPE, SyncClientInfoPayload::handlePayload);
 		}
 
-		LitematicaPayloads.registerPackets();
+		// Litematica 兼容在 26.3 线暂未移植
 	}
 
 	public static <T extends CustomPacketPayload> void registerC2S(CustomPacketPayload.Type<T> id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, ServerPlayNetworking.PlayPayloadHandler<T> handler) {

@@ -1,9 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.inception;
 
 import net.minecraft.world.item.ItemStack;
-import team.reborn.energy.api.EnergyStorage;
 import net.p3pp3rf1y.sophisticatedbackpacks.Config;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.IEnergyStorageUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.IFluidHandlerWrapperUpgrade;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.IInventoryWrapperUpgrade;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModDataComponents;
@@ -18,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 public class InceptionUpgradeWrapper extends UpgradeWrapperBase<InceptionUpgradeWrapper, InceptionUpgradeItem>
-		implements IInventoryWrapperUpgrade, IUpgradeAccessModifier, IFluidHandlerWrapperUpgrade, IEnergyStorageUpgradeWrapper {
+		implements IInventoryWrapperUpgrade, IUpgradeAccessModifier, IFluidHandlerWrapperUpgrade {
 	private SubBackpacksHandler subBackpacksHandler = null;
 
 	public InceptionUpgradeWrapper(IStorageWrapper backpackWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
@@ -73,13 +71,4 @@ public class InceptionUpgradeWrapper extends UpgradeWrapperBase<InceptionUpgrade
 		return fluidHandler;
 	}
 
-	@Override
-	@Nullable
-	public EnergyStorage wrapStorage(@Nullable EnergyStorage energyStorage) {
-		if (Boolean.TRUE.equals(Config.SERVER.inceptionUpgrade.upgradesInContainedBackpacksAreFunctional.get())) {
-			initSubBackpacksHandler();
-			return new InceptionEnergyStorage(energyStorage, getInventoryOrder(), subBackpacksHandler);
-		}
-		return energyStorage;
-	}
 }

@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.common;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -86,9 +86,9 @@ public class CommonEventHandler {
 		AttackBlockCallback.EVENT.register(this::onBlockClick);
 		AttackEntityCallback.EVENT.register(this::onAttackEntity);
 		LivingEntityEvents.TICK.register(EntityBackpackAdditionHandler::onLivingUpdate);
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register(this::onPlayerChangedDimension);
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register(this::onPlayerChangedDimension);
 		ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
-		ServerTickEvents.END_WORLD_TICK.register(this::onWorldTick);
+		ServerTickEvents.END_LEVEL_TICK.register(this::onWorldTick);
 		UseEntityCallback.EVENT.register(this::interactWithEntity);
 		PlayerBlockBreakEvents.BEFORE.register(this::handleBreakBackpackWithInfinityUpgrade);
 
@@ -123,7 +123,7 @@ public class CommonEventHandler {
 		if (!isPointingAtBody || !isPointingAtBack) {
 			return InteractionResult.PASS;
 		}
-		if (targetPlayer.level().isClientSide) {
+		if (targetPlayer.level().isClientSide()) {
 			PacketDistributor.sendToServer(new AnotherPlayerBackpackOpenPayload(targetPlayer.getId()));
 			return InteractionResult.SUCCESS;
 		}
@@ -131,7 +131,7 @@ public class CommonEventHandler {
 	}
 
 	private void onWorldTick(ServerLevel level) {
-		Identifier dimensionKey = level.dimension().location();
+		Identifier dimensionKey = level.dimension().identifier();
 		boolean runSlownessLogic = Boolean.TRUE.equals(Config.SERVER.nerfsConfig.tooManyBackpacksSlowness.get());
 		boolean runDedupeLogic = Boolean.FALSE.equals(Config.SERVER.tickDedupeLogicDisabled.get());
 		if ((!runSlownessLogic && !runDedupeLogic)
@@ -157,7 +157,7 @@ public class CommonEventHandler {
 				int maxNumberOfBackpacks = Config.SERVER.nerfsConfig.maxNumberOfBackpacks.get();
 				if (numberOfBackpacks.get() > maxNumberOfBackpacks) {
 					int numberOfSlownessLevels = Math.min(10, (int) Math.ceil((numberOfBackpacks.get() - maxNumberOfBackpacks) * Config.SERVER.nerfsConfig.slownessLevelsPerAdditionalBackpack.get()));
-					player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, BACKPACK_CHECK_COOLDOWN * 2, numberOfSlownessLevels - 1, false, false));
+					player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, BACKPACK_CHECK_COOLDOWN * 2, numberOfSlownessLevels - 1, false, false));
 				}
 			}
 		});
@@ -190,7 +190,7 @@ public class CommonEventHandler {
 	}
 
 	private InteractionResult onBlockClick(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) {
-		if (world.isClientSide) {
+		if (world.isClientSide()) {
 			return InteractionResult.PASS;
 		}
 		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
@@ -206,7 +206,7 @@ public class CommonEventHandler {
 	}
 
 	private InteractionResult onAttackEntity(Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return InteractionResult.PASS;
 		}
 		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
@@ -253,7 +253,7 @@ public class CommonEventHandler {
 		}
 
 		AtomicReference<ItemStack> remainingStackSimulated = new AtomicReference<>(itemEntity.getItem().copy());
-		Level level = player.getCommandSenderWorld();
+		Level level = player.level();
 		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryHandlerName, identifier, slot) -> {
 					IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
 					remainingStackSimulated.set(InventoryHelper.runPickupOnPickupResponseUpgrades(level, wrapper.getUpgradeHandler(), remainingStackSimulated.get(), true));
@@ -283,7 +283,7 @@ public class CommonEventHandler {
 
 		if (WorldHelper.getBlockEntity(world, pos, BackpackBlockEntity.class)
 				.map(backpackBlockEntity -> backpackBlockEntity.getStorageWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE)
-						.stream().anyMatch(w -> !player.hasPermissions(w.getPermissionLevel())))
+						.stream().anyMatch(w -> !net.p3pp3rf1y.sophisticatedcore.util.PlayerHelper.hasPermissionLevel(player, w.getPermissionLevel())))
 				.orElse(false)) {
 			player.sendOverlayMessage(SBPTranslationHelper.INSTANCE.translStatusMessage("infinity_upgrade_only_admin_break").withStyle(ChatFormatting.RED));
 			return false;

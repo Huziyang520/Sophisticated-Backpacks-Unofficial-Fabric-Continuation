@@ -31,11 +31,10 @@ public class BackpackScreen extends StorageScreenBase<BackpackContainer> {
 		/*if (getFocused() != null) {
 			return super.keyPressed(event);
 		}*/
-		if (keyCode == 256 || KeybindHandler.BACKPACK_OPEN_KEYBIND.matches(keyCode, scanCode)) {
+		if (keyCode == 256 || KeybindHandler.BACKPACK_OPEN_KEYBIND.matches(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, modifiers))) {
 			if (getMenu().isFirstLevelStorage() && (keyCode == 256 || mouseNotOverBackpack())) {
 				if (getMenu().getBackpackContext().wasOpenFromInventory()) {
-					this.minecraft.player.closeContainer();
-					this.minecraft.setScreen(new InventoryScreen(this.minecraft.player));
+					this.minecraft.setScreenAndShow(new InventoryScreen(this.minecraft.player));
 				} else {
 					onClose();
 				}

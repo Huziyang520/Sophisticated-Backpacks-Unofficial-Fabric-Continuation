@@ -22,7 +22,12 @@ public class ClientBackpackContentsTooltip extends ClientStorageContentsTooltipB
 	}
 
 	@Override
-	public void renderImage(Font font, int leftX, int topY, GuiGraphicsExtractor guiGraphics) {
+	public int getHeight(Font font) {
+		return getHeight();
+	}
+
+	@Override
+	public void extractImage(Font font, int leftX, int topY, int width, int height, GuiGraphicsExtractor guiGraphics) {
 		renderTooltip(BackpackWrapper.fromStack(backpack), font, leftX, topY, guiGraphics);
 	}
 

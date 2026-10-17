@@ -1,10 +1,16 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.crafting;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
@@ -12,13 +18,18 @@ import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
 
+import java.util.List;
 import java.util.Optional;
 
-public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecipe<ShapedRecipe> {
+/**
+ * 升级背包的配方：结果背包沿用被升级背包的组件并刷新槽位数。
+ * <p>
+ * 26.3 的 ShapedRecipe 不再暴露 pattern / result 字段，改为委托（与核心仓 UpgradeNextTierRecipe 同一写法）。
+ */
+public class BackpackUpgradeRecipe implements CraftingRecipe, IWrapperRecipe<ShapedRecipe> {
 	private final ShapedRecipe compose;
 
 	public BackpackUpgradeRecipe(ShapedRecipe compose) {
-		super(compose.getGroup(), compose.category(), compose.pattern, compose.result);
 		this.compose = compose;
 	}
 
@@ -28,13 +39,13 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	}
 
 	@Override
-	public boolean isSpecial() {
-		return true;
+	public boolean matches(CraftingInput inv, Level level) {
+		return compose.matches(inv, level);
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput inv, HolderLookup.Provider registries) {
-		ItemStack upgradedBackpack = super.assemble(inv, registries);
+	public ItemStack assemble(CraftingInput inv) {
+		ItemStack upgradedBackpack = compose.assemble(inv);
 		getBackpack(inv).map(ItemStack::getComponents).ifPresent(upgradedBackpack::applyComponents);
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(upgradedBackpack);
 
@@ -56,13 +67,56 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public boolean isSpecial() {
+		return true;
+	}
+
+	@Override
+	public String group() {
+		return compose.group();
+	}
+
+	@Override
+	public boolean showNotification() {
+		return compose.showNotification();
+	}
+
+	@Override
+	public CraftingBookCategory category() {
+		return compose.category();
+	}
+
+	@Override
+	public RecipeBookCategory recipeBookCategory() {
+		return compose.recipeBookCategory();
+	}
+
+	@Override
+	public PlacementInfo placementInfo() {
+		return compose.placementInfo();
+	}
+
+	@Override
+	public List<RecipeDisplay> display() {
+		return compose.display();
+	}
+
+	@Override
+	public RecipeType<CraftingRecipe> getType() {
+		return compose.getType();
+	}
+
+	@Override
+	public RecipeSerializer<? extends CraftingRecipe> getSerializer() {
 		return ModItems.BACKPACK_UPGRADE_RECIPE_SERIALIZER.get();
 	}
 
-	public static class Serializer extends RecipeWrapperSerializer<ShapedRecipe, BackpackUpgradeRecipe> {
-		public Serializer() {
-			super(BackpackUpgradeRecipe::new, RecipeSerializer.SHAPED_RECIPE);
+	public static class Serializer {
+		private Serializer() {
+		}
+
+		public static RecipeSerializer<BackpackUpgradeRecipe> create() {
+			return RecipeWrapperSerializer.create(BackpackUpgradeRecipe::new, ShapedRecipe.SERIALIZER);
 		}
 	}
 }

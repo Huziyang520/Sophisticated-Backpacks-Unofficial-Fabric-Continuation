@@ -1,26 +1,11 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.init;
 
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.CompatModIds;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.chipped.ChippedCompat;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.litematica.LitematicaCompat;
-//import net.p3pp3rf1y.sophisticatedbackpacks.compat.mkb.ModernKeyBindingCompat;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.trinkets.TrinketsCompat;
-import net.p3pp3rf1y.sophisticatedcore.compat.CompatInfo;
-import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
-
-import static net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks.MOD_ID;
-import static net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds.LITEMATICA;
-
+// 26.3 上没有编译期 API 的兼容（Chipped / Litematica / Trinkets）已整体移到 src/parked/，
+// 对应入口也在此摘除；接回方式见 src/parked/README.md。
 public class ModCompat {
 	private ModCompat() {
 	}
 
 	public static void register() {
-		CompatRegistry registry = CompatRegistry.getRegistry(MOD_ID);
-		registry.registerCompat(new CompatInfo(CompatModIds.TRINKETS, null), () -> new TrinketsCompat());
-		//registry.registerCompat(new CompatInfo(CompatModIds.BOTANIA, null), () -> new BotaniaCompat());
-		registry.registerCompat(new CompatInfo(CompatModIds.CHIPPED, null), () -> new ChippedCompat());
-		registry.registerCompat(new CompatInfo(LITEMATICA, null), () -> new LitematicaCompat());
-		//registry.registerCompat(new CompatInfo(CompatModIds.MKB, null), () -> new ModernKeyBindingCompat());
 	}
 }

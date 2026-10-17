@@ -61,7 +61,7 @@ public class AccessLogRecord {
 	public CompoundTag serializeToNBT() {
 		CompoundTag ret = new CompoundTag();
 		ret.putString("backpackItemRegistryName", backpackItemRegistryName.toString());
-		ret.putUUID("backpackUuid", backpackUuid);
+		ret.putString("backpackUuid", backpackUuid.toString());
 		ret.putString("playerName", playerName);
 		ret.putString("backpackName", backpackName);
 		ret.putInt("clothColor", clothColor);
@@ -74,7 +74,7 @@ public class AccessLogRecord {
 	public static AccessLogRecord deserializeFromNBT(CompoundTag nbt) {
 		return new AccessLogRecord(
 				Identifier.parse(nbt.getStringOr("backpackItemRegistryName", "")),
-				nbt.getUUID("backpackUuid"),
+				UUID.fromString(nbt.getStringOr("backpackUuid", "00000000-0000-0000-0000-000000000000")),
 				nbt.getStringOr("playerName", ""),
 				nbt.getStringOr("backpackName", ""),
 				nbt.getIntOr("clothColor", 0),

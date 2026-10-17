@@ -30,7 +30,7 @@ public record InventoryInteractionPayload(BlockPos pos, Direction face) implemen
 		Player player = context.player();
 		PlayerInventoryProvider.get().runOnBackpacks(player, (backpack, inventoryName, identifier, slot) -> {
 			InventoryInteractionHelper.tryInventoryInteraction(payload.pos, player.level(), backpack, payload.face, player);
-			player.swing(InteractionHand.MAIN_HAND, true);
+			player.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
 			return true;
 		});
 	}

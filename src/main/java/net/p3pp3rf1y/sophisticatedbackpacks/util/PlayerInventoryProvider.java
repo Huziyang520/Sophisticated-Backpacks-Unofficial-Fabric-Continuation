@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.util;
 
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.fabricmc.api.EnvType;
@@ -14,6 +13,11 @@ public class PlayerInventoryProvider {
 	public static final String MAIN_INVENTORY = "main";
 	public static final String OFFHAND_INVENTORY = "offhand";
 	public static final String ARMOR_INVENTORY = "armor";
+
+	// 26.3 的 Inventory 槽位编号：0-35 主背包 + 快捷栏，36-39 盔甲（胸甲 38），40 副手
+	private static final int CHEST_SLOT_INDEX = 38;
+	private static final int OFFHAND_SLOT_INDEX = 40;
+	private static final int MAIN_INVENTORY_SLOT_COUNT = 36;
 
 	private final Map<String, PlayerInventoryHandler> playerInventoryHandlers = new LinkedHashMap<>();
 	private final List<String> renderedHandlers = new ArrayList<>();
@@ -30,12 +34,12 @@ public class PlayerInventoryProvider {
 	}
 
 	private PlayerInventoryProvider() {
-		addPlayerInventoryHandler(MAIN_INVENTORY, (player, gameTime) -> PlayerInventoryHandler.SINGLE_IDENTIFIER, (player, identifier) -> player.getInventory().items.size(),
-				(player, identifier, slot) -> player.getInventory().items.get(slot), true, false, false, false);
-		addPlayerInventoryHandler(OFFHAND_INVENTORY, (player, gameTime) -> PlayerInventoryHandler.SINGLE_IDENTIFIER, (player, identifier) -> player.getInventory().offhand.size(),
-				(player, identifier, slot) -> player.getInventory().offhand.get(slot), false, false, false, false);
+		addPlayerInventoryHandler(MAIN_INVENTORY, (player, gameTime) -> PlayerInventoryHandler.SINGLE_IDENTIFIER, (player, identifier) -> MAIN_INVENTORY_SLOT_COUNT,
+				(player, identifier, slot) -> player.getInventory().getItem(slot), true, false, false, false);
+		addPlayerInventoryHandler(OFFHAND_INVENTORY, (player, gameTime) -> PlayerInventoryHandler.SINGLE_IDENTIFIER, (player, identifier) -> 1,
+				(player, identifier, slot) -> player.getInventory().getItem(OFFHAND_SLOT_INDEX), false, false, false, false);
 		addPlayerInventoryHandler(ARMOR_INVENTORY, (player, gameTime) -> PlayerInventoryHandler.SINGLE_IDENTIFIER, (player, identifier) -> 1,
-				(player, identifier, slot) -> player.getInventory().armor.get(EquipmentSlot.CHEST.getIndex()), false, true, false, true);
+				(player, identifier, slot) -> player.getInventory().getItem(CHEST_SLOT_INDEX), false, true, false, true);
 	}
 
 	public void addPlayerInventoryHandler(String name, BiFunction<Player,Long, Set<String>> identifiersGetter, PlayerInventoryHandler.SlotCountGetter slotCountGetter, PlayerInventoryHandler.SlotStackGetter slotStackGetter, boolean visibleInGui, boolean rendered, boolean ownRenderer, boolean accessibleByAnotherPlayer) {

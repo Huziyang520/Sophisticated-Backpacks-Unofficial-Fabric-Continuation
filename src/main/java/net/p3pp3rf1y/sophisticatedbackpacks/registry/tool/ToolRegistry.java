@@ -172,7 +172,7 @@ public class ToolRegistry {
 			return getItemsAndItemPredicates(toolArray);
 		} else {
 			SophisticatedBackpacks.LOGGER.error("Invalid tools list - needs to be an array {}", property.getValue());
-			return new Pair<>(Collections.emptySet(), Collections.emptySet());
+			return Pair.of(Collections.emptySet(), Collections.emptySet());
 		}
 	}
 
@@ -191,7 +191,7 @@ public class ToolRegistry {
 				Matchers.getItemMatcher(jsonElement).ifPresent(itemPredicates::add);
 			}
 		}
-		return new Pair<>(items, itemPredicates);
+		return Pair.of(items, itemPredicates);
 	}
 
 	public static class BlockToolsLoader extends ToolsLoaderBase<Block, BlockContext> {

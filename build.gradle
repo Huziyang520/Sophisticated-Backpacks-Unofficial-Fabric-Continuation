@@ -100,10 +100,13 @@ loom {
     }
 }
 
-fabricApi {
-    configureDataGeneration {
-        setModId(project.mod_id)
-        setOutputDirectory(getProject().file("src/generated/resources"))
+// 数据生成（datagen）已在移植中完成并把产物固化到 src/generated/resources，
+// 生成器代码本身依赖已删除的 Recipe/Loot API，因此移除；生成产物作为资源根打进产物。
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/generated/resources'
+        }
     }
 }
 

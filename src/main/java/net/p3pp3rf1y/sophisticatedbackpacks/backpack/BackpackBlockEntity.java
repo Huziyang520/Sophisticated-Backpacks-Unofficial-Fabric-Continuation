@@ -1,10 +1,15 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.p3pp3rf1y.sophisticatedcore.platform.item.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import com.mojang.serialization.DataResult;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -24,7 +29,6 @@ import net.p3pp3rf1y.sophisticatedcore.renderdata.TankPosition;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import team.reborn.energy.api.EnergyStorage;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
@@ -46,7 +50,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Nullable
 	private IStorageFluidHandler externalFluidHandler;
 	@Nullable
-	private EnergyStorage externalEnergyStorage;
+
 
 	public BackpackBlockEntity(BlockPos pos, BlockState state) {
 		super(BACKPACK_TILE_TYPE.get(), pos, state);
@@ -64,8 +68,9 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.loadAdditional(tag, registries);
+	public void loadAdditional(ValueInput input) {
+		super.loadAdditional(input);
+		CompoundTag tag = input.read("sophisticatedbackpack_data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
 		setBackpackFromNbt(tag);
 
 		// If updateBlockRender exists we are in an update packet load
@@ -92,19 +97,32 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	private void setBackpackFromNbt(CompoundTag nbt) {
-		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> setBackpack(ItemStack.parseOptional(registryAccess, nbt.getCompoundOrEmpty("backpackData"))));
+		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> {
+			Tag data = nbt.get("backpackData");
+			if (data == null) {
+				setBackpack(ItemStack.EMPTY);
+				return;
+			}
+			setBackpack(ItemStack.CODEC.parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), data).result().orElse(ItemStack.EMPTY));
+		});
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.saveAdditional(tag, registries);
-		writeBackpack(tag, registries);
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		CompoundTag tag = new CompoundTag();
+		writeBackpack(tag, getLevel() == null ? null : getLevel().registryAccess());
 		saveControllerPos(tag);
+		output.store("sophisticatedbackpack_data", CompoundTag.CODEC, tag);
 	}
 
-	private void writeBackpack(CompoundTag ret, HolderLookup.Provider registries) {
+	private void writeBackpack(CompoundTag ret, @Nullable HolderLookup.Provider registries) {
+		if (registries == null) {
+			return;
+		}
 		ItemStack backpackCopy = backpackWrapper.getBackpack().copy();
-		ret.put("backpackData", backpackCopy.save(registries));
+		ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), backpackCopy)
+				.result().ifPresent(tag -> ret.put("backpackData", tag));
 	}
 
 	@Override
@@ -144,7 +162,6 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		sophisticatedCore_invalidateCapabilities();
 		externalItemHandler = null;
 		externalFluidHandler = null;
-		externalEnergyStorage = null;
 	}
 
 	private boolean isBlockConnectionDisallowed(@Nullable Direction direction) {
@@ -173,17 +190,6 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		return externalFluidHandler;
 	}
 
-	@Nullable
-	public EnergyStorage getExternalEnergyStorage(@Nullable Direction direction) {
-		if (isBlockConnectionDisallowed(direction)) {
-			return null;
-		}
-		if (externalEnergyStorage == null) {
-			externalEnergyStorage = getBackpackWrapper().getEnergyStorage().map(EnergyStorage.class::cast).orElse(EnergyStorage.EMPTY);
-		}
-		return externalEnergyStorage;
-	}
-
 	public void refreshRenderState() {
 		BlockState state = getBlockState();
 		state = state.setValue(LEFT_TANK, false);
@@ -204,7 +210,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	public static void serverTick(Level level, BlockPos blockPos, BackpackBlockEntity backpackBlockEntity) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		backpackBlockEntity.backpackWrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class).forEach(upgrade -> upgrade.tick(null, level, blockPos));
@@ -256,7 +262,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Override
 	public void registerController(ControllerBlockEntityBase controllerBlockEntity) {
 		IControllableStorage.super.registerController(controllerBlockEntity);
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			backpackWrapper.registerOnSlotsChangeListener(this::changeSlots);
 			backpackWrapper.registerOnInventoryHandlerRefreshListener(this::registerInventoryStackListeners);
 		}

@@ -24,22 +24,14 @@
     "client": [
       "net.p3pp3rf1y.sophisticatedbackpacks.client.SophisticatedBackpacksClient"
     ],
-    "fabric-datagen": [
-      "net.p3pp3rf1y.sophisticatedbackpacks.data.DataGenerators"
-    ],
     "jei_mod_plugin": [
       "net.p3pp3rf1y.sophisticatedbackpacks.compat.jei.SBPPlugin"
     ],
-    "rei_common": [
-      "net.p3pp3rf1y.sophisticatedbackpacks.compat.rei.REIServerCompat"
-    ],
-    "rei_client": [
-      "net.p3pp3rf1y.sophisticatedbackpacks.compat.rei.REIClientCompat"
-    ]
+    "rei_common": [],
+    "rei_client": []
   },
   "mixins": [
-    "${mod_id}.mixins.json",
-    "compat/sophisticatedbackpacks.litematica.mixins.json"
+    "${mod_id}.mixins.json"
   ],
   "accessWidener": "${mod_id}.accesswidener",
   "depends": {
@@ -61,26 +53,45 @@
       "badges": []
     },
     "loom:injected_interfaces": {
-      "net/minecraft/class_2311": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/client/gui/screens/inventory/SophisticatedAbstractContainerScreen"
       ],
-      "net/minecraft/class_2397": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/client/particle/TerrainParticle": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/client/particle/SophisticatedTerrainParticle"
       ],
-      "net/minecraft/class_2476": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/world/entity/Entity": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/entity/SophisticatedEntity"
       ],
-      "net/minecraft/class_2526": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/world/entity/player/Player": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/entity/SophisticatedPlayer"
       ],
-      "net/minecraft/class_2541": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/world/inventory/Slot": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/inventory/SophisticatedSlot"
       ],
-      "net/minecraft/class_2560": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/world/item/Item": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/item/SophisticatedItem"
       ],
-      "net/minecraft/class_5147": [
-        "net/p3pp3rf1y/sophisticatedbackpacks/api/SophisticatedShearable"
+      "net/minecraft/world/item/ItemStack": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/item/SophisticatedItemStack",
+        "net/p3pp3rf1y/sophisticatedcore/extensions/component/SophisticatedMutableDataComponentHolder"
+      ],
+      "net/minecraft/world/level/Level": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/world/SophisticatedLevel"
+      ],
+      "net/minecraft/world/level/block/Block": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/block/SophisticatedBlock"
+      ],
+      "net/minecraft/world/level/block/state/BlockState": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/block/SophisticatedBlockState"
+      ],
+      "net/minecraft/world/level/block/entity/BlockEntity": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/block/entity/SophisticatedBlockEntity"
+      ],
+      "net/minecraft/core/component/DataComponentHolder": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/component/SophisticatedDataComponentHolder"
+      ],
+      "net/minecraft/world/item/component/ItemContainerContents": [
+        "net/p3pp3rf1y/sophisticatedcore/extensions/item/component/SophisticatedItemContainerContents"
       ]
     }
   }

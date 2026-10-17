@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.p3pp3rf1y.sophisticatedcore.platform.FluidStack;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageFluidHandler;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeItem;
@@ -51,11 +51,11 @@ public class BackpackFluidHandler implements IStorageFluidHandler {
 		FluidStack drained = FluidStack.EMPTY;
 		long toDrain = maxDrain;
 		for (TankUpgradeWrapper tank : getAllTanks()) {
-			if ((drained.isEmpty() && tank.getContents().is(resourceTag)) || FluidStack.isSameFluidSameComponents(tank.getContents(), drained)) {
+			if ((drained.isEmpty() && tank.getContents().getVariant().typeHolder().is(resourceTag)) || FluidStack.isSameFluidSameComponents(tank.getContents(), drained)) {
 				if (drained.isEmpty()) {
 					drained = new FluidStack(tank.getContents().getFluid(), tank.drain(toDrain, ctx, ignoreInOutLimit));
 				} else {
-					drained.grow(tank.drain(toDrain, ctx, ignoreInOutLimit));
+					drained.setAmount(drained.getAmount() + tank.drain(toDrain, ctx, ignoreInOutLimit));
 				}
 
 				if (drained.getAmount() == maxDrain) {

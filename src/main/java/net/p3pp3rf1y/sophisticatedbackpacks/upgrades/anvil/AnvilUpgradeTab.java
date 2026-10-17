@@ -43,7 +43,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 
 			@Override
 			protected void extractContents(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
-				super.renderBg(guiGraphics, minecraft, mouseX, mouseY);
+				super.extractContents(guiGraphics, minecraft, mouseX, mouseY);
 				TextureBlitData textureBlitData = getContainer().getSlots().get(0).hasItem() ? EDIT_ITEM_NAME_BACKGROUND : EDIT_ITEM_NAME_BACKGROUND_DISABLED;
 
 				GuiHelper.blit(guiGraphics, getX() - 2, getY() - 2, textureBlitData, getWidth() + 4, getHeight() + 2);
@@ -74,7 +74,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 
 	@Override
 	protected void extractContents(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
-		super.renderBg(guiGraphics, minecraft, mouseX, mouseY);
+		super.extractContents(guiGraphics, minecraft, mouseX, mouseY);
 
 		if (getContainer().isOpen()) {
 			renderSlotBg(guiGraphics, getContainer().getSlots().get(0));

@@ -6,7 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -17,7 +18,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.registry.tool.ToolRegistry;
 
 import java.util.*;
 
-public class RegistryLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
+public class RegistryLoader extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> implements IdentifiableResourceReloadListener {
 	private static final Map<String, IRegistryDataLoader> loaders = new HashMap<>();
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -34,7 +35,19 @@ public class RegistryLoader extends SimpleJsonResourceReloadListener implements 
 	private final Map<Identifier, String> loadedRegistries = new HashMap<>();
 
 	public RegistryLoader() {
-		super(GSON, "registry");
+	}
+
+	@Override
+	protected Map<Identifier, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+		Map<Identifier, JsonElement> registries = new HashMap<>();
+		FileToIdConverter.json("registry").listMatchingResources(resourceManager).forEach((name, resource) -> {
+			try (java.io.Reader reader = resource.openAsReader()) {
+				registries.put(name, net.minecraft.util.GsonHelper.parse(reader));
+			} catch (Exception e) {
+				SophisticatedBackpacks.LOGGER.error("Failed to read registry data {}", name, e);
+			}
+		});
+		return registries;
 	}
 
 	@Override

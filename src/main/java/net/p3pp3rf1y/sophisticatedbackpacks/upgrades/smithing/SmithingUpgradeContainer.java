@@ -28,7 +28,7 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 	private final PersistableSmithingMenu smithingMenuDelegate;
 	public SmithingUpgradeContainer(Player player, int upgradeContainerId, SmithingUpgradeWrapper upgradeWrapper, UpgradeContainerType<SmithingUpgradeWrapper, SmithingUpgradeContainer> type) {
 		super(player, upgradeContainerId, upgradeWrapper, type);
-		smithingMenuDelegate = new PersistableSmithingMenu(new Inventory(player));
+		smithingMenuDelegate = new PersistableSmithingMenu(player.getInventory());
 
 		slots.add(smithingMenuDelegate.getSlot(SmithingMenu.TEMPLATE_SLOT));
 		slots.add(smithingMenuDelegate.getSlot(SmithingMenu.BASE_SLOT));
@@ -45,7 +45,7 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 	@Override
 	public void handlePacket(CompoundTag data) {
 		if (data.contains(DATA_SHIFT_CLICK_INTO_STORAGE)) {
-			setShiftClickIntoStorage(data.getBoolean(DATA_SHIFT_CLICK_INTO_STORAGE));
+			setShiftClickIntoStorage(data.getBooleanOr(DATA_SHIFT_CLICK_INTO_STORAGE, false));
 		}
 	}
 
@@ -188,8 +188,8 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 		}
 
 		public void setSelectedRecipe(Identifier recipeId) {
-			SmithingRecipeInput smithingRecipeInput = new SmithingRecipeInput(getTemplateSlot().getItem(), getBaseSlot().getItem(), getAdditionalSlot().getItem());
-			RecipeHelper.safeGetRecipeFor(RecipeType.SMITHING, smithingRecipeInput, recipeId).ifPresent(recipe -> selectedRecipe = recipe);
+			// 26.3 的 SmithingMenu 不再保存“选中配方”，结果完全由输入槽决定
+			createResult();
 		}
 	}
 }

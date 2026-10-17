@@ -150,7 +150,8 @@ public class EntityBackpackAdditionHandler {
 					float additionalDifficulty = difficultyInstance.getSpecialMultiplier();
 					int enchantmentLevel = (int) (5F + additionalDifficulty * 18F + minDifficulty * 6);
 					EnchantmentHelper.enchantItem(rnd, armorStack, enchantmentLevel, level.registryAccess(),
-							level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getTag(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT));
+							level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getTags()
+									.filter(tags -> tags.key().equals(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT)).findFirst());
 				}
 				monster.setItemSlot(slot, armorStack);
 			}
@@ -160,7 +161,7 @@ public class EntityBackpackAdditionHandler {
 	private static void equipBackpack(Monster monster, ItemStack backpack, int difficulty, boolean playMusicDisc, LevelAccessor level, RandomSource rnd) {
 		getSpawnEgg(monster.getType()).ifPresent(egg -> {
 			IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
-			wrapper.setColors(egg.getColor(0) | 0xFF_000000, egg.getColor(1) | 0xFF_000000);
+			// 26.3 移除了刷怪蛋的两种颜色分量，无法再按刷怪蛋配色给背包染色
 			setLoot(monster, wrapper, difficulty, level);
 			if (playMusicDisc) {
 				wrapper.getInventoryHandler(); //just to assign uuid and real upgrade handler
@@ -194,7 +195,8 @@ public class EntityBackpackAdditionHandler {
 
 	private static List<Item> getMusicDiscs() {
 		if (musicDiscs == null) {
-			BuiltInRegistries.ITEM.getTag(ConventionalItemTags.MUSIC_DISCS).ifPresentOrElse(records -> {
+			java.util.Optional.<Iterable<Holder<Item>>>of(BuiltInRegistries.ITEM.getTagOrEmpty(ConventionalItemTags.MUSIC_DISCS))
+					.filter(records -> records.iterator().hasNext()).ifPresentOrElse(records -> {
 				Set<String> blockedDiscs = new HashSet<>(Config.SERVER.entityBackpackAdditions.discBlockList.get());
 				musicDiscs = new ArrayList<>();
 				records.forEach(musicDisc -> {
@@ -223,17 +225,17 @@ public class EntityBackpackAdditionHandler {
 		}
 	}
 
-	private static Optional<SpawnEggItem> getSpawnEgg(EntityType<?> entityType) {
-		return Optional.ofNullable(SpawnEggItem.BY_ID.get(entityType));
+	private static Optional<Item> getSpawnEgg(EntityType<?> entityType) {
+		return SpawnEggItem.byId(entityType).map(Holder::value);
 	}
 
 	private static final List<ApplicableEffect> APPLICABLE_EFFECTS = List.of(
-			new ApplicableEffect(List.of(MobEffects.DAMAGE_RESISTANCE, MobEffects.REGENERATION), 1),
+			new ApplicableEffect(List.of(MobEffects.RESISTANCE, MobEffects.REGENERATION), 1),
 			new ApplicableEffect(MobEffects.FIRE_RESISTANCE),
 			new ApplicableEffect(MobEffects.ABSORPTION),
 			new ApplicableEffect(MobEffects.HEALTH_BOOST),
-			new ApplicableEffect(MobEffects.MOVEMENT_SPEED),
-			new ApplicableEffect(MobEffects.DAMAGE_BOOST));
+			new ApplicableEffect(MobEffects.SPEED),
+			new ApplicableEffect(MobEffects.STRENGTH));
 
 	private static void setLoot(Monster monster, IBackpackWrapper backpackWrapper, int difficulty, LevelAccessor level) {
 		MinecraftServer server = level.getServer();
@@ -267,7 +269,7 @@ public class EntityBackpackAdditionHandler {
 
 	@SuppressWarnings("unused")
 	static void handleBackpackDrop(LivingEntity mob, DamageSource source, Collection<ItemEntity> drops) {
-		if (mob.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (mob.entityTags().contains(SPAWNED_WITH_BACKPACK)) {
 			ItemStack backpack = mob.getItemBySlot(EquipmentSlot.CHEST);
 			Config.Server.EntityBackpackAdditionsConfig additionsConfig = Config.SERVER.entityBackpackAdditions;
 			if (shouldDropBackpack(source, additionsConfig, mob, backpack)) {
@@ -275,7 +277,7 @@ public class EntityBackpackAdditionHandler {
 				ItemEntity backpackEntity = new ItemEntity(mob.level(), mob.getX(), mob.getY(), mob.getZ(), backpack);
 				drops.add(backpackEntity);
 				mob.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
-				mob.getItem().builtInRegistryHolder().tags().remove(SPAWNED_WITH_BACKPACK);
+				mob.entityTags().remove(SPAWNED_WITH_BACKPACK);
 			} else {
 				removeContentsUuid(backpack);
 			}
@@ -283,7 +285,7 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	private static void putJukeboxItemsInContainerAndRemoveStorageUuid(DamageSource source, LivingEntity mob, ItemStack backpack) {
-		if (mob.getItem().builtInRegistryHolder().tags().remove(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
+		if (mob.entityTags().remove(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
 			List<ItemStack> inventoryItems = new ArrayList<>();
 			IBackpackWrapper backpackwrapper = BackpackWrapper.fromStack(backpack);
 			backpackwrapper.getUpgradeHandler().getTypeWrappers(JukeboxUpgradeItem.TYPE).forEach(wrapper -> {
@@ -322,18 +324,19 @@ public class EntityBackpackAdditionHandler {
 			return false;
 		}
 		float lootingChanceMultiplier = dropChanceMultiplier.getOrDefault(backpack.getItem(), 1F);
-		int lootingLevel = player.level().registryAccess().registry(Registries.ENCHANTMENT).map(registry -> player.getMainHandItem().getEnchantmentLevel(registry.getHolderOrThrow(Enchantments.LOOTING))).orElse(0);
-		return mob.level().random.nextFloat() < (additionsConfig.backpackDropChance.get() + lootingLevel * additionsConfig.lootingChanceIncreasePerLevel.get()) * lootingChanceMultiplier;
+		int lootingLevel = player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(Enchantments.LOOTING)
+				.map(enchantment -> EnchantmentHelper.getItemEnchantmentLevel(enchantment, player.getMainHandItem())).orElse(0);
+		return mob.level().getRandom().nextFloat() < (additionsConfig.backpackDropChance.get() + lootingLevel * additionsConfig.lootingChanceIncreasePerLevel.get()) * lootingChanceMultiplier;
 	}
 
 	public static void removeBeneficialEffects(Creeper creeper) {
-		if (creeper.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (creeper.entityTags().contains(SPAWNED_WITH_BACKPACK)) {
 			creeper.getActiveEffects().removeIf(e -> e.getEffect().value().isBeneficial());
 		}
 	}
 
 	public static void removeBackpackUuid(Monster entity, Level level) {
-		if (level.isClientSide() || !entity.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_BACKPACK)) {
+		if (level.isClientSide() || !entity.entityTags().contains(SPAWNED_WITH_BACKPACK)) {
 			return;
 		}
 
@@ -346,7 +349,7 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	public static void onLivingUpdate(LivingEntity livingEntity) {
-		if (!livingEntity.getItem().builtInRegistryHolder().tags().contains(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
+		if (!livingEntity.entityTags().contains(SPAWNED_WITH_JUKEBOX_UPGRADE)) {
 			return;
 		}
 		IBackpackWrapper backpackWrapper = BackpackWrapper.fromStack(livingEntity.getItemBySlot(EquipmentSlot.CHEST));

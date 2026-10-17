@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper;
 
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.p3pp3rf1y.sophisticatedcore.platform.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
@@ -18,7 +18,6 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
-import net.p3pp3rf1y.sophisticatedbackpacks.api.IEnergyStorageUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.IFluidHandlerWrapperUpgrade;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
@@ -40,7 +39,6 @@ import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.InventorySorter;
 import net.p3pp3rf1y.sophisticatedcore.util.LootHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.RandHelper;
-import team.reborn.energy.api.EnergyStorage;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
@@ -70,10 +68,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private boolean fluidHandlerInitialized = false;
 	@Nullable
 	private IStorageFluidHandler fluidHandler = null;
-	private boolean energyStorageInitialized = false;
-	@Nullable
-	private EnergyStorage energyStorage = null;
-
 	@Nullable
 	private BackpackRenderInfo renderInfo;
 
@@ -201,21 +195,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	@Override
-	public Optional<EnergyStorage> getEnergyStorage() {
-		if (!energyStorageInitialized) {
-			EnergyStorage wrappedStorage = getUpgradeHandler().getWrappersThatImplement(EnergyStorage.class).stream().findFirst().orElse(null);
-
-			for (IEnergyStorageUpgradeWrapper energyStorageWrapperUpgrade : getUpgradeHandler().getWrappersThatImplement(IEnergyStorageUpgradeWrapper.class)) {
-				wrappedStorage = energyStorageWrapperUpgrade.wrapStorage(wrappedStorage);
-			}
-
-			energyStorage = wrappedStorage;
-		}
-
-		return energyStorage == null || energyStorage.getCapacity() == 0 ? Optional.empty() : Optional.of(energyStorage);
-	}
-
-	@Override
 	public void copyDataTo(IStorageWrapper otherStorageWrapper) {
 		getContentsUuid().ifPresent(originalUuid -> {
 			getInventoryHandler().copyStacksTo(otherStorageWrapper.getInventoryHandler());
@@ -260,8 +239,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 					inventoryModificationHandler = null;
 					fluidHandlerInitialized = false;
 					fluidHandler = null;
-					energyStorageInitialized = false;
-					energyStorage = null;
 					upgradeCachesInvalidatedHandler.run();
 				}) {
 					@Override
@@ -437,7 +414,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void fillWithLoot(Player player) {
 		Level level = player.level();
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		BlockPos pos = player.blockPosition();
@@ -542,7 +519,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 		List<ItemStack> loot = LootHelper.getLoot(lootTable, server, serverLevel, pos);
 		loot.removeIf(stack -> stack.getItem() instanceof BackpackItem);
 		loot = RandHelper.getNRandomElements(loot, (int) (loot.size() * lootFactor));
-		LootHelper.fillWithLoot(serverLevel.random, loot, getInventoryHandler());
+		LootHelper.fillWithLoot(serverLevel.getRandom(), loot, getInventoryHandler());
 	}
 
 	private void setNumberOfUpgradeSlots(int numberOfUpgradeSlots) {
@@ -554,8 +531,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 		inventoryModificationHandler = null;
 		fluidHandler = null;
 		fluidHandlerInitialized = false;
-		energyStorage = null;
-		energyStorageInitialized = false;
 		refreshInventoryForInputOutput();
 	}
 

@@ -1,16 +1,16 @@
 package net.p3pp3rf1y.sophisticatedbackpacks;
 
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.p3pp3rf1y.sophisticatedcore.platform.config.ConfigEvents;
+import net.p3pp3rf1y.sophisticatedcore.platform.config.ConfigSpec;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilteredUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IUpgradeCountLimitConfig;
@@ -45,17 +45,17 @@ public class Config {
 	}
 
 	public static final Server SERVER;
-	public static final ModConfigSpec SERVER_SPEC;
+	public static final ConfigSpec SERVER_SPEC;
 
 	public static final Common COMMON;
-	public static final ModConfigSpec COMMON_SPEC;
+	public static final ConfigSpec COMMON_SPEC;
 
 	static {
-		final Pair<Server, ModConfigSpec> serverSpec = new ModConfigSpec.Builder().configure(Server::new);
+		final Pair<Server, ConfigSpec> serverSpec = new ConfigSpec.Builder().configure(Server::new);
 		SERVER_SPEC = serverSpec.getRight();
 		SERVER = serverSpec.getLeft();
 
-		final Pair<Common, ModConfigSpec> commonSpec = new ModConfigSpec.Builder().configure(Common::new);
+		final Pair<Common, ConfigSpec> commonSpec = new ConfigSpec.Builder().configure(Common::new);
 		COMMON_SPEC = commonSpec.getRight();
 		COMMON = commonSpec.getLeft();
 	}
@@ -96,11 +96,11 @@ public class Config {
 		public final AutoCookingUpgradeConfig autoBlastingUpgrade;
 		public final InceptionUpgradeConfig inceptionUpgrade;
 		public final EntityBackpackAdditionsConfig entityBackpackAdditions;
-		public final ModConfigSpec.BooleanValue itemFluidHandlerEnabled;
-		public final ModConfigSpec.BooleanValue allowOpeningOtherPlayerBackpacks;
-		public final ModConfigSpec.BooleanValue itemDisplayDisabled;
-		public final ModConfigSpec.BooleanValue tickDedupeLogicDisabled;
-		public final ModConfigSpec.BooleanValue canBePlacedInContainerItems;
+		public final ConfigSpec.BooleanValue itemFluidHandlerEnabled;
+		public final ConfigSpec.BooleanValue allowOpeningOtherPlayerBackpacks;
+		public final ConfigSpec.BooleanValue itemDisplayDisabled;
+		public final ConfigSpec.BooleanValue tickDedupeLogicDisabled;
+		public final ConfigSpec.BooleanValue canBePlacedInContainerItems;
 		public final FilteredUpgradeConfig toolSwapperUpgrade;
 		public final TankUpgradeConfig tankUpgrade;
 		public final BatteryUpgradeConfig batteryUpgrade;
@@ -112,15 +112,10 @@ public class Config {
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
 		public void initListeners() {
-			NeoForgeModConfigEvents.loading(SophisticatedBackpacks.MOD_ID).register(this::onConfigLoad);
-			NeoForgeModConfigEvents.reloading(SophisticatedBackpacks.MOD_ID).register(this::onConfigReload);
+			ConfigEvents.reloading(SophisticatedBackpacks.MOD_ID).register(this::onConfigReload);
 		}
 
-		public void onConfigReload(ModConfig modConfig) {
-			clearCache();
-		}
-
-		public void onConfigLoad(ModConfig modConfig) {
+		public void onConfigReload() {
 			clearCache();
 		}
 
@@ -130,7 +125,7 @@ public class Config {
 			maxUpgradesPerStorage.clearCache();
 		}
 
-		Server(ModConfigSpec.Builder builder) {
+		Server(ConfigSpec.Builder builder) {
 			builder.comment("Server Settings").push("server");
 
 			disallowedItems = new DisallowedItems(builder);
@@ -196,12 +191,12 @@ public class Config {
 		}
 
 		public static class NerfsConfig {
-			public final ModConfigSpec.BooleanValue tooManyBackpacksSlowness;
-			public final ModConfigSpec.IntValue maxNumberOfBackpacks;
-			public final ModConfigSpec.DoubleValue slownessLevelsPerAdditionalBackpack;
-			public final ModConfigSpec.BooleanValue onlyWornBackpackTriggersUpgrades;
+			public final ConfigSpec.BooleanValue tooManyBackpacksSlowness;
+			public final ConfigSpec.IntValue maxNumberOfBackpacks;
+			public final ConfigSpec.DoubleValue slownessLevelsPerAdditionalBackpack;
+			public final ConfigSpec.BooleanValue onlyWornBackpackTriggersUpgrades;
 
-			public NerfsConfig(ModConfigSpec.Builder builder) {
+			public NerfsConfig(ConfigSpec.Builder builder) {
 				builder.push("nerfs");
 				tooManyBackpacksSlowness = builder.comment("Determines if too many backpacks in player's inventory cause slowness to the player").define("tooManyBackpacksSlowness", false);
 				maxNumberOfBackpacks = builder.comment("Maximum number of backpacks in player's inventory that will not cause slowness").defineInRange("maxNumberOfBackpacks", 3, 1, 27);
@@ -214,21 +209,21 @@ public class Config {
 
 		public static class EntityBackpackAdditionsConfig {
 			private static final String ENTITY_LOOT_MATCHER = "([a-z0-9_.-]+:[a-z0-9_/.-]+)\\|(null|[a-z0-9_.-]+:[a-z0-9/_.-]+)";
-			public final ModConfigSpec.DoubleValue chance;
-			public final ModConfigSpec.BooleanValue addLoot;
-			public final ModConfigSpec.BooleanValue buffWithPotionEffects;
-			public final ModConfigSpec.BooleanValue buffHealth;
-			public final ModConfigSpec.BooleanValue equipWithArmor;
-			public final ModConfigSpec.BooleanValue playJukebox;
-			public final ModConfigSpec.BooleanValue dropToFakePlayers;
-			public final ModConfigSpec.DoubleValue backpackDropChance;
-			public final ModConfigSpec.DoubleValue lootingChanceIncreasePerLevel;
-			public final ModConfigSpec.ConfigValue<List<? extends String>> entityLootTableList;
-			public final ModConfigSpec.ConfigValue<List<? extends String>> discBlockList;
+			public final ConfigSpec.DoubleValue chance;
+			public final ConfigSpec.BooleanValue addLoot;
+			public final ConfigSpec.BooleanValue buffWithPotionEffects;
+			public final ConfigSpec.BooleanValue buffHealth;
+			public final ConfigSpec.BooleanValue equipWithArmor;
+			public final ConfigSpec.BooleanValue playJukebox;
+			public final ConfigSpec.BooleanValue dropToFakePlayers;
+			public final ConfigSpec.DoubleValue backpackDropChance;
+			public final ConfigSpec.DoubleValue lootingChanceIncreasePerLevel;
+			public final ConfigSpec.ConfigValue<List<String>> entityLootTableList;
+			public final ConfigSpec.ConfigValue<List<String>> discBlockList;
 			@Nullable
 			private Map<EntityType<?>, Identifier> entityLootTables = null;
 
-			public EntityBackpackAdditionsConfig(ModConfigSpec.Builder builder) {
+			public EntityBackpackAdditionsConfig(ConfigSpec.Builder builder) {
 				builder.comment("Settings for Spawning Entities with Backpack").push("entityBackpackAdditions");
 				chance = builder.comment("Chance of an entity spawning with Backpack").defineInRange("chance", 0.01, 0, 1);
 				addLoot = builder.comment("Turns on/off addition of loot into backpacks").define("addLoot", true);
@@ -291,32 +286,32 @@ public class Config {
 
 			private Map<EntityType<?>, ResourceKey<LootTable>> getDefaultEntityLootMapping() {
 				Map<EntityType<?>, ResourceKey<LootTable>> mapping = new LinkedHashMap<>();
-				mapping.put(EntityType.CREEPER, BuiltInLootTables.DESERT_PYRAMID);
-				mapping.put(EntityType.DROWNED, BuiltInLootTables.SHIPWRECK_TREASURE);
-				mapping.put(EntityType.ENDERMAN, BuiltInLootTables.END_CITY_TREASURE);
-				mapping.put(EntityType.EVOKER, BuiltInLootTables.WOODLAND_MANSION);
-				mapping.put(EntityType.HUSK, BuiltInLootTables.DESERT_PYRAMID);
-				mapping.put(EntityType.PIGLIN, BuiltInLootTables.BASTION_BRIDGE);
-				mapping.put(EntityType.PIGLIN_BRUTE, BuiltInLootTables.BASTION_TREASURE);
-				mapping.put(EntityType.PILLAGER, BuiltInLootTables.PILLAGER_OUTPOST);
-				mapping.put(EntityType.SKELETON, BuiltInLootTables.SIMPLE_DUNGEON);
-				mapping.put(EntityType.STRAY, BuiltInLootTables.IGLOO_CHEST);
-				mapping.put(EntityType.VEX, BuiltInLootTables.WOODLAND_MANSION);
-				mapping.put(EntityType.VINDICATOR, BuiltInLootTables.WOODLAND_MANSION);
-				mapping.put(EntityType.WITCH, BuiltInLootTables.BURIED_TREASURE);
-				mapping.put(EntityType.WITHER_SKELETON, BuiltInLootTables.NETHER_BRIDGE);
-				mapping.put(EntityType.ZOMBIE, BuiltInLootTables.SIMPLE_DUNGEON);
-				mapping.put(EntityType.ZOMBIE_VILLAGER, BuiltInLootTables.VILLAGE_ARMORER);
-				mapping.put(EntityType.ZOMBIFIED_PIGLIN, BuiltInLootTables.BASTION_OTHER);
+				mapping.put(EntityTypes.CREEPER, BuiltInLootTables.DESERT_PYRAMID);
+				mapping.put(EntityTypes.DROWNED, BuiltInLootTables.SHIPWRECK_TREASURE);
+				mapping.put(EntityTypes.ENDERMAN, BuiltInLootTables.END_CITY_TREASURE);
+				mapping.put(EntityTypes.EVOKER, BuiltInLootTables.WOODLAND_MANSION);
+				mapping.put(EntityTypes.HUSK, BuiltInLootTables.DESERT_PYRAMID);
+				mapping.put(EntityTypes.PIGLIN, BuiltInLootTables.BASTION_BRIDGE);
+				mapping.put(EntityTypes.PIGLIN_BRUTE, BuiltInLootTables.BASTION_TREASURE);
+				mapping.put(EntityTypes.PILLAGER, BuiltInLootTables.PILLAGER_OUTPOST);
+				mapping.put(EntityTypes.SKELETON, BuiltInLootTables.SIMPLE_DUNGEON);
+				mapping.put(EntityTypes.STRAY, BuiltInLootTables.IGLOO_CHEST);
+				mapping.put(EntityTypes.VEX, BuiltInLootTables.WOODLAND_MANSION);
+				mapping.put(EntityTypes.VINDICATOR, BuiltInLootTables.WOODLAND_MANSION);
+				mapping.put(EntityTypes.WITCH, BuiltInLootTables.BURIED_TREASURE);
+				mapping.put(EntityTypes.WITHER_SKELETON, BuiltInLootTables.NETHER_BRIDGE);
+				mapping.put(EntityTypes.ZOMBIE, BuiltInLootTables.SIMPLE_DUNGEON);
+				mapping.put(EntityTypes.ZOMBIE_VILLAGER, BuiltInLootTables.VILLAGE_ARMORER);
+				mapping.put(EntityTypes.ZOMBIFIED_PIGLIN, BuiltInLootTables.BASTION_OTHER);
 				return mapping;
 			}
 		}
 
 		public static class InceptionUpgradeConfig {
-			public final ModConfigSpec.BooleanValue upgradesUseInventoriesOfBackpacksInBackpack;
-			public final ModConfigSpec.BooleanValue upgradesInContainedBackpacksAreFunctional;
+			public final ConfigSpec.BooleanValue upgradesUseInventoriesOfBackpacksInBackpack;
+			public final ConfigSpec.BooleanValue upgradesInContainedBackpacksAreFunctional;
 
-			public InceptionUpgradeConfig(ModConfigSpec.Builder builder) {
+			public InceptionUpgradeConfig(ConfigSpec.Builder builder) {
 				builder.comment("Inception Upgrade Settings").push("inceptionUpgrade");
 				upgradesUseInventoriesOfBackpacksInBackpack = builder.comment("Allows / Disallows backpack upgrades to work with inventories of Backpacks in the Backpack with Inception Upgrade")
 						.define("upgradesUseInventoriesOfBackpacksInBackpack", true);
@@ -327,10 +322,10 @@ public class Config {
 		}
 
 		public static class BackpackConfig {
-			public final ModConfigSpec.IntValue inventorySlotCount;
-			public final ModConfigSpec.IntValue upgradeSlotCount;
+			public final ConfigSpec.IntValue inventorySlotCount;
+			public final ConfigSpec.IntValue upgradeSlotCount;
 
-			public BackpackConfig(ModConfigSpec.Builder builder, String backpackPrefix, int inventorySlotCountDefault, int upgradeSlotCountDefault) {
+			public BackpackConfig(ConfigSpec.Builder builder, String backpackPrefix, int inventorySlotCountDefault, int upgradeSlotCountDefault) {
 				builder.comment(backpackPrefix + " Backpack Settings").push(backpackPrefix.toLowerCase(Locale.ENGLISH) + "Backpack");
 				inventorySlotCount = builder.comment("Number of inventory slots in the backpack").defineInRange("inventorySlotCount", inventorySlotCountDefault, 1, 144);
 				upgradeSlotCount = builder.comment("Number of upgrade slots in the backpack").defineInRange("upgradeSlotCount", upgradeSlotCountDefault, 0, 10);
@@ -339,11 +334,11 @@ public class Config {
 		}
 
 		public static class NoInteractionBlocks {
-			private final ModConfigSpec.ConfigValue<List<String>> noInteractionBlocksList;
+			private final ConfigSpec.ConfigValue<List<String>> noInteractionBlocksList;
 			private boolean initialized = false;
 			private Set<Block> noInteractionBlocksSet = null;
 
-			NoInteractionBlocks(ModConfigSpec.Builder builder) {
+			NoInteractionBlocks(ConfigSpec.Builder builder) {
 				noInteractionBlocksList = builder.comment("List of blocks that inventory interaction upgrades can't interact with - e.g. \"minecraft:shulker_box\"").define("noInteractionBlocks", new ArrayList<>());
 			}
 
@@ -364,18 +359,18 @@ public class Config {
 				for (String disallowedItemName : noInteractionBlocksList.get()) {
 					Identifier registryName = Identifier.parse(disallowedItemName);
 					if (BuiltInRegistries.BLOCK.containsKey(registryName)) {
-						noInteractionBlocksSet.add(BuiltInRegistries.BLOCK.get(registryName));
+						BuiltInRegistries.BLOCK.getOptional(registryName).ifPresent(noInteractionBlocksSet::add);
 					}
 				}
 			}
 		}
 
 		public static class NoConnectionBlocks {
-			private final ModConfigSpec.ConfigValue<List<? extends String>> noConnectionBlocksList;
+			private final ConfigSpec.ConfigValue<List<String>> noConnectionBlocksList;
 			private boolean initialized = false;
 			private Set<Block> noConnnectionBlocksSet = null;
 
-			NoConnectionBlocks(ModConfigSpec.Builder builder) {
+			NoConnectionBlocks(ConfigSpec.Builder builder) {
 				noConnectionBlocksList = builder.comment("List of blocks that are not allowed to connect to backpacks - e.g. \"refinedstorage:external_storage\"")
 						.defineList("noConnectionBlocks", new ArrayList<>(), mapping -> ((String) mapping).matches(REGISTRY_NAME_MATCHER));
 			}
@@ -397,19 +392,19 @@ public class Config {
 				for (String disallowedItemName : noConnectionBlocksList.get()) {
 					Identifier registryName = Identifier.parse(disallowedItemName);
 					if (BuiltInRegistries.BLOCK.containsKey(registryName)) {
-						noConnnectionBlocksSet.add(BuiltInRegistries.BLOCK.get(registryName));
+						BuiltInRegistries.BLOCK.getOptional(registryName).ifPresent(noConnnectionBlocksSet::add);
 					}
 				}
 			}
 		}
 
 		public static class DisallowedItems {
-			private final ModConfigSpec.BooleanValue containerItemsDisallowed;
-			private final ModConfigSpec.ConfigValue<List<String>> disallowedItemsList;
+			private final ConfigSpec.BooleanValue containerItemsDisallowed;
+			private final ConfigSpec.ConfigValue<List<String>> disallowedItemsList;
 			private boolean initialized = false;
 			private Set<Item> disallowedItemsSet = null;
 
-			DisallowedItems(ModConfigSpec.Builder builder) {
+			DisallowedItems(ConfigSpec.Builder builder) {
 				disallowedItemsList = builder.comment("List of items that are not allowed to be put in backpacks - e.g. \"minecraft:shulker_box\"").define("disallowedItems", new ArrayList<>());
 				containerItemsDisallowed = builder.comment("Determines if container items (those that override canFitInsideContainerItems to false) are able to fit in backpacks")
 						.define("containerItemsDisallowed", false);
@@ -443,12 +438,12 @@ public class Config {
 		}
 
 		public static class MaxUgradesPerStorageConfig implements IUpgradeCountLimitConfig {
-			private final ModConfigSpec.ConfigValue<List<? extends String>> maxUpgradesPerStorageList;
+			private final ConfigSpec.ConfigValue<List<String>> maxUpgradesPerStorageList;
 
 			@Nullable
 			private Map<String, Integer> maxUpgradesPerStorage = null;
 
-			protected MaxUgradesPerStorageConfig(ModConfigSpec.Builder builder, Map<String, Integer> defaultUpgradesPerStorage) {
+			protected MaxUgradesPerStorageConfig(ConfigSpec.Builder builder, Map<String, Integer> defaultUpgradesPerStorage) {
 				maxUpgradesPerStorageList = builder.comment("Maximum number of upgrades of type per backpack in format of \"UpgradeRegistryName[or UpgradeGroup]|MaxNumber\"")
 						.defineList("maxUpgradesPerStorage", convertToList(defaultUpgradesPerStorage), mapping -> ((String) mapping).matches(MAX_UPGRADES_MATCHER));
 			}
@@ -497,9 +492,9 @@ public class Config {
 	}
 
 	public static class Common {
-		public final ModConfigSpec.BooleanValue chestLootEnabled;
+		public final ConfigSpec.BooleanValue chestLootEnabled;
 
-		Common(ModConfigSpec.Builder builder) {
+		Common(ConfigSpec.Builder builder) {
 			builder.comment("Common Settings").push("common");
 
 			chestLootEnabled = builder.comment("Turns on/off loot added to various vanilla chest loot tables").define("chestLootEnabled", true);

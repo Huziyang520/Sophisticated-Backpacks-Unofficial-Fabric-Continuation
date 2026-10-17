@@ -1,10 +1,9 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.init;
 
-import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
+import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import team.reborn.energy.api.EnergyStorage;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -34,8 +33,7 @@ public class ModBlocks {
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
     public static final Supplier<BlockEntityType<BackpackBlockEntity>> BACKPACK_TILE_TYPE = BLOCK_ENTITY_TYPES.register("backpack", () ->
-            BlockEntityType.Builder.of(BackpackBlockEntity::new, BACKPACK.get(), COPPER_BACKPACK.get(), IRON_BACKPACK.get(), GOLD_BACKPACK.get(), DIAMOND_BACKPACK.get(), NETHERITE_BACKPACK.get())
-                    .build(null));
+            new BlockEntityType<>(BackpackBlockEntity::new, java.util.Set.of(BACKPACK.get(), COPPER_BACKPACK.get(), IRON_BACKPACK.get(), GOLD_BACKPACK.get(), DIAMOND_BACKPACK.get(), NETHERITE_BACKPACK.get())));
 
     public static void registerHandlers() {
         BLOCKS.register();
@@ -47,6 +45,6 @@ public class ModBlocks {
 	private static void registerCapabilities() {
 		ItemStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalItemHandler, BACKPACK_TILE_TYPE.get());
 		FluidStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalFluidHandler, BACKPACK_TILE_TYPE.get());
-		EnergyStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalEnergyStorage, BACKPACK_TILE_TYPE.get());
+		// 26.3 无 Team Reborn Energy API，方块背包不再对外暴露能量存储
 	}
 }

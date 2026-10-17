@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.crafting;
 
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
@@ -14,12 +14,8 @@ import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
 import java.util.List;
 
 public class BackpackDyeRecipe extends StorageDyeRecipeBase {
-	public BackpackDyeRecipe(CraftingBookCategory category) {
-		super(category);
-	}
-
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<? extends CustomRecipe> getSerializer() {
 		return ModItems.BACKPACK_DYE_RECIPE_SERIALIZER.get();
 	}
 

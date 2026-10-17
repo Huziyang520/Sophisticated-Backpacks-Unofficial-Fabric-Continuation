@@ -20,8 +20,8 @@ public record BackpackClosePayload() implements CustomPacketPayload {
 
 	public static void handlePayload(BackpackClosePayload payload, ServerPlayNetworking.Context context) {
 		Player player = context.player();
-		if (player.containerMenu instanceof BackpackContainer) {
-			player.closeContainer();
+		if (player.containerMenu instanceof BackpackContainer && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+			serverPlayer.closeContainer();
 		}
 	}
 }

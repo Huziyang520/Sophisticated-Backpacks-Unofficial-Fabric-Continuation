@@ -25,11 +25,11 @@ public class SBPCommand {
 	private static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
 		LiteralCommandNode<CommandSourceStack> mainNode = dispatcher.register(
 				Commands.literal("sbp")
-						.requires(cs -> cs.hasPermission(OP_LEVEL))
+						.requires(cs -> cs.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))
 						.then(ListCommand.register())
 						.then(GiveCommand.register())
 						.then(RemoveNonPlayerCommand.register())
 		);
-		dispatcher.register(Commands.literal("sophisticatedbackpacks").requires(cs -> cs.hasPermission(OP_LEVEL)).redirect(mainNode));
+		dispatcher.register(Commands.literal("sophisticatedbackpacks").requires(cs -> cs.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER)).redirect(mainNode));
 	}
 }

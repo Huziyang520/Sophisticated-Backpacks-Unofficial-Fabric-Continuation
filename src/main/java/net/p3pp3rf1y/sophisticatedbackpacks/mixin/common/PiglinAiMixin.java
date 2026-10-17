@@ -30,12 +30,19 @@ public class PiglinAiMixin {
 
 	@Unique
 	private static Iterable<ItemStack> sophisticatedBackpacks_getArmorSlots(LivingEntity entity) {
+		// 26.3 移除了 LivingEntity#getArmorSlots，改为按装备槽逐个读取
+		List<ItemStack> armorSlots = Lists.newArrayList();
+		for (net.minecraft.world.entity.EquipmentSlot slot : net.minecraft.world.entity.EquipmentSlot.values()) {
+			if (slot.isArmor()) {
+				armorSlots.add(entity.getItemBySlot(slot));
+			}
+		}
 		if (entity instanceof Player player) {
 			List<ItemStack> trinkets = Lists.newArrayList();
 			PlayerInventoryProvider.get().runOnBackpacks(player, CompatModIds.TRINKETS, (backpack, inventoryHandlerName, identifier, slot) -> trinkets.add(backpack));
-			return Iterables.concat(entity.getArmorSlots(), trinkets);
+			return Iterables.concat(armorSlots, trinkets);
 		}
 
-		return entity.getArmorSlots();
+		return armorSlots;
 	}
 }
