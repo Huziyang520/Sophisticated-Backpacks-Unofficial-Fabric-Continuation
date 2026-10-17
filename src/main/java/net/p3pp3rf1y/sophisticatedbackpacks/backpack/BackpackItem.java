@@ -1,5 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.ContainerInput;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -21,7 +23,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
@@ -272,11 +274,11 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	public int getNumberOfSlots() {
-		return numberOfSlots.intValue();
+		return numberOfSlots.getAsInt();
 	}
 
 	public int getNumberOfUpgradeSlots() {
-		return numberOfUpgradeSlots.intValue();
+		return numberOfUpgradeSlots.getAsInt();
 	}
 
 	@Override
@@ -333,7 +335,7 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	@Override
-	public boolean overrideStackedOnOther(ItemStack storageStack, Slot slot, ClickAction action, Player player) {
+	public boolean overrideStackedOnOther(ItemStack storageStack, Slot slot, ContainerInput action, Player player) {
 		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPickup(player) || action != ClickAction.SECONDARY) {
 			return super.overrideStackedOnOther(storageStack, slot, action, player);
 		}
@@ -357,7 +359,7 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	@Override
-	public boolean overrideOtherStackedOnMe(ItemStack storageStack, ItemStack otherStack, Slot slot, ClickAction action, Player player, SlotAccess carriedAccess) {
+	public boolean overrideOtherStackedOnMe(ItemStack storageStack, ItemStack otherStack, Slot slot, ContainerInput action, Player player, SlotAccess carriedAccess) {
 		if (hasCreativeScreenContainerOpen(player) || storageStack.getCount() > 1 || !slot.mayPlace(storageStack) || action != ClickAction.SECONDARY) {
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}

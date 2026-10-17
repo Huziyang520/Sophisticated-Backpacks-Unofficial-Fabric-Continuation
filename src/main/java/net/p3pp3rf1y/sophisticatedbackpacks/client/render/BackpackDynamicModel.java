@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client.render;
 
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -177,7 +178,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 			float maxX = minX + pixels / 16f;
 			float maxY = minY + 1 / 16f;
 			float[] cols = new float[]{1f, 1f, 1f, 1f, -1};
-			TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(BACKPACK_MODULES_TEXTURE);
+			TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(BACKPACK_MODULES_TEXTURE);
 			ret.add(createQuad(List.of(getVector(maxX, maxY, minZ), getVector(maxX, minY, minZ), getVector(minX, minY, minZ), getVector(minX, maxY, minZ)), cols, sprite, Direction.NORTH, 14, 14 + (pixels / 2f), 6, 6.5f));
 		}
 
@@ -217,7 +218,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 			Identifier texture = renderProperties.getStillTexture(fluidStack);
 			int color = renderProperties.getTintColor(fluidStack);
 			float[] cols = new float[]{(color >> 24 & 0xFF) / 255F, (color >> 16 & 0xFF) / 255F, (color >> 8 & 0xFF) / 255F, (color & 0xFF) / 255F};
-			TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
+			TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
 			*/
 			FluidVariant fluidVariant = fluidStack.getVariant();
 			int color = FluidVariantRendering.getColor(fluidVariant);
@@ -430,7 +431,7 @@ public class BackpackDynamicModel implements IUnbakedGeometry<BackpackDynamicMod
 			if (modelContents.has("clipsTexture")) {
 				Identifier clipsTexture = Identifier.tryParse(modelContents.get("clipsTexture").getAsString());
 				if (clipsTexture != null) {
-					texturesBuilder.put("clips", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, clipsTexture)));
+					texturesBuilder.put("clips", Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, clipsTexture)));
 				}
 			}
 			ImmutableMap<String, Either<Material, String>> textures = texturesBuilder.build();

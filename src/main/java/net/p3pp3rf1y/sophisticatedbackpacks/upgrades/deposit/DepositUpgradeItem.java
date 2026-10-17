@@ -27,6 +27,6 @@ public class DepositUpgradeItem extends UpgradeItemBase<DepositUpgradeWrapper> {
 	}
 
 	public int getFilterSlotCount() {
-		return filterSlotCount.intValue();
+		return filterSlotCount.getAsInt();
 	}
 }

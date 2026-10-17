@@ -27,6 +27,6 @@ public class RestockUpgradeItem extends UpgradeItemBase<RestockUpgradeWrapper> {
 	}
 
 	public int getFilterSlotCount() {
-		return filterSlotCount.intValue();
+		return filterSlotCount.getAsInt();
 	}
 }

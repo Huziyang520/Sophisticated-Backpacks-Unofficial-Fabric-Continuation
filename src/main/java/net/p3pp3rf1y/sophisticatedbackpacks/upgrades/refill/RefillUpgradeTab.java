@@ -130,7 +130,7 @@ public abstract class RefillUpgradeTab extends UpgradeSettingsTab<RefillUpgradeC
 		private void renderTargetSlotAcronyms(GuiGraphicsExtractor guiGraphics) {
 			Matrix3x2fStack poseStack = guiGraphics.pose();
 			poseStack.pushMatrix();
-			poseStack.translate(0, 0, 300);
+			poseStack.translate(0, 0);
 			getContainer().getSlots().forEach(slot -> {
 				if (!slot.getItem().isEmpty()) {
 					int slotIndex = slot.sophisticatedCore_getSlotIndex();

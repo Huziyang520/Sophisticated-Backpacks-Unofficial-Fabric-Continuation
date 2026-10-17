@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client.render;
 
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -417,7 +418,7 @@ public class BackpackModel extends AgeableListModel<LivingEntity> implements IBa
 		/*
 		IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
 		Identifier texture = renderProperties.getStillTexture(fluidStack);
-		TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
+		TextureAtlasSprite still = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
 		*/
 		FluidVariant fluidVariant = FluidVariant.of(fluidStack.getFluid());
 		TextureAtlasSprite still = FluidVariantRendering.getSprite(fluidVariant);
@@ -425,7 +426,7 @@ public class BackpackModel extends AgeableListModel<LivingEntity> implements IBa
 			return;
 		}
 
-		VertexConsumer vertexBuilder = buffer.getBuffer(RenderType.entityTranslucent(InventoryMenu.BLOCK_ATLAS));
+		VertexConsumer vertexBuilder = buffer.getBuffer(RenderType.entityTranslucent(TextureAtlas.LOCATION_BLOCKS));
 		ModelPart fluidBox = getFluidBar(still, (int) (fill * 10), left);
 		int color = FluidVariantRendering.getColor(fluidVariant);
 		fluidBox.render(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, color);
