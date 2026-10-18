@@ -6,6 +6,10 @@ accessWidener v2 official
 
 accessible field net/minecraft/world/entity/item/ItemEntity pickupDelay I
 
+# 26.3 没有公开的 ItemTintSource 注册入口；这个 id mapper 是 late bound 的（codec 在解码模型时才按 id 查表），
+# 因此把字段放开后直接 put 自定义 tint source 即可。
+accessible field net/minecraft/client/color/item/ItemTintSources ID_MAPPER Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
+
 extendable method net/minecraft/world/inventory/ItemCombinerMenu createContainer (I)Lnet/minecraft/world/SimpleContainer;
 extendable method net/minecraft/world/inventory/ItemCombinerMenu createInputSlots (Lnet/minecraft/world/inventory/ItemCombinerMenuSlotDefinition;)V
 extendable method net/minecraft/world/inventory/ItemCombinerMenu createResultSlot (Lnet/minecraft/world/inventory/ItemCombinerMenuSlotDefinition;)V

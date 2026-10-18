@@ -52,9 +52,14 @@ public class BasicBackpackRecipe implements CraftingRecipe, IWrapperRecipe<Shape
 		BackpackWrapper.fromStack(backpack).removeContentsUuid();
 	}
 
+	/**
+	 * Not special on purpose: 26.3 的 JEI 只接管 {@code !Recipe#isSpecial()} 的合成配方
+	 * （{@code CraftingCategoryExtension#isHandled}），而 {@code RecipeManager} 也只把非 special 的
+	 * 配方放进 learnableRecipes 同步给客户端 —— 标成 special 会让配方在 JEI 与配方书里同时消失。
+	 */
 	@Override
 	public boolean isSpecial() {
-		return true;
+		return false;
 	}
 
 	@Override

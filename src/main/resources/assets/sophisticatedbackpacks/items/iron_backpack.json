@@ -1,6 +1,14 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "sophisticatedbackpacks:item/iron_backpack"
+    "model": "sophisticatedbackpacks:item/iron_backpack",
+    "tints": [
+      {
+        "type": "sophisticatedbackpacks:backpack_main_color"
+      },
+      {
+        "type": "sophisticatedbackpacks:backpack_accent_color"
+      }
+    ]
   }
 }

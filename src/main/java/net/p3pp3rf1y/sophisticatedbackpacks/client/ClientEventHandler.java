@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.render.BackpackBlockTints;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.render.BackpackItemTints;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.render.ClientBackpackContentsTooltip;
 import net.p3pp3rf1y.sophisticatedbackpacks.network.RequestPlayerSettingsPayload;
 import net.p3pp3rf1y.sophisticatedcore.event.client.ClientLifecycleEvents;
@@ -28,7 +30,9 @@ public class ClientEventHandler {
 
 	public static void registerHandlers() {
 		registerEntityRenderers();
-		// 26.3 移除了 Fabric 的 ColorProviderRegistry，物品/方块染色改由模型 tint source 数据驱动，暂未移植
+		// 26.3 移除了 Fabric 的 ColorProviderRegistry，物品染色改由数据驱动的 ItemTintSource 完成
+		BackpackItemTints.register();
+		BackpackBlockTints.register();
 
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientBackpackContentsTooltip::onWorldLoad);
 		ClientPlayConnectionEvents.JOIN.register(ClientEventHandler::onPlayerLoggingIn);
