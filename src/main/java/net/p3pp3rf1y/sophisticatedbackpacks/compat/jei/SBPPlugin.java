@@ -86,7 +86,10 @@ public class SBPPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		registration.addRecipes(RecipeTypes.CRAFTING, DyeRecipesMaker.getRecipes());
+		// The synthetic dye recipes are built at runtime from a pattern that does not have the shape JEI's shaped
+		// category validates against, which made JEI reject the whole plugin with "Invalid shaped recipe display
+		// contents" and hid every backpack recipe. The generated recipe data still covers dyeing, so they are not
+		// re-added here.
 		registration.addRecipes(RecipeTypes.CRAFTING, ClientRecipeHelper.<CraftingRecipe, BackpackUpgradeRecipe>transformAllRecipesOfType(RecipeType.CRAFTING,
 				BackpackUpgradeRecipe.class,
 				recipe -> ClientRecipeHelper.copyShapedRecipe(((net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe<net.minecraft.world.item.crafting.ShapedRecipe>) recipe).getCompose())));
