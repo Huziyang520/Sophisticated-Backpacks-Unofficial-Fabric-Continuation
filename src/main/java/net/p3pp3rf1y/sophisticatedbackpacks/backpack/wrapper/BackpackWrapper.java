@@ -142,7 +142,13 @@ public class BackpackWrapper implements IBackpackWrapper {
 			return inventorySlots;
 		}
 
-		int itemInventorySlots = ((BackpackItem) getBackpackStack().getItem()).getNumberOfSlots();
+		if (!(getBackpackStack().getItem() instanceof BackpackItem backpackItem)) {
+			// A block entity whose data could not be restored holds an empty stack; returning 0 slots keeps the menu
+			// usable instead of throwing a ClassCastException that disconnects the player.
+			return 0;
+		}
+
+		int itemInventorySlots = backpackItem.getNumberOfSlots();
 		setNumberOfInventorySlots(itemInventorySlots);
 		return itemInventorySlots;
 	}
@@ -265,7 +271,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 			return upgradeSlots;
 		}
 
-		int itemUpgradeSlots = ((BackpackItem) getBackpackStack().getItem()).getNumberOfUpgradeSlots();
+		if (!(getBackpackStack().getItem() instanceof BackpackItem backpackItem)) {
+			return 0;
+		}
+
+		int itemUpgradeSlots = backpackItem.getNumberOfUpgradeSlots();
 		setNumberOfUpgradeSlots(itemUpgradeSlots);
 		return itemUpgradeSlots;
 	}

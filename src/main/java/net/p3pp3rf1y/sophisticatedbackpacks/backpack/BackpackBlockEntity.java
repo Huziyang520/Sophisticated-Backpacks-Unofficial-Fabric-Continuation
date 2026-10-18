@@ -4,6 +4,7 @@ import net.p3pp3rf1y.sophisticatedcore.platform.item.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import com.mojang.serialization.DataResult;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.p3pp3rf1y.sophisticatedbackpacks.Config;
+import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageFluidHandler;
@@ -97,14 +99,30 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	private void setBackpackFromNbt(CompoundTag nbt) {
-		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> {
-			Tag data = nbt.get("backpackData");
-			if (data == null) {
-				setBackpack(ItemStack.EMPTY);
-				return;
-			}
-			setBackpack(ItemStack.CODEC.parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), data).result().orElse(ItemStack.EMPTY));
-		});
+		Tag data = nbt.get("backpackData");
+		if (data == null) {
+			setBackpack(ItemStack.EMPTY);
+			return;
+		}
+
+		Optional<RegistryAccess> registryAccess = RegistryHelper.getRegistryAccess();
+		if (registryAccess.isEmpty()) {
+			// The block entity is usually loaded before a level wide registry access is reachable from here; the
+			// block is still a backpack, so fall back to the plain block item instead of an empty stack - an empty
+			// stack is cast to BackpackItem the first time the menu opens.
+			SophisticatedBackpacks.LOGGER.warn("No registry access while loading backpack data at {}, using the block item", getBlockPos());
+			setBackpack(new ItemStack(getBlockState().getBlock()));
+			return;
+		}
+
+		setBackpack(ItemStack.CODEC.parse(registryAccess.get().createSerializationContext(NbtOps.INSTANCE), data)
+				.result()
+				.map(this::fallbackIfEmpty)
+				.orElseGet(() -> new ItemStack(getBlockState().getBlock())));
+	}
+
+	private ItemStack fallbackIfEmpty(ItemStack parsed) {
+		return parsed.isEmpty() ? new ItemStack(getBlockState().getBlock()) : parsed;
 	}
 
 	@Override
@@ -128,7 +146,12 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
 		CompoundTag ret = super.getUpdateTag(registries);
-		writeBackpack(ret, registries);
+		// loadAdditional reads the backpack from the nested "sophisticatedbackpack_data" tag, so the update tag has
+		// to use the same shape - writing "backpackData" at the root made every client side block entity come up with
+		// an empty backpack, and opening it then threw ClassCastException and dropped the player out of the world.
+		CompoundTag data = new CompoundTag();
+		writeBackpack(data, registries);
+		ret.put("sophisticatedbackpack_data", data);
 		ret.putBoolean("updateBlockRender", updateBlockRender);
 		updateBlockRender = true;
 		return ret;

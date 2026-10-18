@@ -40,7 +40,7 @@ public class RegistryLoader extends SimplePreparableReloadListener<Map<Identifie
 	@Override
 	protected Map<Identifier, JsonElement> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
 		Map<Identifier, JsonElement> registries = new HashMap<>();
-		FileToIdConverter.json("registry").listMatchingResources(resourceManager).forEach((name, resource) -> {
+		FileToIdConverter.json("tool_data").listMatchingResources(resourceManager).forEach((name, resource) -> {
 			try (java.io.Reader reader = resource.openAsReader()) {
 				registries.put(name, net.minecraft.util.GsonHelper.parse(reader));
 			} catch (Exception e) {

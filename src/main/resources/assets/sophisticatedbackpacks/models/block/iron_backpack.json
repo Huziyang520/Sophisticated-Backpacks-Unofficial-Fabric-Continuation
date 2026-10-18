@@ -1,4 +1,106 @@
 {
-    "loader": "sophisticatedbackpacks:backpack",
-    "clipsTexture": "sophisticatedbackpacks:block/iron_clips"
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "sophisticatedbackpacks:block/backpack_cloth",
+    "cloth": "sophisticatedbackpacks:block/backpack_cloth",
+    "clips": "sophisticatedbackpacks:block/iron_clips"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        4
+      ],
+      "to": [
+        14,
+        9,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cloth"
+        },
+        "south": {
+          "texture": "#cloth"
+        },
+        "east": {
+          "texture": "#cloth"
+        },
+        "west": {
+          "texture": "#cloth"
+        },
+        "up": {
+          "texture": "#cloth"
+        },
+        "down": {
+          "texture": "#cloth"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        9,
+        4
+      ],
+      "to": [
+        14,
+        11,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clips"
+        },
+        "south": {
+          "texture": "#clips"
+        },
+        "east": {
+          "texture": "#clips"
+        },
+        "west": {
+          "texture": "#clips"
+        },
+        "up": {
+          "texture": "#clips"
+        },
+        "down": {
+          "texture": "#clips"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        4,
+        3
+      ],
+      "to": [
+        12,
+        8,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#clips"
+        },
+        "south": {
+          "texture": "#clips"
+        },
+        "east": {
+          "texture": "#clips"
+        },
+        "west": {
+          "texture": "#clips"
+        },
+        "up": {
+          "texture": "#clips"
+        },
+        "down": {
+          "texture": "#clips"
+        }
+      }
+    }
+  ]
 }
