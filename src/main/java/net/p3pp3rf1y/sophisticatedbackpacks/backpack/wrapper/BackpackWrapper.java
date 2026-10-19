@@ -132,13 +132,28 @@ public class BackpackWrapper implements IBackpackWrapper {
 			}, StackUpgradeItem.getInventorySlotLimit(this));
 			handler.addListener(getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class)::itemChanged);
 		}
+		repairInventoryHandlerSize();
 		return handler;
+	}
+
+	/**
+	 * 背包界面一格都没有的兜底：{@code getNumberOfInventorySlots()} 在组件被旧版本写成 0 时会返回 0，
+	 * handler 就以 0 个槽建出来，之后不管怎么重开界面都不会自己长出格子。
+	 * 这里把 handler 拉回物品/组件声明的槽数（多退少补）。
+	 */
+	private void repairInventoryHandlerSize() {
+		int expectedSlots = getNumberOfInventorySlots() - (getNumberOfSlotRows() * getColumnsTaken());
+		if (handler == null || expectedSlots <= 0 || handler.getSlotCount() == expectedSlots) {
+			return;
+		}
+		handler.changeSlots(expectedSlots - handler.getSlotCount());
 	}
 
 	private int getNumberOfInventorySlots() {
 		Integer inventorySlots = getBackpackStack().sophisticatedCore_get(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS);
 
-		if (inventorySlots != null) {
+		// 0 / 负数一律当作“没写过”：旧版本把 0 写进组件以后，背包就永远没有格子了
+		if (inventorySlots != null && inventorySlots > 0) {
 			return inventorySlots;
 		}
 
@@ -256,7 +271,22 @@ public class BackpackWrapper implements IBackpackWrapper {
 				upgradeHandler = Noop.INSTANCE.getUpgradeHandler();
 			}
 		}
+		repairUpgradeHandlerSize();
 		return upgradeHandler;
+	}
+
+	/**
+	 * 与存储仓同一类问题：升级栏 handler 可能以 0 个槽建出来（物品组件缺失/被旧版本写成 0、
+	 * 构造时背包 stack 还没就绪），之后 {@code setSize} 是 no-op，整列升级栏就永久消失。
+	 */
+	private void repairUpgradeHandlerSize() {
+		if (upgradeHandler == null || upgradeHandler == Noop.INSTANCE.getUpgradeHandler()) {
+			return;
+		}
+		int expectedSlots = getNumberOfUpgradeSlots();
+		if (expectedSlots > 0 && upgradeHandler.getSlotCount() != expectedSlots) {
+			upgradeHandler.resizeTo(expectedSlots);
+		}
 	}
 
 	@Override
@@ -267,7 +297,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private int getNumberOfUpgradeSlots() {
 		Integer upgradeSlots = getBackpackStack().sophisticatedCore_get(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS);
 
-		if (upgradeSlots != null) {
+		// 0 当作“没写过”（旧版本写进组件的 0 会让升级栏整列消失）
+		if (upgradeSlots != null && upgradeSlots > 0) {
 			return upgradeSlots;
 		}
 
