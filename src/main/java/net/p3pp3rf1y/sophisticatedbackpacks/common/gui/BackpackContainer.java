@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import static net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.BACKPACK_CONTAINER_TYPE;
 
-public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper> implements ISyncedContainer {
+public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper> implements IContextAwareContainer, ISyncedContainer {
 	private final BackpackContext backpackContext;
 
 	public BackpackContainer(int windowId, Player player, BackpackContext backpackContext) {

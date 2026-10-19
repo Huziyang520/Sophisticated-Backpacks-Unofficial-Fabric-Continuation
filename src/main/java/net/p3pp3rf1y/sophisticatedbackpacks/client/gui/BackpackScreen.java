@@ -57,11 +57,6 @@ public class BackpackScreen extends StorageScreenBase<BackpackContainer> {
 		return SBPTranslationHelper.INSTANCE.translGui("settings.tooltip");
 	}
 
-	@Override
-	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
-		if (getMenu().getNumberOfStorageInventorySlots() == 0 && Minecraft.getInstance().player != null) {
-			Minecraft.getInstance().player.closeContainer();
-		}
-	}
+	// 26.3：这里曾有一段「槽位数为 0 就 closeContainer」的逻辑，是排查期的临时补丁。
+	// 它会让界面开一帧就被自己关掉（表现为“打不开、也不崩”），已删除。
 }
