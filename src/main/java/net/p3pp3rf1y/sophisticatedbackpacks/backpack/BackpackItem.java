@@ -322,6 +322,12 @@ public class BackpackItem extends ItemBase implements IStashStorageItem {
 			return super.overrideStackedOnOther(storageStack, slot, action, player);
 		}
 
+		if (player.level().isClientSide()) {
+			// 26.3 客户端会先本机跑一遍 menu.clicked 再发包。客户端只预测「已处理」，
+			// 容器内容一律由服务端写 —— 否则客户端本地先把物品吞了，服务端一旦丢弃这次点击就是「物品直接消失」。
+			return true;
+		}
+
 		ItemStack stackToStash = slot.getItem();
 		ItemStack stashResult = stash(storageStack, stackToStash, true);
 		if (stashResult.getCount() < stackToStash.getCount()) {
@@ -346,10 +352,13 @@ public class BackpackItem extends ItemBase implements IStashStorageItem {
 			return super.overrideOtherStackedOnMe(storageStack, otherStack, slot, action, player, carriedAccess);
 		}
 
+		if (player.level().isClientSide()) {
+			return true;
+		}
+
 		ItemStack result = stash(storageStack, otherStack, false);
 		if (result.getCount() != otherStack.getCount()) {
 			carriedAccess.set(result);
-			slot.set(storageStack);
 			return true;
 		}
 
