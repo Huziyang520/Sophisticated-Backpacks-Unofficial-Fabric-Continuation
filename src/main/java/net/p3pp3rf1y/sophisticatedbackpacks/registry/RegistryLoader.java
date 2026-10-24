@@ -93,6 +93,12 @@ public class RegistryLoader extends SimplePreparableReloadListener<Map<Identifie
 		SophisticatedBackpacks.LOGGER.debug("Started loading registry data from {} ", name);
 		String path = name.getPath();
 		String shortName = path.substring(path.lastIndexOf('/') + 1);
+		// 26.3 的 FileToIdConverter.json 保留文件扩展名（1.21.1 会去掉），而解析器是按不带扩展名的名字注册的
+		// （block_tools / entity_tools / swords）。不剥掉的话每个 tool_data 文件都会落到 "No loader defined"，
+		// 于是工具/剑的匹配表整份是空的，同时刷 43 条 ERROR 把真错误埋掉。
+		if (shortName.endsWith(".json")) {
+			shortName = shortName.substring(0, shortName.length() - ".json".length());
+		}
 
 		if (!fullJson.isJsonObject()) {
 			return;

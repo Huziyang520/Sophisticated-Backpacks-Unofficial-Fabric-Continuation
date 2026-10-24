@@ -143,6 +143,12 @@ public class KeybindHandler {
 			double mouseX = mh.xpos() * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
 			double mouseY = mh.ypos() * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();
 			Slot selectedSlot = screen.findSlot(mouseX, mouseY);
+			// 26.3 的中键在容器界面里是「选取物品」（AbstractContainerScreen 里 keyPickItem → CLONE）。
+			// 这里若把格子上的中键也消费掉（allowMouseClick 返回 false），中键永远到不了父类，
+			// 背包界面就完全不能中键选取。规约：格子里有东西 → 让给原版；空格子/空白处 → 整理。
+			if (selectedSlot != null && selectedSlot.hasItem()) {
+				return false;
+			}
 			if (selectedSlot == null || container.isNotPlayersInventorySlot(selectedSlot.index)) {
 				container.sort();
 				return true;

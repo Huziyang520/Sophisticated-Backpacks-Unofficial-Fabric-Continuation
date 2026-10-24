@@ -1,10 +1,4 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedbackpacks:advanced_tool_swapper_upgrade"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_the_recipe": {

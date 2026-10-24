@@ -31,6 +31,13 @@ public class BackpackStorage extends SavedData {
 	private final Map<UUID, CompoundTag> backpackContents = new HashMap<>();
 	private static final BackpackStorage clientStorageCopy = new BackpackStorage();
 	private final Map<UUID, AccessLogRecord> accessLogRecords = new HashMap<>();
+	/**
+	 * 客户端已从服务端收到过内容的背包 uuid。背包内容不在物品组件上，而在服务端这份 SavedData 里，
+	 * 所以客户端 tooltip 只能靠「有没有收到过 backpack_contents」区分「空背包」与「还没同步」。
+	 * 只在 {@link #setBackpackContents}（服务端回包在客户端调用的入口）里记，
+	 * {@link #getOrCreateBackpackContents} 不算——它被客户端自己读内容时调用，会把「没同步」误判成「已同步」。
+	 */
+	private final Set<UUID> syncedBackpackContents = new HashSet<>();
 
 	private BackpackStorage() {
 	}
@@ -115,6 +122,7 @@ public class BackpackStorage extends SavedData {
 	}
 
 	public void setBackpackContents(UUID backpackUuid, CompoundTag contents) {
+		syncedBackpackContents.add(backpackUuid);
 		if (!backpackContents.containsKey(backpackUuid)) {
 			backpackContents.put(backpackUuid, contents);
 			updatedBackpackSettingsFlags.add(backpackUuid);
@@ -134,6 +142,13 @@ public class BackpackStorage extends SavedData {
 
 	public Map<UUID, AccessLogRecord> getAccessLogs() {
 		return accessLogRecords;
+	}
+
+	/**
+	 * 客户端是否已经收到过这只背包的内容。tooltip 用它区分「真空背包」与「内容还没同步」。
+	 */
+	public boolean hasSyncedContents(UUID backpackUuid) {
+		return syncedBackpackContents.contains(backpackUuid);
 	}
 
 	public int removeNonPlayerBackpackContents(boolean onlyWithEmptyInventory) {
@@ -161,6 +176,7 @@ public class BackpackStorage extends SavedData {
 		//if (evt.getLevel().isClientSide()) {
 			clientStorageCopy.backpackContents.clear();
 			clientStorageCopy.accessLogRecords.clear();
+			clientStorageCopy.syncedBackpackContents.clear();
 		//}
 	}
 }

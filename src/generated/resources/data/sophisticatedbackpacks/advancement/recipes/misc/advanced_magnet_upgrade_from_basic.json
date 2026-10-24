@@ -1,10 +1,4 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedbackpacks:advanced_magnet_upgrade"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_magnet_upgrade": {
