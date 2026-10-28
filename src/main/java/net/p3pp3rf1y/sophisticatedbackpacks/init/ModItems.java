@@ -3,6 +3,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.init;
 import com.mojang.serialization.MapCodec;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredHolder;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.phys.BlockHitResult;
 import net.p3pp3rf1y.sophisticatedbackpacks.Config;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
@@ -385,7 +387,33 @@ public class ModItems {
 	}
 
 	public static void registerCauldronInteractions() {
-		// 26.3 的大锅交互改为数据驱动（CauldronInteraction.WATER 已删除），这里没有编译期注册入口。
+		// 26.3 删了 CauldronInteraction.WATER 且 Dispatcher.put 是包私有，只能从 UseBlockCallback 接
+		UseBlockCallback.EVENT.register(ModItems::tryWashBackpack);
+	}
+
+	private static InteractionResult tryWashBackpack(Player player, Level level, InteractionHand hand, BlockHitResult hitResult) {
+		ItemStack stack = player.getItemInHand(hand);
+		if (!(stack.getItem() instanceof BackpackItem)) {
+			return InteractionResult.PASS;
+		}
+
+		BlockPos pos = hitResult.getBlockPos();
+		BlockState state = level.getBlockState(pos);
+		if (!(state.getBlock() instanceof LayeredCauldronBlock) || state.getValue(LayeredCauldronBlock.LEVEL) <= 0) {
+			return InteractionResult.PASS;
+		}
+
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
+		if (wrapper.getMainColor() == BackpackWrapper.DEFAULT_MAIN_COLOR && wrapper.getAccentColor() == BackpackWrapper.DEFAULT_ACCENT_COLOR) {
+			return InteractionResult.PASS;
+		}
+
+		if (!level.isClientSide()) {
+			wrapper.setColors(BackpackWrapper.DEFAULT_MAIN_COLOR, BackpackWrapper.DEFAULT_ACCENT_COLOR);
+			LayeredCauldronBlock.lowerFillLevel(state, level, pos);
+		}
+
+		return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
 	}
 
 	private static void registerCapabilities() {

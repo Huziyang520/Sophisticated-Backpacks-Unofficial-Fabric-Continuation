@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
@@ -26,10 +25,10 @@ import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackScreen;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.SBPTranslationHelper;
-import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.compat.CompatModIds;
 import net.p3pp3rf1y.sophisticatedbackpacks.network.*;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
 
@@ -91,6 +90,9 @@ public class KeybindHandler {
 			});
 		}
 
+		// 中键整理由核心屏幕统一执行，这里只把改过的键位交给它，避免两处各判一次
+		StorageScreenBase.setSortMouseMatcher(SORT_KEYBIND::matchesMouse);
+		StorageScreenBase.setSortKeyMatcher(SORT_KEYBIND::matches);
 		ClientTickEvents.END_CLIENT_TICK.register(KeybindHandler::handleKeyInputEvent);
 	}
 
@@ -103,18 +105,14 @@ public class KeybindHandler {
 	}
 
 	public static boolean handleGuiKeyPress(Screen screen, KeyEvent event) {
-		if (SORT_KEYBIND.matches(event) && tryCallSort(screen)) {
-			return false;
-		} else if (BACKPACK_OPEN_KEYBIND.matches(event) && sendBackpackOpenOrCloseMessage()) {
+		if (BACKPACK_OPEN_KEYBIND.matches(event) && sendBackpackOpenOrCloseMessage()) {
 			return false;
 		}
 		return true;
 	}
 
 	public static boolean handleGuiMouseKeyPress(Screen screen, MouseButtonEvent event) {
-		if (SORT_KEYBIND.matchesMouse(event) && tryCallSort(screen)) {
-			return false;
-		} else if (BACKPACK_OPEN_KEYBIND.matchesMouse(event) && sendBackpackOpenOrCloseMessage()) {
+		if (BACKPACK_OPEN_KEYBIND.matchesMouse(event) && sendBackpackOpenOrCloseMessage()) {
 			return false;
 		}
 		return true;
@@ -134,27 +132,6 @@ public class KeybindHandler {
 				}
 			}
 		}
-	}
-
-	public static boolean tryCallSort(Screen gui) {
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.player != null && mc.player.containerMenu instanceof BackpackContainer container && gui instanceof BackpackScreen screen) {
-			MouseHandler mh = mc.mouseHandler;
-			double mouseX = mh.xpos() * mc.getWindow().getGuiScaledWidth() / mc.getWindow().getScreenWidth();
-			double mouseY = mh.ypos() * mc.getWindow().getGuiScaledHeight() / mc.getWindow().getScreenHeight();
-			Slot selectedSlot = screen.findSlot(mouseX, mouseY);
-			// 26.3 的中键在容器界面里是「选取物品」（AbstractContainerScreen 里 keyPickItem → CLONE）。
-			// 这里若把格子上的中键也消费掉（allowMouseClick 返回 false），中键永远到不了父类，
-			// 背包界面就完全不能中键选取。规约：格子里有东西 → 让给原版；空格子/空白处 → 整理。
-			if (selectedSlot != null && selectedSlot.hasItem()) {
-				return false;
-			}
-			if (selectedSlot == null || container.isNotPlayersInventorySlot(selectedSlot.index)) {
-				container.sort();
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static void sendToolSwapMessage() {

@@ -20,4 +20,14 @@ public abstract class EnderDragonMixin extends Mob {
 		super(entityType, level);
 	}
 
+	// checkWalls 里两处 BlockState.is(TagKey)：ordinal 0 是 DRAGON_TRANSPARENT，ordinal 1 才是 DRAGON_IMMUNE
+	@Redirect(method = "checkWalls", require = 1,
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/tags/TagKey;)Z", ordinal = 1))
+	public boolean sophisticatedBackpacks$checkWalls(BlockState blockState, TagKey<Block> tagKey, @Local(ordinal = 0) BlockPos blockPos) {
+		if (blockState.getBlock() instanceof BlockInterfaceHelper bih) {
+			return !bih.canEntityDestroy(blockState, this.level(), blockPos, this);
+		}
+
+		return blockState.is(tagKey);
+	}
 }

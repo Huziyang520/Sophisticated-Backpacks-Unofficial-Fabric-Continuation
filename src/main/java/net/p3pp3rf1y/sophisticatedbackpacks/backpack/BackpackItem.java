@@ -52,6 +52,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.util.InventoryInteractionHelper;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedcore.api.IStashStorageItem;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
+import net.p3pp3rf1y.sophisticatedcore.extensions.item.SophisticatedItem;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
@@ -70,7 +71,7 @@ import java.util.function.UnaryOperator;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class BackpackItem extends ItemBase implements IStashStorageItem {
+public class BackpackItem extends ItemBase implements IStashStorageItem, SophisticatedItem {
 	private final IntSupplier numberOfSlots;
 	private final IntSupplier numberOfUpgradeSlots;
 	private final Supplier<BackpackBlock> blockSupplier;
@@ -270,10 +271,20 @@ public class BackpackItem extends ItemBase implements IStashStorageItem {
 		if (!(entity instanceof Player player) || player.isSpectator() || player.isDeadOrDying()) {
 			return;
 		}
+		// 26.3 的 inventoryTick 只给装备槽传真实槽位，主物品栏里非选中槽传 null，选中槽传 MAINHAND
+		if (Config.SERVER.nerfsConfig.onlyWornBackpackTriggersUpgrades.get() && itemSlot != EquipmentSlot.CHEST) {
+			return;
+		}
 		BackpackWrapper.fromStack(stack).getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
 				.forEach(upgrade -> upgrade.tick(player, player.level(), player.blockPosition())
 				);
 		super.inventoryTick(stack, level, entity, itemSlot);
+	}
+
+	@Override
+	public boolean onDroppedByPlayer(ItemStack item, Player player) {
+		return !(player.containerMenu instanceof BackpackContainer backpackContainer
+				&& backpackContainer.getVisibleStorageItem().map(visibleStorageItem -> visibleStorageItem == item).orElse(false));
 	}
 
 	public int getNumberOfSlots() {

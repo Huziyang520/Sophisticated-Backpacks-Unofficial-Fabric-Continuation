@@ -7,6 +7,8 @@ import com.google.common.util.concurrent.AtomicDouble;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.BlockTransformer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -372,9 +374,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 	}
 
 	private boolean itemWorksOnBlock(Level level, BlockPos pos, BlockState blockState, Player player, ItemStack stack) {
-		// 26.3：剥离/刮削/去蜡/平整等“工具改造方块”行为改为 BlockTransformer 组件驱动，
-		// 无法再逐种 ItemAbility 探测，这里退化为“物品带有方块改造能力即视为可用”
-		if (stack.has(DataComponents.BLOCK_TRANSFORMER)) {
+		if (blockTransformerWorksOn(level, pos, stack)) {
 			return true;
 		}
 		Block block = blockState.getBlock();
@@ -383,6 +383,24 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		}
 
 		return ToolRegistry.isToolForBlock(stack, block, level, blockState, pos);
+	}
+
+	// 26.3 用 BlockTransformer 组件做剥离/刮削/去蜡/平整，rule_based provider 对方块不匹配时返回 null，
+	// 拿它当只读探测即可判断这一格是否真能被改造
+	private static boolean blockTransformerWorksOn(Level level, BlockPos pos, ItemStack stack) {
+		Holder<BlockTransformer> transformerHolder = stack.get(DataComponents.BLOCK_TRANSFORMER);
+		if (transformerHolder == null) {
+			return false;
+		}
+
+		for (BlockTransformer.BlockTransformData transformData : transformerHolder.value().transforms()) {
+			if (!transformData.disallowedFaces().contains(Direction.UP)
+					&& transformData.blockStateProvider().value().getOptionalState(level, level.getRandom(), pos) != null) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean isShearsItem(ItemStack stack) {

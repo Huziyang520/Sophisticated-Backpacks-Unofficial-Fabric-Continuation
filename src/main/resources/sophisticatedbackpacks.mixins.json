@@ -13,8 +13,10 @@
     "common.WitherBossMixin",
     "common.WitherSkullMixin"
   ],
-  "client": [],
+  "client": [
+    "client.MinecraftMixin"
+  ],
   "injectors": {
-    "defaultRequire": 0
+    "defaultRequire": 1
   }
 }

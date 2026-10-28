@@ -64,6 +64,13 @@ public class EverlastingBackpackItemEntity extends ItemEntity {
 		return true;
 	}
 
+	// 26.3 的 isInvulnerableToBase 是 protected final，且 ItemEntity 的 hurtServer/hurtClient 也是 final，
+	// 唯一可覆写的入口是 isInvulnerable —— isInvulnerableToBase 里就是它
+	@Override
+	public boolean isInvulnerable() {
+		return true;
+	}
+
 	@Override
 	protected void onBelowWorld() {
 		//do nothing as the only thing that vanilla does here is remove entity from world, but it can't for this
