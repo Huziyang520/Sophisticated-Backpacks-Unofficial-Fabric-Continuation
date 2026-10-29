@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Lanière",
   "commands.sophisticatedbackpacks.give.success": "J'ai donné un sac à dos à %s",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Suppression %s des sacs à dos des non-joueurs",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Cliquez pour donner l'UUID du sac à dos : %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Cliquez pour donner l'UUID du sac à dos : %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Обрізка",
   "commands.sophisticatedbackpacks.give.success": "Віддав ранець %s",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Вилучено %s ранців не гравців",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Натисніть, щоб надати ранцю UUID: %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Натисніть, щоб надати ранцю UUID: %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

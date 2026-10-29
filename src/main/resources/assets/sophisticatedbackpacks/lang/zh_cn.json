@@ -554,5 +554,6 @@
   "config.sophisticatedbackpacks.server.nerfs.onlyWornBackpackTriggersUpgrades.tooltip": "是否只有玩家穿戴的背包中的主动升级才会生效；主动升级包括磁铁、拾取、熔炼、喂食等。",
   "config.sophisticatedbackpacks.server.maxUpgradesPerStorage": "每个背包的升级上限",
   "config.sophisticatedbackpacks.server.maxUpgradesPerStorage.tooltip": "每个背包各类型升级的数量上限，格式为 \"升级注册名[或升级组]|上限数量\"。",
-  "sophisticatedcore.link.feedback": "备用反馈地址"
+  "sophisticatedcore.link.feedback": "备用反馈地址",
+  "sophisticatedbackpacks.link.feedback": "备用反馈地址"
 }

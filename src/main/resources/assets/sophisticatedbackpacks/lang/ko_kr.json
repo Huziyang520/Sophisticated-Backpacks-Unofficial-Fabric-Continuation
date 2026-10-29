@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "테두리 색",
   "commands.sophisticatedbackpacks.give.success": "%s에게 배낭을 지급했습니다.",
   "commands.sophisticatedbackpacks.remove_non_player.success": "%s개의 비플레이어 배낭을 제거했습니다.",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "좌클릭하면 해당 배낭을 얻을 수 있습니다. UUID: %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "좌클릭하면 해당 배낭을 얻을 수 있습니다. UUID: %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

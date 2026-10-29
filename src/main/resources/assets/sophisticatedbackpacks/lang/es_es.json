@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Correa",
   "commands.sophisticatedbackpacks.give.success": "Le has dado la mochila a %s.",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Se han eliminado %s mochilas sin propietario.",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Haz clic para dar mochila UUID: %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Haz clic para dar mochila UUID: %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

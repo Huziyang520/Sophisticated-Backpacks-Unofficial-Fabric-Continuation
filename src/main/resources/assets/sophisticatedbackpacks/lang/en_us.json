@@ -411,5 +411,6 @@
   "config.sophisticatedbackpacks.server.nerfs.slownessLevelsPerAdditionalBackpack": "Slowness Levels Per Additional Backpack",
   "config.sophisticatedbackpacks.server.nerfs.onlyWornBackpackTriggersUpgrades": "Only Worn Backpack Triggers Upgrades",
   "config.sophisticatedbackpacks.server.maxUpgradesPerStorage": "Max Upgrades Per Storage",
-  "sophisticatedcore.link.feedback": "Backup Feedback"
+  "sophisticatedcore.link.feedback": "Backup Feedback",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

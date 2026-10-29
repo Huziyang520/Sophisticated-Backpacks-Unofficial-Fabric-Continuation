@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "修剪",
   "commands.sophisticatedbackpacks.give.success": "已將背包給予%s",
   "commands.sophisticatedbackpacks.remove_non_player.success": "已刪除%s個非玩家背包",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "點擊獲取背包UUID：%s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "點擊獲取背包UUID：%s",
+  "sophisticatedbackpacks.link.feedback": "備用回饋地址"
 }

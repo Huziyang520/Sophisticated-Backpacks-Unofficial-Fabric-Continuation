@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Kant",
   "commands.sophisticatedbackpacks.give.success": "Gav ryggsäck till %s",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Tog bort %s ryggsäckar från icke-spelare",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Klicka för att ge ryggsäckens UUID: %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Klicka för att ge ryggsäckens UUID: %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

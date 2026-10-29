@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Enfeite",
   "commands.sophisticatedbackpacks.give.success": "Deu mochila para %s",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Removida(s) %s mochila(s) de não-jogadores",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Clique para dar a mochila (%s)"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Clique para dar a mochila (%s)",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

@@ -222,5 +222,6 @@
   "commands.sophisticatedbackpacks.list.trim_color": "Süsleme",
   "commands.sophisticatedbackpacks.give.success": "Sırt çantası %s adlı oyuncuya verildi",
   "commands.sophisticatedbackpacks.remove_non_player.success": "Oyuncu olmayan sırt çantaları %s kaldırıldı",
-  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Sırt çantası UUID'sini vermek için tıkla: %s"
+  "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "Sırt çantası UUID'sini vermek için tıkla: %s",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

@@ -234,5 +234,6 @@
   "item.sophisticatedbackpacks.chipped.philosopher_workbench_upgrade": "Chipped: Philosophen-Werkbank-Upgrade",
   "item.sophisticatedbackpacks.chipped.philosopher_workbench_upgrade.tooltip": "Chipped Philosophen-Werkbank in einem Upgrade-Tab",
   "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade": "Chipped: Bastler-Werkbank-Upgrade",
-  "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade.tooltip": "Chipped Bastler-Werkbank in einem Upgrade-Tab"
+  "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade.tooltip": "Chipped Bastler-Werkbank in einem Upgrade-Tab",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }

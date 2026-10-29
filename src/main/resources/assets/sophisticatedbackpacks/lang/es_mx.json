@@ -234,5 +234,6 @@
   "item.sophisticatedbackpacks.chipped.philosopher_workbench_upgrade": "Mejora Chipped: Philosopher's Workbench",
   "item.sophisticatedbackpacks.chipped.philosopher_workbench_upgrade.tooltip": "Chipped Philosopher's Workbench es muna mejora",
   "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade": "Mejora Chipped: Tinkerer's Workbench",
-  "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade.tooltip": "Chipped Tinkerer's Workbench es una mejora"
+  "item.sophisticatedbackpacks.chipped.tinkerer_workbench_upgrade.tooltip": "Chipped Tinkerer's Workbench es una mejora",
+  "sophisticatedbackpacks.link.feedback": "Backup Feedback"
 }
