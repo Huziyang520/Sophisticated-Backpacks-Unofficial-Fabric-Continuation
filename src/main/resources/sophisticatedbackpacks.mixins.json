@@ -1,0 +1,23 @@
+{
+    "required": true,
+    "priority": 1100,
+    "minVersion": "0.8",
+    "package": "net.p3pp3rf1y.sophisticatedbackpacks.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "mixins": [
+        "common.CreeperMixin",
+        "common.EnderDragonMixin",
+        "common.ExplosionDamageCalculatorMixin",
+        "common.PiglinAiMixin",
+        "common.ShearableBlocksMixin",
+        "common.ShearableMixin",
+        "common.WitherBossMixin",
+        "common.WitherSkullMixin"
+    ],
+    "client": [
+        "client.ItemInHandRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
