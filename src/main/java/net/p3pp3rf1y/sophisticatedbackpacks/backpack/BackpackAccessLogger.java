@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;

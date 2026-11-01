@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.data;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -15,11 +15,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.chipped.ChippedCompat;
 import net.p3pp3rf1y.sophisticatedbackpacks.crafting.*;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatModIds;
-import net.p3pp3rf1y.sophisticatedcore.compat.chipped.BlockTransformationUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.crafting.ShapeBasedRecipeBuilder;
 import net.p3pp3rf1y.sophisticatedcore.crafting.UpgradeNextTierRecipe;
 import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
@@ -30,7 +28,7 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 	private static final String HAS_UPGRADE_BASE = "has_upgrade_base";
 	private static final String HAS_SMELTING_UPGRADE = "has_smelting_upgrade";
 
-	public SBPRecipeProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+	public SBPRecipeProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 		super(output, registriesFuture);
 	}
 
@@ -486,31 +484,6 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE.get()))
 				.save(recipeOutput);
 
-		ShapeBasedRecipeBuilder.shaped(ModItems.TOOL_SWAPPER_UPGRADE.get())
-				.pattern("RWR")
-				.pattern("PBA")
-				.pattern("ISI")
-				.define('B', ModItems.UPGRADE_BASE.get())
-				.define('S', Items.WOODEN_SHOVEL)
-				.define('P', Items.WOODEN_PICKAXE)
-				.define('A', Items.WOODEN_AXE)
-				.define('W', Items.WOODEN_SWORD)
-				.define('I', ConventionalItemTags.IRON_INGOTS)
-				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
-				.unlockedBy(HAS_UPGRADE_BASE, has(ModItems.UPGRADE_BASE.get()))
-				.save(recipeOutput);
-
-		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_TOOL_SWAPPER_UPGRADE.get(), UpgradeNextTierRecipe::new)
-				.pattern(" D ")
-				.pattern("GVG")
-				.pattern("RRR")
-				.define('D', ConventionalItemTags.DIAMOND_GEMS)
-				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
-				.define('V', ModItems.TOOL_SWAPPER_UPGRADE.get())
-				.unlockedBy("has_tool_swapper_upgrade", has(ModItems.TOOL_SWAPPER_UPGRADE.get()))
-				.save(recipeOutput);
-
 		ShapeBasedRecipeBuilder.shaped(ModItems.TANK_UPGRADE.get(), UpgradeNextTierRecipe::new)
 				.pattern("GGG")
 				.pattern("GBG")
@@ -531,15 +504,6 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 				.unlockedBy("has_feeding_upgrade", has(ModItems.FEEDING_UPGRADE.get()))
 				.save(recipeOutput);
 
-		ShapeBasedRecipeBuilder.shaped(ModItems.BATTERY_UPGRADE.get(), UpgradeNextTierRecipe::new)
-				.pattern("GRG")
-				.pattern("RBR")
-				.pattern("GRG")
-				.define('R', ConventionalItemTags.STORAGE_BLOCKS_REDSTONE)
-				.define('G', ConventionalItemTags.GOLD_INGOTS)
-				.define('B', ModItems.UPGRADE_BASE.get())
-				.unlockedBy(HAS_UPGRADE_BASE, has(ModItems.UPGRADE_BASE.get()))
-				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.PUMP_UPGRADE.get(), UpgradeNextTierRecipe::new)
 				.pattern("GUG")
@@ -688,31 +652,8 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 				.unlocks("has_diamond_backpack", has(ModItems.DIAMOND_BACKPACK.get()))
 				.save(recipeOutput, RegistryHelper.getItemKey(ModItems.NETHERITE_BACKPACK.get()));
 
-		addChippedUpgradeRecipes(recipeOutput);
 	}
 
-	private void addChippedUpgradeRecipes(RecipeOutput recipeOutput) {
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.BOTANIST_WORKBENCH_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.BOTANIST_WORKBENCH.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.GLASSBLOWER_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.GLASSBLOWER.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.CARPENTERS_TABLE_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.CARPENTERS_TABLE.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.LOOM_TABLE_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.LOOM_TABLE.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.MASON_TABLE_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.MASON_TABLE.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.ALCHEMY_BENCH_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.ALCHEMY_BENCH.get());
-		addChippedUpgradeRecipe(recipeOutput, ChippedCompat.TINKERING_TABLE_UPGRADE.get(), earth.terrarium.chipped.common.registry.ModBlocks.TINKERING_TABLE.get());
-	}
-
-	private void addChippedUpgradeRecipe(RecipeOutput recipeOutput, BlockTransformationUpgradeItem upgrade, Block workbench) {
-		ShapeBasedRecipeBuilder.shaped(upgrade)
-				.pattern(" W ")
-				.pattern("IBI")
-				.pattern(" R ")
-				.define('B', ModItems.UPGRADE_BASE.get())
-				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
-				.define('I', ConventionalItemTags.IRON_INGOTS)
-				.define('W', workbench)
-				.unlockedBy(HAS_UPGRADE_BASE, has(ModItems.UPGRADE_BASE.get()))
-				.save(withConditions(recipeOutput, ResourceConditions.allModsLoaded(CompatModIds.CHIPPED)));
-	}
 
 	private static Criterion<?> hasLeather() {
 		return inventoryTrigger(ItemPredicate.Builder.item().of(ConventionalItemTags.LEATHERS).build());

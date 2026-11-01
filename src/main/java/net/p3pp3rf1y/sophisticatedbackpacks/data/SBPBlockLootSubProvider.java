@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.data;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -15,7 +15,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 import java.util.concurrent.CompletableFuture;
 
 public class SBPBlockLootSubProvider extends FabricBlockLootTableProvider {
-	protected SBPBlockLootSubProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
+	protected SBPBlockLootSubProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
 		super(output, registryLookup);
 	}
 

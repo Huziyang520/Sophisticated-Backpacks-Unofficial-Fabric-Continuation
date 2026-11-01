@@ -1,10 +1,9 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.init;
 
-import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
+import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import team.reborn.energy.api.EnergyStorage;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -47,6 +46,5 @@ public class ModBlocks {
 	private static void registerCapabilities() {
 		ItemStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalItemHandler, BACKPACK_TILE_TYPE.get());
 		FluidStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalFluidHandler, BACKPACK_TILE_TYPE.get());
-		EnergyStorage.SIDED.registerForBlockEntity(BackpackBlockEntity::getExternalEnergyStorage, BACKPACK_TILE_TYPE.get());
 	}
 }

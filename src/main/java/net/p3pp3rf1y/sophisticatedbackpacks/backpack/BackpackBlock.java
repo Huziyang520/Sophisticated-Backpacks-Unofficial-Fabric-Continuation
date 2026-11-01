@@ -1,7 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
 import com.mojang.math.Axis;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import net.p3pp3rf1y.sophisticatedcore.platform.TransferHelper;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -33,7 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
@@ -76,7 +76,7 @@ public class BackpackBlock extends Block implements EntityBlock, SimpleWaterlogg
 	public static final BooleanProperty RIGHT_TANK = BooleanProperty.create("right_tank");
 	public static final BooleanProperty BATTERY = BooleanProperty.create("battery");
 
-	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final EnumProperty<net.minecraft.core.Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	private static final int BEDROCK_RESISTANCE = 3600000;
 
 	public BackpackBlock() {
@@ -174,7 +174,7 @@ public class BackpackBlock extends Block implements EntityBlock, SimpleWaterlogg
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (!stack.isEmpty() && FluidUtil.isFluidStorage(stack)) {
 			WorldHelper.getBlockEntity(level, pos, BackpackBlockEntity.class)
 					.flatMap(be -> be.getBackpackWrapper().getFluidHandler()).ifPresent(backpackFluidHandler ->
@@ -189,7 +189,7 @@ public class BackpackBlock extends Block implements EntityBlock, SimpleWaterlogg
 									}
 								}
 							}));
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 	}

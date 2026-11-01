@@ -26,7 +26,6 @@ import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackScreen;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.SBPTranslationHelper;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.compat.CompatModIds;
-import net.p3pp3rf1y.sophisticatedbackpacks.compat.trinkets.TrinketsCompat;
 import net.p3pp3rf1y.sophisticatedbackpacks.network.*;
 import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
@@ -207,7 +206,6 @@ public class KeybindHandler {
 	}
 
 	private static boolean isTrinket(Container container) {
-		return FabricLoader.getInstance().isModLoaded(CompatModIds.TRINKETS) && TrinketsCompat.isTrinketContainer(container);
 	}
 
 	record PlayerInventoryReturn(String identifier, String handlerName) {}
@@ -219,7 +217,6 @@ public class KeybindHandler {
 		} else if (slotIndex == OFFHAND_SLOT_INDEX) {
 			return Optional.of(new PlayerInventoryReturn("", PlayerInventoryProvider.OFFHAND_INVENTORY));
 		} else if (isTrinket(slot.container)) {
-			return Optional.of(new PlayerInventoryReturn(TrinketsCompat.getIdentifierForSlot(slot.container), CompatModIds.TRINKETS));
 		} else if (slotIndex >= 0 && slotIndex < 36) {
 			return Optional.of(new PlayerInventoryReturn("", PlayerInventoryProvider.MAIN_INVENTORY));
 		}

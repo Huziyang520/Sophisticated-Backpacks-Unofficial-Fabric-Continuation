@@ -27,7 +27,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.Vec3;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.p3pp3rf1y.sophisticatedcore.platform.FluidStack;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;

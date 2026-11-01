@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks;
 
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
+import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -15,7 +15,6 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilteredUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IUpgradeCountLimitConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeGroup;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.battery.BatteryUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoCookingUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.CookingUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.ICookingUpgrade;
@@ -103,7 +102,6 @@ public class Config {
 		public final ModConfigSpec.BooleanValue canBePlacedInContainerItems;
 		public final FilteredUpgradeConfig toolSwapperUpgrade;
 		public final TankUpgradeConfig tankUpgrade;
-		public final BatteryUpgradeConfig batteryUpgrade;
 		public final StackUpgradeConfig stackUpgrade;
 		public final PumpUpgradeConfig pumpUpgrade;
 		public final XpPumpUpgradeConfig xpPumpUpgrade;
@@ -112,8 +110,8 @@ public class Config {
 		public final MaxUgradesPerStorageConfig maxUpgradesPerStorage;
 
 		public void initListeners() {
-			NeoForgeModConfigEvents.loading(SophisticatedBackpacks.MOD_ID).register(this::onConfigLoad);
-			NeoForgeModConfigEvents.reloading(SophisticatedBackpacks.MOD_ID).register(this::onConfigReload);
+			ModConfigEvents.loading(SophisticatedBackpacks.MOD_ID).register(this::onConfigLoad);
+			ModConfigEvents.reloading(SophisticatedBackpacks.MOD_ID).register(this::onConfigReload);
 		}
 
 		public void onConfigReload(ModConfig modConfig) {
@@ -172,7 +170,6 @@ public class Config {
 			inceptionUpgrade = new InceptionUpgradeConfig(builder);
 			toolSwapperUpgrade = new FilteredUpgradeConfig(builder, "Tool Swapper Upgrade", "toolSwapperUpgrade", 8, 4);
 			tankUpgrade = new TankUpgradeConfig(builder);
-			batteryUpgrade = new BatteryUpgradeConfig(builder);
 			pumpUpgrade = new PumpUpgradeConfig(builder);
 			xpPumpUpgrade = new XpPumpUpgradeConfig(builder);
 			advancedJukeboxUpgrade = new JukeboxUpgradeConfig(builder, "Advanced Jukebox Upgrade", "advancedJukeboxUpgrade", 12);

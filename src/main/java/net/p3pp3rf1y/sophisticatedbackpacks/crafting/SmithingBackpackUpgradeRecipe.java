@@ -58,9 +58,10 @@ public class SmithingBackpackUpgradeRecipe extends SmithingTransformRecipe imple
 		return compose;
 	}
 
-	public static class Serializer extends RecipeWrapperSerializer<SmithingTransformRecipe, SmithingBackpackUpgradeRecipe> {
-		public Serializer() {
-			super(SmithingBackpackUpgradeRecipe::new, RecipeSerializer.SMITHING_TRANSFORM);
-		}
+	/**
+	 * Wraps the vanilla serializer so this recipe still loads and syncs.
+	 */
+	public static net.minecraft.world.item.crafting.RecipeSerializer<SmithingBackpackUpgradeRecipe> createSerializer() {
+		return RecipeWrapperSerializer.create(SmithingBackpackUpgradeRecipe::new, SmithingTransformRecipe.SERIALIZER);
 	}
 }

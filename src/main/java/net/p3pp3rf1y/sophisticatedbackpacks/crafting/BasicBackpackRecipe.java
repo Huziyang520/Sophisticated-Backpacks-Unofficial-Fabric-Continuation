@@ -39,9 +39,10 @@ public class BasicBackpackRecipe extends ShapedRecipe implements IWrapperRecipe<
 		return ModItems.BASIC_BACKPACK_RECIPE_SERIALIZER.get();
 	}
 
-	public static class Serializer extends RecipeWrapperSerializer<ShapedRecipe, BasicBackpackRecipe> {
-		public Serializer() {
-			super(BasicBackpackRecipe::new, RecipeSerializer.SHAPED_RECIPE);
-		}
+	/**
+	 * Wraps the vanilla serializer so this recipe still loads and syncs.
+	 */
+	public static net.minecraft.world.item.crafting.RecipeSerializer<BasicBackpackRecipe> createSerializer() {
+		return RecipeWrapperSerializer.create(BasicBackpackRecipe::new, ShapedRecipe.SERIALIZER);
 	}
 }

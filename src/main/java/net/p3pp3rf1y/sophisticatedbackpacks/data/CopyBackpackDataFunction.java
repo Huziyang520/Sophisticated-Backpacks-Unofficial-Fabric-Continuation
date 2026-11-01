@@ -5,7 +5,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
@@ -26,8 +25,8 @@ public class CopyBackpackDataFunction implements LootItemFunction {
 	}
 
 	@Override
-	public LootItemFunctionType<CopyBackpackDataFunction> getType() {
-		return ModItems.COPY_BACKPACK_DATA.get();
+	public MapCodec<? extends LootItemFunction> codec() {
+		return CODEC;
 	}
 
 	public static Builder builder() {

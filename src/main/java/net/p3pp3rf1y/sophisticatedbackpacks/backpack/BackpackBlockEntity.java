@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
-import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.p3pp3rf1y.sophisticatedcore.platform.SlottedStackStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -24,7 +24,6 @@ import net.p3pp3rf1y.sophisticatedcore.renderdata.TankPosition;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
-import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -46,7 +45,6 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Nullable
 	private IStorageFluidHandler externalFluidHandler;
 	@Nullable
-	private EnergyStorage externalEnergyStorage;
 
 	public BackpackBlockEntity(BlockPos pos, BlockState state) {
 		super(BACKPACK_TILE_TYPE.get(), pos, state);
@@ -144,7 +142,6 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		sophisticatedCore_invalidateCapabilities();
 		externalItemHandler = null;
 		externalFluidHandler = null;
-		externalEnergyStorage = null;
 	}
 
 	private boolean isBlockConnectionDisallowed(@Nullable Direction direction) {
@@ -173,16 +170,6 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		return externalFluidHandler;
 	}
 
-	@Nullable
-	public EnergyStorage getExternalEnergyStorage(@Nullable Direction direction) {
-		if (isBlockConnectionDisallowed(direction)) {
-			return null;
-		}
-		if (externalEnergyStorage == null) {
-			externalEnergyStorage = getBackpackWrapper().getEnergyStorage().map(EnergyStorage.class::cast).orElse(EnergyStorage.EMPTY);
-		}
-		return externalEnergyStorage;
-	}
 
 	public void refreshRenderState() {
 		BlockState state = getBlockState();

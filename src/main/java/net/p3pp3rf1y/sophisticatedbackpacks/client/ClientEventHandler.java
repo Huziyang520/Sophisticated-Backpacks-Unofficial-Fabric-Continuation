@@ -1,10 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client;
 
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
@@ -70,7 +66,6 @@ public class ClientEventHandler {
 	}
 
 	private static void onModelRegistry(Map<Identifier, IGeometryLoader<?>> loaders) {
-		loaders.put(Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, BACKPACK_REG_NAME), BackpackDynamicModel.Loader.INSTANCE);
 	}
 
 	public static void registerReloadListener() {
@@ -79,17 +74,14 @@ public class ClientEventHandler {
 
 	private static void registerEntityRenderers() {
 		EntityRendererRegistry.register(EVERLASTING_BACKPACK_ITEM_ENTITY.get(), ItemEntityRenderer::new);
-		BlockEntityRenderers.register(ModBlocks.BACKPACK_TILE_TYPE.get(), context -> new BackpackBlockEntityRenderer());
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), BACKPACKS.stream().map(Supplier::get).toArray(BackpackBlock[]::new));
 	}
 
 	public static void registerLayer() {
-		EntityModelLayerRegistry.registerModelLayer(BACKPACK_LAYER, BackpackModel::createBodyLayer);
 	}
 
 	private static void registerBackpackLayer() {
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) -> {
-			registrationHelper.register(new BackpackLayerRenderer<>(livingEntityRenderer));
 		});
 	}
 
@@ -116,6 +108,5 @@ public class ClientEventHandler {
 	}
 
 	private static void registerBackpackClientExtension() {
-		ModItems.BACKPACKS.forEach(backpack -> BuiltinItemRendererRegistry.INSTANCE.register(backpack.get(), new BackpackItemStackRenderer()));
 	}
 }
