@@ -46,6 +46,7 @@ public class ClientEventHandler {
 		registerLayer();
 		registerEntityRenderers();
 		registerReloadListener();
+		registerModelLayers();
 		registerBackpackClientExtension();
 		net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModBlockColors.registerBlockColorHandlers();
 		net.p3pp3rf1y.sophisticatedbackpacks.client.init.BackpackModelModifier.init();
@@ -66,6 +67,14 @@ public class ClientEventHandler {
 
 	private static void registerEntityRenderers() {
 		EntityRendererRegistry.register(EVERLASTING_BACKPACK_ITEM_ENTITY.get(), ItemEntityRenderer::new);
+	}
+
+	/**
+	 * Publishes the backpack layer so it can be baked once the layer set is built.
+	 */
+	private static void registerModelLayers() {
+		net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry
+				.registerModelLayer(BACKPACK_LAYER, BackpackModel::createBodyLayer);
 	}
 
 	public static void registerLayer() {

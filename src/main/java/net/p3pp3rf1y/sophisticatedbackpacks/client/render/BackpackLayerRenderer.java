@@ -36,7 +36,6 @@ import org.joml.Vector3f;
 public class BackpackLayerRenderer<S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLayer<S, M> {
 	public BackpackLayerRenderer(RenderLayerParent<S, M> entityRendererIn) {
 		super(entityRendererIn);
-		BackpackModelManager.initModels();
 	}
 
 	@Override
@@ -46,6 +45,8 @@ public class BackpackLayerRenderer<S extends LivingEntityRenderState, M extends 
 			return;
 		}
 
+		// Layers are baked with the entity models, which is after renderers are created.
+		BackpackModelManager.initModels();
 		IBackpackModel model = BackpackModelManager.getBackpackModel(backpack.getItem());
 		if (model == null) {
 			return;
