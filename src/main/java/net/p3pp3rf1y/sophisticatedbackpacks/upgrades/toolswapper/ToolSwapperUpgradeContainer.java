@@ -22,9 +22,9 @@ public class ToolSwapperUpgradeContainer extends UpgradeContainerBase<ToolSwappe
 	@Override
 	public void handlePacket(CompoundTag data) {
 		if (data.contains(DATA_SHOULD_SWAP_WEAPON)) {
-			setSwapWeapon(data.getBoolean(DATA_SHOULD_SWAP_WEAPON));
+			setSwapWeapon(data.getBooleanOr(DATA_SHOULD_SWAP_WEAPON, false));
 		} else if (data.contains(DATA_TOOL_SWAP_MODE)) {
-			setToolSwapMode(ToolSwapMode.fromName(data.getString(DATA_TOOL_SWAP_MODE)));
+			data.getString(DATA_TOOL_SWAP_MODE).ifPresent(name -> setToolSwapMode(ToolSwapMode.fromName(name)));
 		} else {
 			filterLogicContainer.handlePacket(data);
 		}

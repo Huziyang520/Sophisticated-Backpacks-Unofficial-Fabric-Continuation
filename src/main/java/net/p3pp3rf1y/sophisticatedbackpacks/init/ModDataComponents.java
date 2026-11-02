@@ -9,6 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.inception.InventoryOrder;
 import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill.RefillUpgradeWrapper;
+import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.toolswapper.ToolSwapMode;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -39,6 +40,9 @@ public class ModDataComponents {
 
     public static final Supplier<DataComponentType<Boolean>> SHOULD_SWAP_WEAPON = DATA_COMPONENT_TYPES.register("should_swap_weapon",
             () -> new DataComponentType.Builder<Boolean>().persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL).build());
+
+    public static final Supplier<DataComponentType<ToolSwapMode>> TOOL_SWAP_MODE = DATA_COMPONENT_TYPES.register("tool_swap_mode",
+            () -> new DataComponentType.Builder<ToolSwapMode>().persistent(ToolSwapMode.CODEC).networkSynchronized(ToolSwapMode.STREAM_CODEC).build());
 
 
     public static void register() {

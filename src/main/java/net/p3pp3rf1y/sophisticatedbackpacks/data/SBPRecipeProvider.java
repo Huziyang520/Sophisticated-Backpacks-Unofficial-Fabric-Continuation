@@ -494,6 +494,31 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE.get()))
 				.save(output);
 
+		ShapeBasedRecipeBuilder.shaped(ModItems.TOOL_SWAPPER_UPGRADE.get())
+				.pattern("RWR")
+				.pattern("PBA")
+				.pattern("ISI")
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.define('S', Items.WOODEN_SHOVEL)
+				.define('P', Items.WOODEN_PICKAXE)
+				.define('A', Items.WOODEN_AXE)
+				.define('W', Items.WOODEN_SWORD)
+				.define('I', ConventionalItemTags.IRON_INGOTS)
+				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
+				.unlockedBy(HAS_UPGRADE_BASE, has(ModItems.UPGRADE_BASE.get()))
+				.save(output);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_TOOL_SWAPPER_UPGRADE.get(), UpgradeNextTierRecipe::new)
+				.pattern(" D ")
+				.pattern("GVG")
+				.pattern("RRR")
+				.define('D', ConventionalItemTags.DIAMOND_GEMS)
+				.define('G', ConventionalItemTags.GOLD_INGOTS)
+				.define('R', ConventionalItemTags.REDSTONE_DUSTS)
+				.define('V', ModItems.TOOL_SWAPPER_UPGRADE.get())
+				.unlockedBy("has_tool_swapper_upgrade", has(ModItems.TOOL_SWAPPER_UPGRADE.get()))
+				.save(output);
+
 		ShapeBasedRecipeBuilder.shaped(ModItems.TANK_UPGRADE.get(), UpgradeNextTierRecipe::new)
 				.pattern("GGG")
 				.pattern("GBG")

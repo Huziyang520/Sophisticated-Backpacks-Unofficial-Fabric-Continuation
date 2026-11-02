@@ -4,8 +4,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.AtomicDouble;
-import io.github.fabricators_of_create.porting_lib.tool.ItemAbilities;
-import io.github.fabricators_of_create.porting_lib.tool.ItemAbility;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,6 +38,7 @@ import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.FilterLogic;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
+import net.p3pp3rf1y.sophisticatedcore.util.ToolAbilities;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -49,7 +48,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static io.github.fabricators_of_create.porting_lib.tool.ItemAbilities.*;
 
 public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpgradeWrapper, ToolSwapperUpgradeItem>
 		implements IBlockClickResponseUpgrade, IAttackEntityResponseUpgrade, IBlockToolSwapUpgrade, IEntityToolSwapUpgrade {
@@ -168,19 +166,9 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 	}
 
 	private static boolean canPerformToolAction(ItemStack stack) {
-		return canPerformAnyAction(stack, ItemAbilities.DEFAULT_AXE_ACTIONS) || canPerformAnyAction(stack, ItemAbilities.DEFAULT_HOE_ACTIONS)
-				|| canPerformAnyAction(stack, ItemAbilities.DEFAULT_PICKAXE_ACTIONS) || canPerformAnyAction(stack, ItemAbilities.DEFAULT_SHOVEL_ACTIONS)
-				|| canPerformAnyAction(stack, ItemAbilities.DEFAULT_SHEARS_ACTIONS);
+		return ToolAbilities.isDiggingTool(stack);
 	}
 
-	private static boolean canPerformAnyAction(ItemStack stack, Set<ItemAbility> toolActions) {
-		for (ItemAbility toolAction : toolActions) {
-			if (stack.canPerformAction(toolAction)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	private boolean isSword(ItemStack stack, Player player) {
 		if (SwordRegistry.isSword(stack)) {
@@ -188,7 +176,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		}
 
 		AttributeInstance attackDamage = player.getAttribute(Attributes.ATTACK_DAMAGE);
-		if (!stack.isEmpty() && stack.canPerformAction(ItemAbilities.SWORD_SWEEP)) {
+		if (!stack.isEmpty() && ToolAbilities.isSword(stack)) {
 			return attackDamage != null && attackDamage.getModifier(Item.BASE_ATTACK_DAMAGE_ID) != null;
 		}
 		return false;
@@ -229,12 +217,12 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		});
 
 		double damageValue = attribute.getValue();
-		if (stack.canPerformAction(ItemAbilities.AXE_DIG)) {
+		if (ToolAbilities.isAxe(stack)) {
 			if (damageValue > bestAxeDamage.get()) {
 				bestAxe.set(stack);
 				bestAxeDamage.set(damageValue);
 			}
-		} else if ((SwordRegistry.isSword(stack) || stack.canPerformAction(ItemAbilities.SWORD_SWEEP)) && damageValue > bestSwordDamage.get()) {
+		} else if ((SwordRegistry.isSword(stack) || ToolAbilities.isSword(stack)) && damageValue > bestSwordDamage.get()) {
 			bestSword.set(stack);
 			bestSwordDamage.set(damageValue);
 		}
@@ -381,14 +369,17 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		return false;
 	}
 
-	private static final Set<ItemAbility> BLOCK_MODIFICATION_ACTIONS = Set.of(AXE_STRIP, AXE_SCRAPE, AXE_WAX_OFF, SHOVEL_FLATTEN, SHEARS_CARVE, SHEARS_HARVEST);
-
+	/**
+	 * Whether the given tool is worth swapping in for this block.
+	 * <p>
+	 * 26.3 moved axe/shovel reshaping (stripping, waxing off, flattening) into block data, so there is
+	 * no runtime "tool modified state" to ask about any more. A tool qualifies when it is the correct
+	 * tool for the block or gets a speed bonus on it, which covers those reshaping cases as well.
+	 */
 	private boolean itemWorksOnBlock(Level level, BlockPos pos, BlockState blockState, Player player, ItemStack stack) {
-		for (ItemAbility action : BLOCK_MODIFICATION_ACTIONS) {
-			if (stack.canPerformAction(action) && blockState.getToolModifiedState(
-					new UseOnContext(level, player, InteractionHand.MAIN_HAND, stack, new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, true)), action, true) != null) {
-				return true;
-			}
+		if (ToolAbilities.hasToolComponent(stack)
+				&& (ToolAbilities.isCorrectForDrops(stack, blockState) || ToolAbilities.getMiningSpeed(stack, blockState) > 1F)) {
+			return true;
 		}
 		Block block = blockState.getBlock();
 		if (isShearInteractionBlock(level, pos, stack, block) && isShearsItem(stack)) {
