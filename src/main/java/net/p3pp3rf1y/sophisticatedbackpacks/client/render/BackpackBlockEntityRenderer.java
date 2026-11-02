@@ -6,12 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
@@ -20,6 +22,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 import net.p3pp3rf1y.sophisticatedcore.platform.FluidStack;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.TankPosition;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedBatteryUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedTankUpgrade;
 import org.joml.Matrix4f;
 
@@ -40,7 +43,7 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 
 	@Override
 	public void extractRenderState(BackpackBlockEntity blockEntity, State state, float partialTick, Vec3 cameraPos,
-			net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+			ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTick, cameraPos, crumblingOverlay);
 
 		BlockState blockState = blockEntity.getBlockState();
@@ -51,6 +54,8 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 
 		IBackpackWrapper wrapper = blockEntity.getBackpackWrapper();
 		RenderInfo renderInfo = wrapper.getRenderInfo();
+		// Idempotent: also covers worlds where no player layer has baked the model yet.
+		BackpackModelManager.initModels();
 		state.model = BackpackModelManager.getBackpackModel(wrapper.getBackpack().getItem());
 
 		state.leftFluid = getFluid(renderInfo, TankPosition.LEFT);
@@ -58,17 +63,14 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 		state.rightFluid = getFluid(renderInfo, TankPosition.RIGHT);
 		state.rightFill = getFill(renderInfo, TankPosition.RIGHT);
 
-		state.chargeRatio = renderInfo.getBatteryRenderInfo().map(info -> info.getChargeRatio()).orElse(0F);
-		state.displayItem = renderInfo.getItemDisplayRenderInfo().getDisplayItem().orElse(null);
-		state.displayRotation = state.displayItem == null ? 0F : state.displayItem.getRotation();
+		state.chargeRatio = renderInfo.getBatteryRenderInfo().map(IRenderedBatteryUpgrade.BatteryRenderInfo::getChargeRatio).orElse(0F);
 
 		ItemModelResolver resolver = Minecraft.getInstance().getItemModelResolver();
-		state.displayItemState = null;
-		if (state.displayItem != null) {
-			ItemStackRenderState itemState = new ItemStackRenderState();
-			resolver.updateForTopItem(itemState, state.displayItem.getItem(), ItemDisplayContext.FIXED, blockEntity.getLevel(), null, 0);
-			state.displayItemState = itemState;
-		}
+		state.displayItem = renderInfo.getItemDisplayRenderInfo().getDisplayItem().orElse(null);
+		state.displayRotation = state.displayItem == null ? 0F : state.displayItem.getRotation();
+		// Items are baked into the render state here because the item model resolver needs a level.
+		ItemStack itemStack = state.displayItem == null ? ItemStack.EMPTY : state.displayItem.getItem();
+		resolver.updateForTopItem(state.displayItemState, itemStack, ItemDisplayContext.FIXED, blockEntity.getLevel(), null, 0);
 	}
 
 	@Nullable
@@ -93,7 +95,7 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 		poseStack.mulPose(new Matrix4f().rotate(Axis.YN.rotationDegrees(state.facing.toYRot())));
 		poseStack.pushPose();
 		poseStack.scale(6 / 10f, 6 / 10f, 6 / 10f);
-		poseStack.mulPose(new Matrix4f().rotate(Axis.ZP.rotationDegrees(180)));
+		poseStack.rotate(Axis.ZP.rotationDegrees(180));
 		poseStack.translate(0, -2.5, 0);
 
 		if (state.showLeftTank && state.leftFluid != null) {
@@ -112,7 +114,7 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 
 		if (state.showBattery && state.chargeRatio > 0.1F) {
 			poseStack.pushPose();
-			poseStack.mulPose(new Matrix4f().rotate(Axis.XN.rotationDegrees(180)));
+			poseStack.rotate(Axis.XN.rotationDegrees(180));
 			poseStack.translate(0, -1.5, 0);
 			state.model.renderBatteryCharge(poseStack, collector, state.lightCoords, state.chargeRatio);
 			poseStack.popPose();
@@ -123,14 +125,14 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 	}
 
 	private void renderItemDisplay(State state, PoseStack poseStack, SubmitNodeCollector collector) {
-		if (state.displayItemState == null) {
+		if (state.displayItem == null) {
 			return;
 		}
 		poseStack.pushPose();
 		poseStack.translate(0, 0.6, 0.25);
 		poseStack.scale(0.5f, 0.5f, 0.5f);
-		poseStack.mulPose(new Matrix4f().rotate(Axis.XN.rotationDegrees(180)));
-		poseStack.mulPose(new Matrix4f().rotate(Axis.ZP.rotationDegrees(180f + state.displayRotation)));
+		poseStack.rotate(Axis.XN.rotationDegrees(180));
+		poseStack.rotate(Axis.ZP.rotationDegrees(180f + state.displayRotation));
 		state.displayItemState.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 		poseStack.popPose();
 	}
@@ -155,7 +157,6 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 		@Nullable
 		public RenderInfo.DisplayItem displayItem;
 		public float displayRotation;
-		@Nullable
-		public ItemStackRenderState displayItemState;
+		public final ItemStackRenderState displayItemState = new ItemStackRenderState();
 	}
 }

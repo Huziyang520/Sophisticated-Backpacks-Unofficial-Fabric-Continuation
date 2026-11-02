@@ -23,6 +23,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
@@ -545,6 +546,4 @@ public class BackpackModel extends EntityModel<LivingEntityRenderState> implemen
 				, PartPose.offset(0.0F, 24.0F, 0.0F)
 		);
 	}
-
-
 }

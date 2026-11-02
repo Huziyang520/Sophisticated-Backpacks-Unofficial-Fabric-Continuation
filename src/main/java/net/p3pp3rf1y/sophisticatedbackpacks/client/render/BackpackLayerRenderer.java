@@ -7,6 +7,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -52,9 +53,27 @@ public class BackpackLayerRenderer<S extends LivingEntityRenderState, M extends 
 
 		poseStack.pushPose();
 		EquipmentSlot equipmentSlot = model.getRenderEquipmentSlot();
-		boolean wearsArmor = equipmentSlot != EquipmentSlot.CHEST || !BackpackRenderStateData.isArmorSlot(state);
+		boolean wearsArmor = (equipmentSlot != EquipmentSlot.CHEST || !BackpackRenderStateData.isArmorSlot(state))
+				&& hasArmorInSlot(state, equipmentSlot);
 		renderBackpack(getParentModel(), state, poseStack, collector, packedLight, backpack, wearsArmor, model);
 		poseStack.popPose();
+	}
+
+	/**
+	 * 26.3 dropped {@code Inventory.armor}, so the worn armor comes from the humanoid render state instead.
+	 */
+	private static boolean hasArmorInSlot(LivingEntityRenderState state, EquipmentSlot slot) {
+		if (!(state instanceof HumanoidRenderState humanoid)) {
+			return false;
+		}
+		ItemStack worn = switch (slot) {
+			case HEAD -> humanoid.headEquipment;
+			case CHEST -> humanoid.chestEquipment;
+			case LEGS -> humanoid.legsEquipment;
+			case FEET -> humanoid.feetEquipment;
+			default -> ItemStack.EMPTY;
+		};
+		return !worn.isEmpty();
 	}
 
 	public static <M extends EntityModel<?>> void renderBackpack(M parentModel, LivingEntityRenderState state, PoseStack matrixStack,
