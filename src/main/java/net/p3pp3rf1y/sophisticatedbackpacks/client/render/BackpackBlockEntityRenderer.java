@@ -24,7 +24,6 @@ import net.p3pp3rf1y.sophisticatedcore.renderdata.RenderInfo;
 import net.p3pp3rf1y.sophisticatedcore.renderdata.TankPosition;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedBatteryUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.IRenderedTankUpgrade;
-import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
 
@@ -92,10 +91,10 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 
 		poseStack.pushPose();
 		poseStack.translate(0.5, 0, 0.5);
-		poseStack.mulPose(new Matrix4f().rotate(Axis.YN.rotationDegrees(state.facing.toYRot())));
+		poseStack.rotateDegrees(Axis.YN, state.facing.toYRot());
 		poseStack.pushPose();
 		poseStack.scale(6 / 10f, 6 / 10f, 6 / 10f);
-		poseStack.rotate(Axis.ZP.rotationDegrees(180));
+		poseStack.rotateDegrees(Axis.ZP, 180);
 		poseStack.translate(0, -2.5, 0);
 
 		if (state.showLeftTank && state.leftFluid != null) {
@@ -114,7 +113,7 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 
 		if (state.showBattery && state.chargeRatio > 0.1F) {
 			poseStack.pushPose();
-			poseStack.rotate(Axis.XN.rotationDegrees(180));
+			poseStack.rotateDegrees(Axis.XN, 180);
 			poseStack.translate(0, -1.5, 0);
 			state.model.renderBatteryCharge(poseStack, collector, state.lightCoords, state.chargeRatio);
 			poseStack.popPose();
@@ -131,8 +130,8 @@ public class BackpackBlockEntityRenderer implements BlockEntityRenderer<Backpack
 		poseStack.pushPose();
 		poseStack.translate(0, 0.6, 0.25);
 		poseStack.scale(0.5f, 0.5f, 0.5f);
-		poseStack.rotate(Axis.XN.rotationDegrees(180));
-		poseStack.rotate(Axis.ZP.rotationDegrees(180f + state.displayRotation));
+		poseStack.rotateDegrees(Axis.XN, 180);
+		poseStack.rotateDegrees(Axis.ZP, 180f + state.displayRotation);
 		state.displayItemState.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 		poseStack.popPose();
 	}
