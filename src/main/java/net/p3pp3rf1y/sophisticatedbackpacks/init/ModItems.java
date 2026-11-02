@@ -3,6 +3,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.init;
 import com.mojang.serialization.MapCodec;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredHolder;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
+import net.p3pp3rf1y.sophisticatedcore.platform.RegistryRegistrationContext;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -245,7 +246,7 @@ public class ModItems {
 	public static final DeferredHolder<Item, ToolSwapperUpgradeItem> ADVANCED_TOOL_SWAPPER_UPGRADE = ITEMS.register("advanced_tool_swapper_upgrade",
 			() -> new ToolSwapperUpgradeItem(true, true));
 
-	public static final Supplier<ItemBase> UPGRADE_BASE = ITEMS.register("upgrade_base", () -> new ItemBase(new Item.Properties().stacksTo(16)));
+	public static final Supplier<ItemBase> UPGRADE_BASE = ITEMS.register("upgrade_base", () -> new ItemBase(RegistryRegistrationContext.itemProperties().stacksTo(16)));
 
 	public static final Supplier<CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
 			FabricCreativeModeTab.builder().icon(() -> new ItemStack(ModItems.BACKPACK.get()))
