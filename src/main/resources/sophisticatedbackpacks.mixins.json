@@ -14,6 +14,9 @@
         "common.WitherBossMixin",
         "common.WitherSkullMixin"
     ],
+    "client": [
+        "client.LivingEntityRendererExtractMixin"
+    ],
     "injectors": {
         "defaultRequire": 1
     }

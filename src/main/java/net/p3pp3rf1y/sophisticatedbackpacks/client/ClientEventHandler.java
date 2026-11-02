@@ -69,9 +69,10 @@ public class ClientEventHandler {
 	public static void registerLayer() {
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static void registerBackpackLayer() {
-		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) -> {
-		});
+		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) ->
+				registrationHelper.register(new BackpackLayerRenderer(livingEntityRenderer)));
 	}
 
 	public static ItemStack handleBlockPick(Player player, HitResult target, ItemStack stack) {

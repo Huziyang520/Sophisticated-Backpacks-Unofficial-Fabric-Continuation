@@ -52,7 +52,13 @@ public class PlayerInventoryProvider {
 		}
 	}
 
-	public Optional<RenderInfo> getBackpackFromRendered(Player player) {
+	/**
+	 * Resolves the backpack that should be drawn on this player's body.
+	 * <p>
+	 * 26.3 split entity rendering into extract and submit, and submit no longer sees the player, so
+	 * callers that draw during submit need the stack plus which inventory it came from.
+	 */
+	public Optional<RenderedBackpack> getBackpackFromRendered(Player player) {
 		for (String handlerName : renderedHandlers) {
 			PlayerInventoryHandler invHandler = playerInventoryHandlers.get(handlerName);
 			if (invHandler == null) {
@@ -64,12 +70,22 @@ public class PlayerInventoryProvider {
 				for (int slot = 0; slot < invHandler.getSlotCount(player, identifier); slot++) {
 					ItemStack slotStack = invHandler.getStackInSlot(player, identifier, slot);
 					if (slotStack.getItem() instanceof BackpackItem) {
-						return invHandler.hasItsOwnRenderer() ? Optional.empty() : Optional.of(new RenderInfo(slotStack, handlerName.equals(ARMOR_INVENTORY)));
+						return invHandler.hasItsOwnRenderer() ? Optional.empty()
+								: Optional.of(new RenderedBackpack(slotStack, handlerName.equals(ARMOR_INVENTORY)));
 					}
 				}
 			}
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * A backpack chosen for body rendering.
+	 *
+	 * @param backpack     the stack to draw
+	 * @param isArmorSlot  whether it came from the chest armor slot
+	 */
+	public record RenderedBackpack(ItemStack backpack, boolean isArmorSlot) {
 	}
 
 	private Map<String, PlayerInventoryHandler> getPlayerInventoryHandlers() {
