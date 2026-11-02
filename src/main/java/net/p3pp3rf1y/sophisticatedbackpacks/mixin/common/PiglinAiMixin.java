@@ -19,8 +19,8 @@ import java.util.List;
 
 @Mixin(PiglinAi.class)
 public class PiglinAiMixin {
-	@Inject(method = "isWearingGold", at = @At(value = "HEAD"), cancellable = true)
-	private static void sophisticatedBackpacks$isWearingGold(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
+	@Inject(method = "isWearingSafeArmor", at = @At(value = "HEAD"), cancellable = true)
+	private static void sophisticatedBackpacks$isWearingSafeArmor(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
 		for (ItemStack itemStack : sophisticatedBackpacks_getArmorSlots(entity)) {
 			if (itemStack.makesPiglinsNeutral(entity)) {
 				cir.setReturnValue(true);

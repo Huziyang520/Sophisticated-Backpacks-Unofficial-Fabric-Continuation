@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(WitherSkull.class)
 public class WitherSkullMixin {
-	@ModifyExpressionValue(method = "getBlockExplosionResistance", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/WitherSkull;isDangerous()Z"))
+	@ModifyExpressionValue(method = "getBlockExplosionResistance", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/hurtingprojectile/WitherSkull;isDangerous()Z"))
 	public boolean sophisticatedBackpacks$canDestroy(boolean original, @Local(argsOnly = true) BlockGetter blockGetter, @Local(argsOnly = true) BlockPos blockPos, @Local(argsOnly = true) BlockState blockState) {
 		if (blockState.getBlock() instanceof BlockInterfaceHelper bih) {
 			return original && bih.canEntityDestroy(blockState, blockGetter, blockPos, (Entity)(Object) this);
