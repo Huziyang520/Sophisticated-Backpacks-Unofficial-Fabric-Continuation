@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.crafting;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -18,7 +17,7 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	private final ShapedRecipe compose;
 
 	public BackpackUpgradeRecipe(ShapedRecipe compose) {
-		super(compose.getGroup(), compose.category(), compose.pattern, compose.result);
+		super(compose.commonInfo, compose.bookInfo, compose.pattern, compose.result);
 		this.compose = compose;
 	}
 
@@ -33,8 +32,8 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput inv, HolderLookup.Provider registries) {
-		ItemStack upgradedBackpack = super.assemble(inv, registries);
+	public ItemStack assemble(CraftingInput inv) {
+		ItemStack upgradedBackpack = super.assemble(inv);
 		getBackpack(inv).map(ItemStack::getComponents).ifPresent(upgradedBackpack::applyComponents);
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(upgradedBackpack);
 
@@ -56,8 +55,8 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
-		return ModItems.BACKPACK_UPGRADE_RECIPE_SERIALIZER.get();
+	public RecipeSerializer<ShapedRecipe> getSerializer() {
+		return (RecipeSerializer<ShapedRecipe>) (RecipeSerializer<?>) ModItems.BACKPACK_UPGRADE_RECIPE_SERIALIZER.get();
 	}
 
 	/**

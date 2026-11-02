@@ -61,7 +61,7 @@ public class AccessLogRecord {
 	public CompoundTag serializeToNBT() {
 		CompoundTag ret = new CompoundTag();
 		ret.putString("backpackItemRegistryName", backpackItemRegistryName.toString());
-		ret.putUUID("backpackUuid", backpackUuid);
+		ret.put("backpackUuid", net.minecraft.core.UUIDUtil.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, backpackUuid).getOrThrow());
 		ret.putString("playerName", playerName);
 		ret.putString("backpackName", backpackName);
 		ret.putInt("clothColor", clothColor);
@@ -73,14 +73,14 @@ public class AccessLogRecord {
 
 	public static AccessLogRecord deserializeFromNBT(CompoundTag nbt) {
 		return new AccessLogRecord(
-				Identifier.parse(nbt.getString("backpackItemRegistryName")),
-				nbt.getUUID("backpackUuid"),
-				nbt.getString("playerName"),
-				nbt.getString("backpackName"),
-				nbt.getInt("clothColor"),
-				nbt.getInt("trimColor"),
-				nbt.getLong("accessTime"),
-				nbt.getInt("columnsTaken")
+				Identifier.parse(nbt.getString("backpackItemRegistryName").orElse("")),
+				net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, nbt.get("backpackUuid")).getOrThrow(),
+				nbt.getString("playerName").orElse(""),
+				nbt.getString("backpackName").orElse(""),
+				nbt.getInt("clothColor").orElse(0),
+				nbt.getInt("trimColor").orElse(0),
+				nbt.getLong("accessTime").orElse(0L),
+				nbt.getInt("columnsTaken").orElse(0)
 		);
 	}
 }

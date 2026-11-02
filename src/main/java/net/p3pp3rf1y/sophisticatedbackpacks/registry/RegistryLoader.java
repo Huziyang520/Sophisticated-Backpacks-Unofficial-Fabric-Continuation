@@ -1,9 +1,11 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.registry;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -17,9 +19,8 @@ import net.p3pp3rf1y.sophisticatedbackpacks.registry.tool.ToolRegistry;
 
 import java.util.*;
 
-public class RegistryLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
+public class RegistryLoader extends SimpleJsonResourceReloadListener<JsonElement> implements IdentifiableResourceReloadListener {
 	private static final Map<String, IRegistryDataLoader> loaders = new HashMap<>();
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 	public static void registerParser(IRegistryDataLoader parser) {
 		loaders.put(parser.getName(), parser);
@@ -34,8 +35,13 @@ public class RegistryLoader extends SimpleJsonResourceReloadListener implements 
 	private final Map<Identifier, String> loadedRegistries = new HashMap<>();
 
 	public RegistryLoader() {
-		super(GSON, "registry");
+		super(JSON_CODEC, FileToIdConverter.json("registry"));
 	}
+
+	/** 26.3 的 JSON reload listener 只接受 Codec，这里用 JsonOps 直接往返保留原始 JSON。 */
+	private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
+			dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
+			json -> new Dynamic<>(JsonOps.INSTANCE, json));
 
 	@Override
 	public Identifier getFabricId() {

@@ -171,7 +171,7 @@ public class ToolRegistry {
 			return getItemsAndItemPredicates(toolArray);
 		} else {
 			SophisticatedBackpacks.LOGGER.error("Invalid tools list - needs to be an array {}", property.getValue());
-			return new Tuple<>(Collections.emptySet(), Collections.emptySet());
+			return new ToolSets(Collections.emptySet(), Collections.emptySet());
 		}
 	}
 

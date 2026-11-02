@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SmithingTemplateItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.SBPTranslationHelper;
@@ -58,11 +58,9 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 
 			if (!stack.isEmpty()) {
 				ItemStack itemstack = stack.copy();
-				if (stack.getItem() instanceof ArmorItem armoritem) {
-					armorStandPreview.setItemSlot(armoritem.getEquipmentSlot(), itemstack);
-				} else {
-					armorStandPreview.setItemSlot(EquipmentSlot.OFFHAND, itemstack);
-				}
+				EquipmentSlot equipmentslot = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE) != null
+						? stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE).slot() : EquipmentSlot.OFFHAND;
+				armorStandPreview.setItemSlot(equipmentslot, itemstack);
 			}
 		}
 	}
@@ -77,9 +75,9 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 			renderSlotBg(guiGraphics, getContainer().getAdditionalSlot());
 			renderSlotBg(guiGraphics, getContainer().getResultSlot());
 
-			templateIcon.render(screen.getMenu(), guiGraphics, 0, screen.getLeftX(), screen.getTopY());
-			baseIcon.render(screen.getMenu(), guiGraphics, 0, screen.getLeftX(), screen.getTopY());
-			additionalIcon.render(screen.getMenu(), guiGraphics, 0, screen.getLeftX(), screen.getTopY());
+			templateIcon.extractRenderState(screen.getMenu(), guiGraphics, 0, screen.sophisticatedCore_getGuiLeft(), screen.sophisticatedCore_getGuiTop());
+			baseIcon.extractRenderState(screen.getMenu(), guiGraphics, 0, screen.sophisticatedCore_getGuiLeft(), screen.sophisticatedCore_getGuiTop());
+			additionalIcon.extractRenderState(screen.getMenu(), guiGraphics, 0, screen.sophisticatedCore_getGuiLeft(), screen.sophisticatedCore_getGuiTop());
 		}
 	}
 
@@ -94,8 +92,8 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+	protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		if (!isOpen) {
 			return;
@@ -114,8 +112,7 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 			GuiHelper.blit(guiGraphics, arrowX, arrowY, RED_CROSS);
 		}
 
-		InventoryScreen.renderEntityInInventory(guiGraphics, getX() + getWidth() / 2F, getTopY() + getHeight() - 10, 25.0F,
-				SmithingScreen.ARMOR_STAND_TRANSLATION, SmithingScreen.ARMOR_STAND_ANGLE, null, armorStandPreview);
+		InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, getX(), getTopY() + getHeight() - 60, getWidth(), 60, 25, 0.0625F, getX() + getWidth() / 2F, getTopY() + getHeight() - 10, armorStandPreview);
 	}
 
 	private int getArrowY(int inputSlotsY) {
@@ -189,10 +186,10 @@ public class SmithingUpgradeTab extends UpgradeSettingsTab<SmithingUpgradeContai
 	}
 
 	private void renderOnboardingTooltip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, Component tooltip) {
-		guiGraphics.pose().pushPose();
-		guiGraphics.pose().translate(0, 0, 410);
-		guiGraphics.renderTooltip(font, font.split(tooltip, 115), mouseX, mouseY);
-		guiGraphics.pose().popPose();
+		guiGraphics.pose().pushMatrix();
+		guiGraphics.nextStratum();
+		guiGraphics.setTooltipForNextFrame(font, font.split(tooltip, 115), mouseX, mouseY);
+		guiGraphics.pose().popMatrix();
 	}
 
 	private boolean hasRecipeError() {

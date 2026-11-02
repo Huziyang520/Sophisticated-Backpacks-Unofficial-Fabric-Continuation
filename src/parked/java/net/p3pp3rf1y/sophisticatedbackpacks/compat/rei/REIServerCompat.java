@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.compat.rei;
 
 import me.shedaniel.rei.api.common.entry.comparison.EntryComparator;
 import me.shedaniel.rei.api.common.entry.comparison.ItemComparatorRegistry;
-import me.shedaniel.rei.api.common.plugins.REIServerPlugin;
+import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +14,7 @@ import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 
 import java.util.function.Supplier;
 
-public class REIServerCompat implements REIServerPlugin {
+public class REIServerCompat implements REICommonPlugin {
     @Override
     public double getPriority() {
         return 0D;

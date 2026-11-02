@@ -8,7 +8,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackSettingsScreen;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.compat.jei.DyeRecipesMaker;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
-import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
+
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.REIStorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.SophisticatedTransferHandler;
 import net.p3pp3rf1y.sophisticatedcore.crafting.UpgradeNextTierRecipe;

@@ -3,18 +3,20 @@ package net.p3pp3rf1y.sophisticatedbackpacks.init;
 import com.mojang.serialization.MapCodec;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredHolder;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.cauldron.CauldronInteractions;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -46,7 +48,6 @@ import net.p3pp3rf1y.sophisticatedbackpacks.crafting.BasicBackpackRecipe;
 import net.p3pp3rf1y.sophisticatedbackpacks.crafting.SmithingBackpackUpgradeRecipe;
 import net.p3pp3rf1y.sophisticatedbackpacks.data.CopyBackpackDataFunction;
 import net.p3pp3rf1y.sophisticatedbackpacks.data.SBLootEnabledCondition;
-import net.p3pp3rf1y.sophisticatedbackpacks.data.SBLootModifierProvider;
 import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil.AnvilUpgradeContainer;
 import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil.AnvilUpgradeItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil.AnvilUpgradeWrapper;
@@ -122,7 +123,6 @@ public class ModItems {
 	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, SophisticatedBackpacks.MOD_ID);
 	public static final DeferredRegister<com.mojang.serialization.MapCodec<? extends LootItemFunction>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, SophisticatedBackpacks.MOD_ID);
 	public static final DeferredRegister<com.mojang.serialization.MapCodec<? extends LootItemCondition>> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, SophisticatedBackpacks.MOD_ID);
-	public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS = DeferredRegister.create(PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS, SophisticatedBackpacks.MOD_ID);
 	private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(BuiltInRegistries.MENU, SophisticatedBackpacks.MOD_ID);
 	private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, SophisticatedBackpacks.MOD_ID);
 
@@ -237,9 +237,9 @@ public class ModItems {
 	public static final Supplier<ItemBase> UPGRADE_BASE = ITEMS.register("upgrade_base", () -> new ItemBase(new Item.Properties().stacksTo(16)));
 
 	public static final Supplier<CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("main", () ->
-			FabricItemGroup.builder().icon(() -> new ItemStack(ModItems.BACKPACK.get()))
+			FabricCreativeModeTab.builder().icon(() -> new ItemStack(ModItems.BACKPACK.get()))
 					.title(Component.translatable("itemGroup.sophisticatedbackpacks"))
-					.displayItems((featureFlags, output) -> ITEMS.getEntries().stream().filter(i -> i.get() instanceof ItemBase).forEach(i -> ((ItemBase) i.get()).addCreativeTabItems(output::accept)))
+					.displayItems((params, output) -> ITEMS.getEntries().stream().filter(i -> i.get() instanceof ItemBase).forEach(i -> ((ItemBase) i.get()).addCreativeTabItems(output::accept)))
 					.build());
 
 	public static final Supplier<MenuType<BackpackContainer>> BACKPACK_CONTAINER_TYPE = MENU_TYPES.register("backpack",
@@ -257,7 +257,7 @@ public class ModItems {
 
 	public static final Supplier<EntityType<EverlastingBackpackItemEntity>> EVERLASTING_BACKPACK_ITEM_ENTITY = ENTITY_TYPES.register(
 			"everlasting_backpack_item", () -> EntityType.Builder.of(EverlastingBackpackItemEntity::new, MobCategory.MISC)
-					.sized(0.25F, 0.25F).clientTrackingRange(6).updateInterval(20).build("")
+					.sized(0.25F, 0.25F).clientTrackingRange(6).updateInterval(20).build(ResourceKey.create(Registries.ENTITY_TYPE, SophisticatedBackpacks.getRL("everlasting_backpack_item")))
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,14 +269,13 @@ public class ModItems {
 
 	private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, SophisticatedBackpacks.MOD_ID);
 
-	public static final Supplier<SimpleCraftingRecipeSerializer<?>> BACKPACK_DYE_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("backpack_dye", () -> new SimpleCraftingRecipeSerializer<>(BackpackDyeRecipe::new));
+	public static final Supplier<RecipeSerializer<?>> BACKPACK_DYE_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("backpack_dye", () -> new RecipeSerializer<>(BackpackDyeRecipe.CODEC, BackpackDyeRecipe.STREAM_CODEC));
 	public static final Supplier<RecipeSerializer<?>> BACKPACK_UPGRADE_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("backpack_upgrade", BackpackUpgradeRecipe::createSerializer);
 	public static final Supplier<RecipeSerializer<?>> SMITHING_BACKPACK_UPGRADE_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("smithing_backpack_upgrade", SmithingBackpackUpgradeRecipe::createSerializer);
 	public static final Supplier<RecipeSerializer<?>> BASIC_BACKPACK_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("basic_backpack", BasicBackpackRecipe::createSerializer);
 
 	public static final Supplier<com.mojang.serialization.MapCodec<? extends LootItemFunction>> COPY_BACKPACK_DATA = LOOT_FUNCTION_TYPES.register("copy_backpack_data", () -> CopyBackpackDataFunction.CODEC);
 	public static final Supplier<com.mojang.serialization.MapCodec<? extends LootItemCondition>> LOOT_ENABLED_CONDITION = LOOT_CONDITION_TYPES.register("loot_enabled", () -> SBLootEnabledCondition.CODEC);
-	public static final Supplier<MapCodec<SBLootModifierProvider.InjectLootModifier>> INJECT_LOOT = LOOT_MODIFIERS.register("inject_loot", () -> SBLootModifierProvider.InjectLootModifier.CODEC);
 
 	public static void registerHandlers() {
 		ITEMS.register();
@@ -287,7 +286,6 @@ public class ModItems {
 		RECIPE_SERIALIZERS.register();
 		LOOT_FUNCTION_TYPES.register();
 		LOOT_CONDITION_TYPES.register();
-		LOOT_MODIFIERS.register();
 
 		registerContainers();
 		registerCapabilities();
@@ -370,7 +368,7 @@ public class ModItems {
 	}
 
 	public static void registerCauldronInteractions() {
-		ModItems.BACKPACKS.forEach(backpack -> CauldronInteraction.WATER.map().put(backpack.get(), new BackpackCauldronInteraction()));
+		ModItems.BACKPACKS.forEach(backpack -> CauldronInteractions.WATER.put(backpack.get(), new BackpackCauldronInteraction()));
 	}
 
 	private static void registerCapabilities() {
@@ -399,12 +397,12 @@ public class ModItems {
 				return InteractionResult.FAIL;
 			}
 
-			if (!level.isClientSide) {
+			if (!level.isClientSide()) {
 				backpackWrapper.setColors(BackpackWrapper.DEFAULT_MAIN_COLOR, BackpackWrapper.DEFAULT_ACCENT_COLOR);
 				LayeredCauldronBlock.lowerFillLevel(state, level, pos);
 			}
 
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER);
 		}
 	}
 

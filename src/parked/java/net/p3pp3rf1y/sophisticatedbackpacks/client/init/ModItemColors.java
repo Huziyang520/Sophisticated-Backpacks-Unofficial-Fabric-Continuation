@@ -2,7 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.client.init;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackWrapper;
@@ -19,7 +19,7 @@ public class ModItemColors {
 	}
 
 	public static void registerItemColorHandlers() {
-		ColorProviderRegistry.ITEM.register((backpack, layer) -> {
+		net.fabricmc.fabric.api.client.rendering.v1.ItemColorRegistry.ITEM.register((backpack, layer) -> {
 			if (layer > 3 || !(backpack.getItem() instanceof BackpackItem)) {
 				return -1;
 			}

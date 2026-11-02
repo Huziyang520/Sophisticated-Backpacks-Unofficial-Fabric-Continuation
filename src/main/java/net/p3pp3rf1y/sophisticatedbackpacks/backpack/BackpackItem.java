@@ -3,16 +3,15 @@ package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,7 +23,7 @@ import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Equipable;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -66,7 +65,7 @@ import java.util.function.UnaryOperator;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class BackpackItem extends ItemBase implements IStashStorageItem, Equipable {
+public class BackpackItem extends ItemBase implements IStashStorageItem {
 	private final IntSupplier numberOfSlots;
 	private final IntSupplier numberOfUpgradeSlots;
 	private final Supplier<BackpackBlock> blockSupplier;
@@ -114,14 +113,15 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
-		super.appendHoverText(stack, context, tooltip, tooltipFlag);
+	public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag tooltipFlag) {
+		super.appendHoverText(stack, context, display, tooltip, tooltipFlag);
 		if (tooltipFlag.isAdvanced()) {
 			BackpackWrapper.fromStack(stack).getContentsUuid()
-					.ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
+					.ifPresent(uuid -> tooltip.accept(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
 		}
-		if (!Screen.hasShiftDown()) {
-			tooltip.add(Component.translatable(
+		// The hint only makes sense while the player can hold shift, so it is resolved client-side.
+		if (!net.p3pp3rf1y.sophisticatedcore.client.gui.utils.ModifierKeys.isShiftDown()) {
+			tooltip.accept(Component.translatable(
 					TranslationHelper.INSTANCE.translItemTooltip("storage") + ".press_for_contents",
 					Component.translatable(TranslationHelper.INSTANCE.translItemTooltip("storage") + ".shift").withStyle(ChatFormatting.AQUA)
 			).withStyle(ChatFormatting.GRAY));
@@ -158,7 +158,7 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 
 	@Nullable
 	private EverlastingBackpackItemEntity createEverlastingBackpack(Level level, ItemEntity itemEntity, ItemStack itemstack) {
-		EverlastingBackpackItemEntity backpackItemEntity = ModItems.EVERLASTING_BACKPACK_ITEM_ENTITY.get().create(level);
+		EverlastingBackpackItemEntity backpackItemEntity = ModItems.EVERLASTING_BACKPACK_ITEM_ENTITY.get().create(level, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
 		if (backpackItemEntity != null) {
 			backpackItemEntity.setPos(itemEntity.getX(), itemEntity.getY(), itemEntity.getZ());
 			backpackItemEntity.setItem(itemstack);
@@ -212,7 +212,7 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 				be.tryToAddToController();
 			});
 
-			if (!level.isClientSide) {
+			if (!level.isClientSide()) {
 				stopBackpackSounds(backpack, level, pos);
 			}
 
@@ -247,27 +247,28 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			String handlerName = hand == InteractionHand.MAIN_HAND ? PlayerInventoryProvider.MAIN_INVENTORY : PlayerInventoryProvider.OFFHAND_INVENTORY;
-			int slot = hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : 0;
+			int slot = hand == InteractionHand.MAIN_HAND ? player.getInventory().getSelectedSlot() : 0;
 			BackpackContext.Item context = new BackpackContext.Item(handlerName, slot);
 			player.sophisticatedCore_openMenu(new SimpleMenuProvider((w, p, pl) -> new BackpackContainer(w, pl, context), stack.getHoverName()), context::toBuffer);
 		}
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
-		if (level.isClientSide || !(entity instanceof Player player) || player.isSpectator() || player.isDeadOrDying() || (Config.SERVER.nerfsConfig.onlyWornBackpackTriggersUpgrades.get() && itemSlot > -1)) {
+	public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+		// 26.3 用 EquipmentSlot 取代了旧的槽位下标：slot 为 null 表示物品躺在背包栏里而不是被穿戴。
+		if (!(entity instanceof Player player) || player.isSpectator() || player.isDeadOrDying() || (Config.SERVER.nerfsConfig.onlyWornBackpackTriggersUpgrades.get() && slot == null)) {
 			return;
 		}
 		BackpackWrapper.fromStack(stack).getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
 				.forEach(upgrade -> upgrade.tick(player, player.level(), player.blockPosition())
 				);
-		super.inventoryTick(stack, level, entity, itemSlot, isSelected);
+		super.inventoryTick(stack, level, entity, slot);
 	}
 
 	public int getNumberOfSlots() {
@@ -284,11 +285,6 @@ public class BackpackItem extends ItemBase implements IStashStorageItem, Equipab
 	}
 
 	@Nullable
-	@Override
-	public EquipmentSlot getEquipmentSlot() {
-		return EquipmentSlot.CHEST;
-	}
-
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
 		return slotChanged;

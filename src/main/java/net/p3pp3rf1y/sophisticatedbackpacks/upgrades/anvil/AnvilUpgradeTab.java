@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -29,12 +28,12 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		openTabDimension = new Dimension(103, 92);
 		itemNameTextBox = new TextBox(new Position(x + 5, y + 25), new Dimension(90, 14)) {
 			@Override
-			public boolean mouseClicked(double mouseX, double mouseY, int button) {
+			public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
 				if (isEditable()) {
 					setFocused(true);
 					screen.setFocused(itemNameTextBox);
 				}
-				return super.mouseClicked(mouseX, mouseY, button);
+				return super.mouseClicked(event, doubleClick);
 			}
 
 			@Override
@@ -84,8 +83,8 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+	protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		if (!isOpen) {
 			return;
@@ -126,7 +125,6 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 	}
 
 	protected void renderCost(GuiGraphicsExtractor guiGraphics, int x, int y) {
-		RenderSystem.disableBlend();
 		int i = getContainer().getCost();
 		if (i > 0) {
 			int color = 8453920;
@@ -151,7 +149,7 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 				int yOffset = 0;
 				for (FormattedCharSequence line : lines) {
 					int width = font.width(line);
-					guiGraphics.drawString(font, line, x + 2 + (maxWidth - width) / 2, y + 2 + yOffset, color, true);
+					guiGraphics.text(font, line, x + 2 + (maxWidth - width) / 2, y + 2 + yOffset, color, true);
 					yOffset += 12;
 				}
 			}

@@ -1,20 +1,20 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ConstantValue;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SBPBlockLootSubProvider extends FabricBlockLootTableProvider {
+public class SBPBlockLootSubProvider extends FabricBlockLootSubProvider {
 	protected SBPBlockLootSubProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
 		super(output, registryLookup);
 	}
@@ -31,7 +31,7 @@ public class SBPBlockLootSubProvider extends FabricBlockLootTableProvider {
 
 	private static LootTable.Builder dropBackpackWithContents(BackpackItem item) {
 		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(item);
-		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).apply(CopyBackpackDataFunction.builder());
+		LootPool.Builder pool = LootPool.lootPool().setRolls(net.minecraft.core.Holder.direct(new ConstantValue(1))).add(entry).apply(CopyBackpackDataFunction.builder());
 		return LootTable.lootTable().withPool(pool);
 	}
 }

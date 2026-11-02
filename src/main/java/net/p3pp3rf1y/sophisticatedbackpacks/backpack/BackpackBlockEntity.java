@@ -62,13 +62,14 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.loadAdditional(tag, registries);
+	public void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+		super.loadAdditional(input);
+		CompoundTag tag = input.read("data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
 		setBackpackFromNbt(tag);
 
 		// If updateBlockRender exists we are in an update packet load
 		if (tag.contains("updateBlockRender")) {
-			if (tag.getBoolean("updateBlockRender")) {
+			if (tag.getBoolean("updateBlockRender").orElse(false)) {
 				WorldHelper.notifyBlockUpdate(this);
 			}
 		} else {
@@ -90,25 +91,33 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	private void setBackpackFromNbt(CompoundTag nbt) {
-		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> setBackpack(ItemStack.parseOptional(registryAccess, nbt.getCompound("backpackData"))));
+		RegistryHelper.getRegistryAccess().ifPresent(registryAccess -> net.p3pp3rf1y.sophisticatedcore.util.CodecHelper.OVERSIZED_ITEM_STACK_CODEC
+				.parse(registryAccess.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), nbt.getCompoundOrEmpty("backpackData"))
+				.result()
+				.ifPresent(this::setBackpack));
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.saveAdditional(tag, registries);
-		writeBackpack(tag, registries);
+	protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+		super.saveAdditional(output);
+		CompoundTag tag = new CompoundTag();
+		writeBackpack(tag);
 		saveControllerPos(tag);
+		output.store("data", CompoundTag.CODEC, tag);
 	}
 
-	private void writeBackpack(CompoundTag ret, HolderLookup.Provider registries) {
+	private void writeBackpack(CompoundTag ret) {
 		ItemStack backpackCopy = backpackWrapper.getBackpack().copy();
-		ret.put("backpackData", backpackCopy.save(registries));
+		net.p3pp3rf1y.sophisticatedcore.util.RegistryHelper.getRegistryAccess().ifPresent(access ->
+				ret.put("backpackData", net.p3pp3rf1y.sophisticatedcore.util.CodecHelper.OVERSIZED_ITEM_STACK_CODEC
+						.encode(backpackCopy, access.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), new CompoundTag())
+						.getOrThrow()));
 	}
 
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
 		CompoundTag ret = super.getUpdateTag(registries);
-		writeBackpack(ret, registries);
+		writeBackpack(ret);
 		ret.putBoolean("updateBlockRender", updateBlockRender);
 		updateBlockRender = true;
 		return ret;
@@ -129,7 +138,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		}
 
 		setBackpackFromNbt(tag);
-		if (tag.getBoolean("updateBlockRender")) {
+		if (tag.getBoolean("updateBlockRender").orElse(false)) {
 			WorldHelper.notifyBlockUpdate(this);
 		}
 	}*/
@@ -191,7 +200,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	}
 
 	public static void serverTick(Level level, BlockPos blockPos, BackpackBlockEntity backpackBlockEntity) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		backpackBlockEntity.backpackWrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class).forEach(upgrade -> upgrade.tick(null, level, blockPos));
@@ -243,7 +252,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Override
 	public void registerController(ControllerBlockEntityBase controllerBlockEntity) {
 		IControllableStorage.super.registerController(controllerBlockEntity);
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			backpackWrapper.registerOnSlotsChangeListener(this::changeSlots);
 			backpackWrapper.registerOnInventoryHandlerRefreshListener(this::registerInventoryStackListeners);
 		}

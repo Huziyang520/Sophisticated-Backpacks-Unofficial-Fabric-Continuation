@@ -1,15 +1,13 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.fabric.api.event.client.player.ClientPickBlockApplyCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
 import net.minecraft.core.BlockPos;
@@ -23,8 +21,6 @@ import net.minecraft.world.phys.HitResult;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
-import net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModBlockColors;
-import net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModItemColors;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.render.*;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
@@ -47,16 +43,12 @@ public class ClientEventHandler {
 	public static final ModelLayerLocation BACKPACK_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, BACKPACK_REG_NAME), "main");
 
 	public static void registerHandlers() {
-		RegisterGeometryLoadersCallback.EVENT.register(ClientEventHandler::onModelRegistry);
 		registerLayer();
 		registerEntityRenderers();
 		registerReloadListener();
-		ModItemColors.registerItemColorHandlers();
-		ModBlockColors.registerBlockColorHandlers();
 		registerBackpackClientExtension();
 
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientBackpackContentsTooltip::onWorldLoad);
-		ClientPickBlockApplyCallback.EVENT.register(ClientEventHandler::handleBlockPick);
 		ClientPlayConnectionEvents.JOIN.register(ClientEventHandler::onPlayerLoggingIn);
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(BackpackStorage::onClientWorldLoad);
 	}
@@ -65,8 +57,6 @@ public class ClientEventHandler {
 		PacketDistributor.sendToServer(new RequestPlayerSettingsPayload());
 	}
 
-	private static void onModelRegistry(Map<Identifier, IGeometryLoader<?>> loaders) {
-	}
 
 	public static void registerReloadListener() {
 		registerBackpackLayer(); //event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> registerBackpackLayer());
@@ -74,14 +64,13 @@ public class ClientEventHandler {
 
 	private static void registerEntityRenderers() {
 		EntityRendererRegistry.register(EVERLASTING_BACKPACK_ITEM_ENTITY.get(), ItemEntityRenderer::new);
-		BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(), BACKPACKS.stream().map(Supplier::get).toArray(BackpackBlock[]::new));
 	}
 
 	public static void registerLayer() {
 	}
 
 	private static void registerBackpackLayer() {
-		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) -> {
+		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) -> {
 		});
 	}
 
@@ -97,7 +86,7 @@ public class ClientEventHandler {
 			return stack;
 		}
 
-		ItemStack result = state.getBlock().getCloneItemStack(level, pos, state);
+		ItemStack result = state.getBlock().asItem().getDefaultInstance();
 
 		if (result.isEmpty() || player.getInventory().findSlotMatchingItem(result) > -1) {
 			return stack;

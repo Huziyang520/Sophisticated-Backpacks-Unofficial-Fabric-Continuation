@@ -7,7 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
+import net.minecraft.tags.ItemTags;
 import net.fabricmc.loader.api.FabricLoader;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.registry.IRegistryDataLoader;
@@ -32,7 +32,7 @@ public class SwordRegistry {
 			return true;
 		}
 
-		if (stack.getItem() instanceof SwordItem) {
+			if (stack.is(ItemTags.SWORDS)) {
 			SWORD_ITEMS.add(stack.getItem());
 			return true;
 		}

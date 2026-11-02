@@ -2,6 +2,7 @@ package net.p3pp3rf1y.sophisticatedbackpacks.mixin.common;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
@@ -33,9 +34,18 @@ public class PiglinAiMixin {
 		if (entity instanceof Player player) {
 			List<ItemStack> trinkets = Lists.newArrayList();
 			PlayerInventoryProvider.get().runOnBackpacks(player, CompatModIds.TRINKETS, (backpack, inventoryHandlerName, identifier, slot) -> trinkets.add(backpack));
-			return Iterables.concat(entity.getArmorSlots(), trinkets);
+			return Iterables.concat(sophisticatedBackpacks_iterateArmorSlots(entity), trinkets);
 		}
 
-		return entity.getArmorSlots();
+		return sophisticatedBackpacks_iterateArmorSlots(entity);
+	}
+
+	@Unique
+	private static Iterable<ItemStack> sophisticatedBackpacks_iterateArmorSlots(LivingEntity entity) {
+		List<ItemStack> armor = Lists.newArrayList();
+		for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+			armor.add(entity.getItemBySlot(slot));
+		}
+		return armor;
 	}
 }

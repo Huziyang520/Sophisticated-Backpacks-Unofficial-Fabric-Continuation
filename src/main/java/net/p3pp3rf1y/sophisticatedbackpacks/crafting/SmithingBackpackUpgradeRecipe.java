@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.crafting;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SmithingRecipeInput;
@@ -19,7 +18,7 @@ public class SmithingBackpackUpgradeRecipe extends SmithingTransformRecipe imple
 	private final SmithingTransformRecipe compose;
 
 	public SmithingBackpackUpgradeRecipe(SmithingTransformRecipe compose) {
-		super(compose.template, compose.base, compose.addition, compose.result);
+		super(compose.commonInfo, compose.template, compose.base, compose.addition, compose.result);
 		this.compose = compose;
 	}
 
@@ -29,8 +28,8 @@ public class SmithingBackpackUpgradeRecipe extends SmithingTransformRecipe imple
 	}
 
 	@Override
-	public ItemStack assemble(SmithingRecipeInput inv, HolderLookup.Provider registryAccess) {
-		ItemStack upgradedBackpack = result.copy();
+	public ItemStack assemble(SmithingRecipeInput inv) {
+		ItemStack upgradedBackpack = result.create();
 		if (SophisticatedCore.isLogicalServerThread()) {
 			getBackpack(inv).map(ItemStack::getComponents).ifPresent(upgradedBackpack::applyComponents);
 			IBackpackWrapper wrapper = BackpackWrapper.fromStack(upgradedBackpack);
@@ -49,8 +48,8 @@ public class SmithingBackpackUpgradeRecipe extends SmithingTransformRecipe imple
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
-		return ModItems.SMITHING_BACKPACK_UPGRADE_RECIPE_SERIALIZER.get();
+	public RecipeSerializer<SmithingTransformRecipe> getSerializer() {
+		return (RecipeSerializer<SmithingTransformRecipe>) (RecipeSerializer<?>) ModItems.SMITHING_BACKPACK_UPGRADE_RECIPE_SERIALIZER.get();
 	}
 
 	@Override

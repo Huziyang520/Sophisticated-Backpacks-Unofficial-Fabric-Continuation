@@ -69,8 +69,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Nullable
 	private IStorageFluidHandler fluidHandler = null;
 	@Nullable
-
-	@Nullable
 	private BackpackRenderInfo renderInfo;
 
 	private IntConsumer onSlotsChange = diff -> {
@@ -195,8 +193,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 	public Optional<IStorageFluidHandler> getItemFluidHandler() {
 		return getFluidHandler().map(fh -> new FluidHandlerItemWrapper(getBackpackStack(), fh));
 	}
-
-	@Override
 
 	@Override
 	public void copyDataTo(IStorageWrapper otherStorageWrapper) {
@@ -418,7 +414,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void fillWithLoot(Player player) {
 		Level level = player.level();
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		BlockPos pos = player.blockPosition();
@@ -523,7 +519,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 		List<ItemStack> loot = LootHelper.getLoot(lootTable, server, serverLevel, pos);
 		loot.removeIf(stack -> stack.getItem() instanceof BackpackItem);
 		loot = RandHelper.getNRandomElements(loot, (int) (loot.size() * lootFactor));
-		LootHelper.fillWithLoot(serverLevel.random, loot, getInventoryHandler());
+		LootHelper.fillWithLoot(serverLevel.getRandom(), loot, getInventoryHandler());
 	}
 
 	private void setNumberOfUpgradeSlots(int numberOfUpgradeSlots) {

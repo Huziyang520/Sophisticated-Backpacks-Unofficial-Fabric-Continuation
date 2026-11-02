@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedbackpacks.data;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -12,14 +11,14 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ConstantValue;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public class SBInjectLootSubProvider implements LootTableSubProvider {
+public class SBInjectLootSubProvider {
 	private static final String INJECT_FOLDER = "inject/";
 	public static final ResourceKey<LootTable> ABANDONED_MINESHAFT = createInjectLootTableRegistryKey(BuiltInLootTables.ABANDONED_MINESHAFT);
 	public static final ResourceKey<LootTable> BASTION_TREASURE = createInjectLootTableRegistryKey(BuiltInLootTables.BASTION_TREASURE);
@@ -32,14 +31,16 @@ public class SBInjectLootSubProvider implements LootTableSubProvider {
 	public static final Set<ResourceKey<LootTable>> ALL_TABLES = Set.of(ABANDONED_MINESHAFT, BASTION_TREASURE, DESERT_PYRAMID, END_CITY_TREASURE, NETHER_BRIDGE, SHIPWRECK_TREASURE, SIMPLE_DUNGEON, WOODLAND_MANSION);
 
 	private static ResourceKey<LootTable> createInjectLootTableRegistryKey(ResourceKey<LootTable> vanillaLootTable) {
-		Identifier location = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, INJECT_FOLDER + vanillaLootTable.location().getPath());
+		Identifier location = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, INJECT_FOLDER + vanillaLootTable.identifier().getPath());
 		return ResourceKey.create(Registries.LOOT_TABLE, location);
+	}
+
+	public SBInjectLootSubProvider(net.fabricmc.fabric.api.datagen.v1.FabricPackOutput output, java.util.concurrent.CompletableFuture<HolderLookup.Provider> registries) {
 	}
 
 	public SBInjectLootSubProvider(HolderLookup.Provider registries) {
 	}
 
-	@Override
 	public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> tables) {
 		tables.accept(SIMPLE_DUNGEON, getLootTable(90,
 				getItemLootEntry(ModItems.BACKPACK.get(), 5),
@@ -83,7 +84,7 @@ public class SBInjectLootSubProvider implements LootTableSubProvider {
 	}
 
 	private static LootTable.Builder getLootTable(int emptyWeight, LootPoolEntryContainer.Builder<?>... entries) {
-		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1));
+		LootPool.Builder pool = LootPool.lootPool().setRolls(net.minecraft.core.Holder.direct(new ConstantValue(1)));
 		for (LootPoolEntryContainer.Builder<?> entry : entries) {
 			pool.add(entry);
 		}

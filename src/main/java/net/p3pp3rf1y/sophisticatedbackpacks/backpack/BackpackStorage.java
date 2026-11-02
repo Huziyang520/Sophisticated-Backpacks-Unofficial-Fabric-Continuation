@@ -71,7 +71,7 @@ public class BackpackStorage extends SavedData {
 		ListTag contentsTag = nbt.getListOrEmpty("backpackContents");
 		for (int i = 0; i < contentsTag.size(); i++) {
 			CompoundTag uuidContentsPair = contentsTag.getCompoundOrEmpty(i);
-			UUID uuid = NbtUtils.loadUUID(Objects.requireNonNull(uuidContentsPair.get("uuid")));
+			UUID uuid = net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, Objects.requireNonNull(uuidContentsPair.get("uuid"))).getOrThrow();
 			CompoundTag contents = uuidContentsPair.getCompoundOrEmpty("contents");
 			storage.backpackContents.put(uuid, contents);
 		}
@@ -88,7 +88,7 @@ public class BackpackStorage extends SavedData {
 		ListTag backpackContentsNbt = new ListTag();
 		for (Map.Entry<UUID, CompoundTag> entry : backpackContents.entrySet()) {
 			CompoundTag uuidContentsPair = new CompoundTag();
-			uuidContentsPair.put("uuid", NbtUtils.createUUID(entry.getKey()));
+			uuidContentsPair.put("uuid", net.minecraft.core.UUIDUtil.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, entry.getKey()).getOrThrow());
 			uuidContentsPair.put("contents", entry.getValue());
 			backpackContentsNbt.add(uuidContentsPair);
 		}
@@ -126,7 +126,7 @@ public class BackpackStorage extends SavedData {
 			updatedBackpackSettingsFlags.add(backpackUuid);
 		} else {
 			CompoundTag currentContents = backpackContents.get(backpackUuid);
-			for (String key : contents.getAllKeys()) {
+			for (String key : contents.keySet()) {
 				//noinspection ConstantConditions - the key is one of the tag keys so there's no reason it wouldn't exist here
 				currentContents.put(key, contents.get(key));
 

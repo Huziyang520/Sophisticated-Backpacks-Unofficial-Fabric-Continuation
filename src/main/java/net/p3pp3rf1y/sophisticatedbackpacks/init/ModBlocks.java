@@ -12,6 +12,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -33,8 +34,7 @@ public class ModBlocks {
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
     public static final Supplier<BlockEntityType<BackpackBlockEntity>> BACKPACK_TILE_TYPE = BLOCK_ENTITY_TYPES.register("backpack", () ->
-            BlockEntityType.Builder.of(BackpackBlockEntity::new, BACKPACK.get(), COPPER_BACKPACK.get(), IRON_BACKPACK.get(), GOLD_BACKPACK.get(), DIAMOND_BACKPACK.get(), NETHERITE_BACKPACK.get())
-                    .build(null));
+            new BlockEntityType<>(BackpackBlockEntity::new, Set.of(BACKPACK.get(), COPPER_BACKPACK.get(), IRON_BACKPACK.get(), GOLD_BACKPACK.get(), DIAMOND_BACKPACK.get(), NETHERITE_BACKPACK.get())));
 
     public static void registerHandlers() {
         BLOCKS.register();
