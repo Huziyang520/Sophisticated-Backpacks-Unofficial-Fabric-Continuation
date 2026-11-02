@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.api;
 
-import team.reborn.energy.api.EnergyStorage;
+import net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage;
 
 import javax.annotation.Nullable;
 

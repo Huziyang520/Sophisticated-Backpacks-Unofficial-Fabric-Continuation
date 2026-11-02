@@ -18,6 +18,7 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
+import net.p3pp3rf1y.sophisticatedbackpacks.api.IEnergyStorageUpgradeWrapper;
 import net.p3pp3rf1y.sophisticatedbackpacks.api.IFluidHandlerWrapperUpgrade;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackStorage;
@@ -66,6 +67,9 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Nullable
 	private BackpackSettingsHandler settingsHandler = null;
 	private boolean fluidHandlerInitialized = false;
+	private boolean energyStorageInitialized = false;
+	@Nullable
+	private net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage energyStorage = null;
 	@Nullable
 	private IStorageFluidHandler fluidHandler = null;
 	@Nullable
@@ -195,6 +199,23 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	@Override
+	public Optional<net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage> getEnergyStorage() {
+		if (!energyStorageInitialized) {
+			net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage wrappedStorage =
+					getUpgradeHandler().getWrappersThatImplement(net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage.class).stream().findFirst().orElse(null);
+
+			for (IEnergyStorageUpgradeWrapper energyStorageWrapperUpgrade : getUpgradeHandler().getWrappersThatImplement(IEnergyStorageUpgradeWrapper.class)) {
+				wrappedStorage = energyStorageWrapperUpgrade.wrapStorage(wrappedStorage);
+			}
+
+			energyStorage = wrappedStorage;
+			energyStorageInitialized = true;
+		}
+
+		return energyStorage == null || energyStorage.getCapacity() == 0 ? Optional.empty() : Optional.of(energyStorage);
+	}
+
+	@Override
 	public void copyDataTo(IStorageWrapper otherStorageWrapper) {
 		getContentsUuid().ifPresent(originalUuid -> {
 			getInventoryHandler().copyStacksTo(otherStorageWrapper.getInventoryHandler());
@@ -238,6 +259,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 					inventoryIOHandler = null;
 					inventoryModificationHandler = null;
 					fluidHandlerInitialized = false;
+		energyStorageInitialized = false;
+		energyStorage = null;
 					fluidHandler = null;
 					upgradeCachesInvalidatedHandler.run();
 				}) {
@@ -531,6 +554,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 		inventoryModificationHandler = null;
 		fluidHandler = null;
 		fluidHandlerInitialized = false;
+		energyStorageInitialized = false;
+		energyStorage = null;
 		refreshInventoryForInputOutput();
 	}
 

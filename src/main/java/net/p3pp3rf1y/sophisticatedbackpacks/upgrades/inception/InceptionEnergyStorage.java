@@ -1,6 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.upgrades.inception;
 
-import team.reborn.energy.api.EnergyStorage;
+import net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import javax.annotation.Nullable;

@@ -399,6 +399,7 @@ public class ModItems {
 					}
 					return BackpackWrapper.fromStack(stack).getItemFluidHandler().orElse(null);
 				}, backpacks);
+		net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage.ITEM.registerForItems((stack, ctx) -> BackpackWrapper.fromStack(stack).getEnergyStorage().orElse(null), backpacks);
 	}
 
 	private static class BackpackCauldronInteraction implements CauldronInteraction {

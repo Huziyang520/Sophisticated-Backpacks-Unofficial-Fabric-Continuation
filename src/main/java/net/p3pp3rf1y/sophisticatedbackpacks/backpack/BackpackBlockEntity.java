@@ -45,6 +45,8 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Nullable
 	private IStorageFluidHandler externalFluidHandler;
 	@Nullable
+	private net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage externalEnergyStorage;
+	@Nullable
 
 	public BackpackBlockEntity(BlockPos pos, BlockState state) {
 		super(BACKPACK_TILE_TYPE.get(), pos, state);
@@ -151,6 +153,7 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		sophisticatedCore_invalidateCapabilities();
 		externalItemHandler = null;
 		externalFluidHandler = null;
+		externalEnergyStorage = null;
 	}
 
 	private boolean isBlockConnectionDisallowed(@Nullable Direction direction) {
@@ -177,6 +180,17 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 			externalFluidHandler = getBackpackWrapper().getFluidHandler().map(IStorageFluidHandler.class::cast).orElse(EmptyFluidHandler.INSTANCE);
 		}
 		return externalFluidHandler;
+	}
+
+	@Nullable
+	public net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage getExternalEnergyStorage(@Nullable Direction direction) {
+		if (isBlockConnectionDisallowed(direction)) {
+			return null;
+		}
+		if (externalEnergyStorage == null) {
+			externalEnergyStorage = getBackpackWrapper().getEnergyStorage().orElse(net.p3pp3rf1y.sophisticatedcore.api.energy.EnergyStorage.EMPTY);
+		}
+		return externalEnergyStorage;
 	}
 
 
