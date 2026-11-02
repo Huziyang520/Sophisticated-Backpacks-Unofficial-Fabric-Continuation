@@ -1,0 +1,6 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_cfg_tank_pouch_battery",
+  "textures": {
+    "clips": "sophisticatedbackpacks:block/leather_clips"
+  }
+}

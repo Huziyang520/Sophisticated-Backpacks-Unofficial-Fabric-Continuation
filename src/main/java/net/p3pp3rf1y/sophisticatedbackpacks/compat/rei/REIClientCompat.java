@@ -2,7 +2,6 @@ package net.p3pp3rf1y.sophisticatedbackpacks.compat.rei;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackScreen;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.BackpackSettingsScreen;
 import net.p3pp3rf1y.sophisticatedbackpacks.common.gui.BackpackContainer;
@@ -11,7 +10,6 @@ import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.REIStorageGhostIngredientHandler;
 import net.p3pp3rf1y.sophisticatedcore.compat.rei.SophisticatedTransferHandler;
-import net.p3pp3rf1y.sophisticatedcore.crafting.UpgradeNextTierRecipe;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -21,7 +19,7 @@ import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
-import me.shedaniel.rei.api.common.util.EntryStacks;
+import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 
 import java.util.ArrayList;
@@ -62,8 +60,8 @@ public class REIClientCompat implements REIClientPlugin {
 
 	@Override
 	public void registerCategories(CategoryRegistry registry) {
-		registry.addWorkstations(BuiltinPlugin.CRAFTING, EntryStacks.of(ModItems.CRAFTING_UPGRADE.get()));
-		registry.addWorkstations(BuiltinPlugin.STONE_CUTTING, EntryStacks.of(ModItems.STONECUTTER_UPGRADE.get()));
+		registry.addWorkstations(BuiltinPlugin.CRAFTING, me.shedaniel.rei.api.common.entry.EntryIngredient.of(EntryStack.of(me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes.ITEM, new net.minecraft.world.item.ItemStack(ModItems.CRAFTING_UPGRADE.get()))));
+		registry.addWorkstations(BuiltinPlugin.STONE_CUTTING, me.shedaniel.rei.api.common.entry.EntryIngredient.of(EntryStack.of(me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes.ITEM, new net.minecraft.world.item.ItemStack(ModItems.STONECUTTER_UPGRADE.get()))));
 		additionalCategories.accept(registry);
 	}
 
@@ -80,7 +78,6 @@ public class REIClientCompat implements REIClientPlugin {
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         registerRecipes(registry, DyeRecipesMaker.getRecipes(), BuiltinPlugin.CRAFTING);
-        registerRecipes(registry, ClientRecipeHelper.transformAllRecipesOfType(RecipeType.CRAFTING, UpgradeNextTierRecipe.class, ClientRecipeHelper::copyShapedRecipe), BuiltinPlugin.CRAFTING);
     }
 
     public static void registerRecipes(DisplayRegistry registry, Collection<?> recipes, CategoryIdentifier<?> identifier) {

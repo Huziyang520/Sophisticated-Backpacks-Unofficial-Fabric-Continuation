@@ -47,6 +47,8 @@ public class ClientEventHandler {
 		registerEntityRenderers();
 		registerReloadListener();
 		registerBackpackClientExtension();
+		net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModBlockColors.registerBlockColorHandlers();
+		net.p3pp3rf1y.sophisticatedbackpacks.client.init.BackpackModelModifier.init();
 
 		ClientLifecycleEvents.CLIENT_LEVEL_LOAD.register(ClientBackpackContentsTooltip::onWorldLoad);
 		ClientPlayConnectionEvents.JOIN.register(ClientEventHandler::onPlayerLoggingIn);

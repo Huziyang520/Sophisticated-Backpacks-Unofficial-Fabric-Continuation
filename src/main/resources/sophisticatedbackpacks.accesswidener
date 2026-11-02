@@ -30,3 +30,7 @@ accessible field net/minecraft/world/item/crafting/SmithingTransformRecipe templ
 accessible field net/minecraft/world/level/storage/loot/LootTable pools Ljava/util/List;
 
 accessible method net/minecraft/core/cauldron/CauldronInteraction$Dispatcher put (Lnet/minecraft/world/item/Item;Lnet/minecraft/core/cauldron/CauldronInteraction;)V
+
+# 26.3: item tints are set on the render state's per-layer color lists
+accessible field net/minecraft/client/renderer/item/ItemStackRenderState layers [Lnet/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState;
+accessible field net/minecraft/client/renderer/item/ItemStackRenderState activeLayerCount I

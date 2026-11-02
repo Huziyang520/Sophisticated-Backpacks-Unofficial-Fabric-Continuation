@@ -1,0 +1,6 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_cfg_tank_tank_none",
+  "textures": {
+    "clips": "sophisticatedbackpacks:block/iron_clips"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "sophisticatedbackpacks:block/backpack_cfg_pouch_tank_none",
+  "textures": {
+    "clips": "sophisticatedbackpacks:block/leather_clips"
+  }
+}
