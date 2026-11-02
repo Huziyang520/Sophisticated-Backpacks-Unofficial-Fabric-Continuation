@@ -540,6 +540,15 @@ public class SBPRecipeProvider extends FabricRecipeProvider {
 				.save(output);
 
 
+		ShapeBasedRecipeBuilder.shaped(ModItems.BATTERY_UPGRADE.get(), UpgradeNextTierRecipe::new)
+				.pattern("GRG")
+				.pattern("RBR")
+				.pattern("GRG")
+				.define('R', ConventionalItemTags.STORAGE_BLOCKS_REDSTONE)
+				.define('G', ConventionalItemTags.GOLD_INGOTS)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE, has(ModItems.UPGRADE_BASE.get()))
+				.save(output);
 		ShapeBasedRecipeBuilder.shaped(ModItems.PUMP_UPGRADE.get(), UpgradeNextTierRecipe::new)
 				.pattern("GUG")
 				.pattern("PBS")

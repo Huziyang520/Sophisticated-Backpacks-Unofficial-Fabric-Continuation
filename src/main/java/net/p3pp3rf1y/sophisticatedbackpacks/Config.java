@@ -25,6 +25,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.battery.BatteryUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeConfig;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeConfig;
@@ -102,6 +103,7 @@ public class Config {
 		public final ModConfigSpec.BooleanValue tickDedupeLogicDisabled;
 		public final ModConfigSpec.BooleanValue canBePlacedInContainerItems;
 		public final FilteredUpgradeConfig toolSwapperUpgrade;
+		public final BatteryUpgradeConfig batteryUpgrade;
 		public final TankUpgradeConfig tankUpgrade;
 		public final StackUpgradeConfig stackUpgrade;
 		public final PumpUpgradeConfig pumpUpgrade;
@@ -170,6 +172,7 @@ public class Config {
 			autoBlastingUpgrade = new AutoCookingUpgradeConfig(builder, "Auto-Blasting Upgrade", "autoBlastingUpgrade");
 			inceptionUpgrade = new InceptionUpgradeConfig(builder);
 			toolSwapperUpgrade = new FilteredUpgradeConfig(builder, "Tool Swapper Upgrade", "toolSwapperUpgrade", 8, 4);
+			batteryUpgrade = new BatteryUpgradeConfig(builder);
 			tankUpgrade = new TankUpgradeConfig(builder);
 			pumpUpgrade = new PumpUpgradeConfig(builder);
 			xpPumpUpgrade = new XpPumpUpgradeConfig(builder);
