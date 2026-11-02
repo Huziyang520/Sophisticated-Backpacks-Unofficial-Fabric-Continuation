@@ -15,7 +15,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedbackpacks:chipped/loom_table_upgrade"
+        "recipes": "sophisticatedbackpacks:chipped/loom_table_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

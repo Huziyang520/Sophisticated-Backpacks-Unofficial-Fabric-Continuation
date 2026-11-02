@@ -15,7 +15,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedbackpacks:chipped/alchemy_bench_upgrade"
+        "recipes": "sophisticatedbackpacks:chipped/alchemy_bench_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

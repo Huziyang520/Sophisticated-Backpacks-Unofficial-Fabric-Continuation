@@ -15,7 +15,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedbackpacks:chipped/glassblower_upgrade"
+        "recipes": "sophisticatedbackpacks:chipped/glassblower_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },
