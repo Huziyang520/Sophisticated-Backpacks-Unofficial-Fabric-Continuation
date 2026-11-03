@@ -58,7 +58,9 @@ public class DyeRecipesMaker {
 
 		BackpackWrapper.fromStack(backpackOutput).setColors(clothColor, trimColor);
 
-		ShapedRecipePattern pattern = new ShapedRecipePattern(3, 1, ingredients, Optional.empty());
+		// 3x2 grid: six slots, matching the ingredient order above. 26.3 validates width * height
+		// against the slot list when a recipe display is built, so the old 3x1 claim now throws.
+		ShapedRecipePattern pattern = new ShapedRecipePattern(3, 2, ingredients, Optional.empty());
 		Identifier id = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "multiple_colors");
 		recipes.add(new RecipeHolder<>(net.minecraft.resources.ResourceKey.create(Registries.RECIPE, id), new ShapedRecipe(
 				net.minecraft.data.recipes.RecipeBuilder.createCraftingCommonInfo(true),
