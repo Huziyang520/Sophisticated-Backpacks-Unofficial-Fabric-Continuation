@@ -34,6 +34,7 @@ import net.p3pp3rf1y.sophisticatedbackpacks.util.PlayerInventoryProvider;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.util.CapabilityHelper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,25 +42,21 @@ public class KeybindHandler {
 	private KeybindHandler() {
 	}
 
-	private static final int KEY_B = 66;
-	private static final int KEY_C = 67;
-	private static final int KEY_Z = 90;
-	private static final int KEY_X = 88;
-	private static final int KEY_UNKNOWN = -1;
-	private static final int MIDDLE_BUTTON = 2;
 	private static final int CHEST_SLOT_INDEX = 38;
 	private static final int OFFHAND_SLOT_INDEX = 40;
 	private static final KeyMapping.Category SBP_KEY_CATEGORY = KeyMapping.Category.register(SophisticatedBackpacks.getRL("sophisticatedbackpacks"));
+	// 26.3 keys are SDL scancodes and "unbound" is 0; any other value is read straight out of the keyboard state buffer.
+	private static final int UNBOUND_KEY = InputConstants.UNKNOWN.getValue();
 	public static final KeyMapping BACKPACK_TOGGLE_UPGRADE_5 = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("toggle_upgrade_5"),
-			InputConstants.Type.KEYBOARD.getOrCreate(KEY_UNKNOWN).getValue(), SBP_KEY_CATEGORY);
+			UNBOUND_KEY, SBP_KEY_CATEGORY);
 	public static final KeyMapping BACKPACK_TOGGLE_UPGRADE_4 = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("toggle_upgrade_4"),
-		    InputConstants.Type.KEYBOARD.getOrCreate(KEY_UNKNOWN).getValue(), SBP_KEY_CATEGORY);
+			UNBOUND_KEY, SBP_KEY_CATEGORY);
 	public static final KeyMapping BACKPACK_TOGGLE_UPGRADE_3 = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("toggle_upgrade_3"),
-		    InputConstants.Type.KEYBOARD.getOrCreate(KEY_UNKNOWN).getValue(), SBP_KEY_CATEGORY);
+			UNBOUND_KEY, SBP_KEY_CATEGORY);
 	public static final KeyMapping BACKPACK_TOGGLE_UPGRADE_2 = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("toggle_upgrade_2"),
-		    InputConstants.Type.KEYBOARD.getOrCreate(KEY_X).getValue(), SBP_KEY_CATEGORY);
+			InputConstants.KEY_X, SBP_KEY_CATEGORY);
 	public static final KeyMapping BACKPACK_TOGGLE_UPGRADE_1 = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("toggle_upgrade_1"),
-		    InputConstants.Type.KEYBOARD.getOrCreate(KEY_Z).getValue(), SBP_KEY_CATEGORY);
+			InputConstants.KEY_Z, SBP_KEY_CATEGORY);
 
 	public static final Map<Integer, KeyMapping> UPGRADE_SLOT_TOGGLE_KEYBINDS = Map.of(
 			0, BACKPACK_TOGGLE_UPGRADE_1,
@@ -69,13 +66,13 @@ public class KeybindHandler {
 			4, BACKPACK_TOGGLE_UPGRADE_5
 	);
 	public static final KeyMapping SORT_KEYBIND = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("sort"),
-            InputConstants.Type.MOUSE, MIDDLE_BUTTON, SBP_KEY_CATEGORY); // BackpackGuiKeyConflictContext.INSTANCE
+            InputConstants.Type.MOUSE, InputConstants.MOUSE_BUTTON_MIDDLE, SBP_KEY_CATEGORY); // BackpackGuiKeyConflictContext.INSTANCE
 	public static final KeyMapping TOOL_SWAP_KEYBIND = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("tool_swap"),
-		    InputConstants.Type.KEYBOARD.getOrCreate(KEY_UNKNOWN).getValue(), SBP_KEY_CATEGORY);
+		    UNBOUND_KEY, SBP_KEY_CATEGORY);
 	public static final KeyMapping INVENTORY_INTERACTION_KEYBIND = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("inventory_interaction"),
-			InputConstants.Type.KEYBOARD.getOrCreate(KEY_C).getValue(), SBP_KEY_CATEGORY);
+			InputConstants.KEY_C, SBP_KEY_CATEGORY);
 	public static final KeyMapping BACKPACK_OPEN_KEYBIND = new KeyMapping(SBPTranslationHelper.INSTANCE.translKeybind("open_backpack"),
-			InputConstants.Type.KEYBOARD.getOrCreate(KEY_B).getValue(), SBP_KEY_CATEGORY); // BackpackKeyConflictContext.INSTANCE
+			InputConstants.KEY_B, SBP_KEY_CATEGORY); // BackpackKeyConflictContext.INSTANCE
 
 	public static void register() {
 		if (!FabricLoader.getInstance().isModLoaded(CompatModIds.MKB)) {
@@ -86,6 +83,35 @@ public class KeybindHandler {
 		}
 
 		ClientTickEvents.END_CLIENT_TICK.register(KeybindHandler::handleKeyInputEvent);
+	}
+
+	private static final List<KeyMapping> KEYBINDS = List.of(BACKPACK_TOGGLE_UPGRADE_1, BACKPACK_TOGGLE_UPGRADE_2,
+			BACKPACK_TOGGLE_UPGRADE_3, BACKPACK_TOGGLE_UPGRADE_4, BACKPACK_TOGGLE_UPGRADE_5, SORT_KEYBIND, TOOL_SWAP_KEYBIND,
+			INVENTORY_INTERACTION_KEYBIND, BACKPACK_OPEN_KEYBIND);
+	private static final int KEYBOARD_KEY_COUNT = 512;
+	private static boolean legacyKeybindsRepaired;
+
+	/**
+	 * Repairs keybinds saved by builds that wrote GLFW key codes into scancode slots: an out of range value makes
+	 * {@code KeyMapping.setAll} throw while grabbing the mouse, which leaves the player unable to look around.
+	 * Runs once; if any of our binds is out of range every bind of this mod goes back to its default.
+	 */
+	private static void repairLegacyKeybinds(Minecraft minecraft) {
+		if (legacyKeybindsRepaired) {
+			return;
+		}
+		legacyKeybindsRepaired = true;
+		if (KEYBINDS.stream().noneMatch(KeybindHandler::isKeyOutOfRange)) {
+			return;
+		}
+		KEYBINDS.forEach(keybind -> keybind.setKey(keybind.getDefaultKey()));
+		KeyMapping.resetMapping();
+		minecraft.options.save();
+	}
+
+	private static boolean isKeyOutOfRange(KeyMapping keybind) {
+		InputConstants.Key key = InputConstants.getKey(keybind.saveString());
+		return key.getType() == InputConstants.Type.KEYBOARD && (key.getValue() < 0 || key.getValue() >= KEYBOARD_KEY_COUNT);
 	}
 
 	public static void registerKeyMappings() {
@@ -115,6 +141,7 @@ public class KeybindHandler {
 	}
 
 	private static void handleKeyInputEvent(Minecraft minecraft) {
+		repairLegacyKeybinds(minecraft);
 		if (BACKPACK_OPEN_KEYBIND.consumeClick()) {
 			sendBackpackOpenOrCloseMessage();
 		} else if (INVENTORY_INTERACTION_KEYBIND.consumeClick()) {
