@@ -5,6 +5,7 @@ import net.p3pp3rf1y.sophisticatedcore.platform.DeferredHolder;
 import net.p3pp3rf1y.sophisticatedcore.platform.DeferredRegister;
 import net.p3pp3rf1y.sophisticatedcore.platform.RegistryRegistrationContext;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
@@ -296,6 +297,11 @@ public class ModItems {
 		MENU_TYPES.register();
 		ENTITY_TYPES.register();
 		RECIPE_SERIALIZERS.register();
+		// 26.3 keeps no recipe manager on the client; custom serializers only reach it when synced explicitly.
+		RecipeSynchronization.synchronizeRecipeSerializer(BACKPACK_DYE_RECIPE_SERIALIZER.get());
+		RecipeSynchronization.synchronizeRecipeSerializer(BACKPACK_UPGRADE_RECIPE_SERIALIZER.get());
+		RecipeSynchronization.synchronizeRecipeSerializer(SMITHING_BACKPACK_UPGRADE_RECIPE_SERIALIZER.get());
+		RecipeSynchronization.synchronizeRecipeSerializer(BASIC_BACKPACK_RECIPE_SERIALIZER.get());
 		LOOT_FUNCTION_TYPES.register();
 		LOOT_CONDITION_TYPES.register();
 

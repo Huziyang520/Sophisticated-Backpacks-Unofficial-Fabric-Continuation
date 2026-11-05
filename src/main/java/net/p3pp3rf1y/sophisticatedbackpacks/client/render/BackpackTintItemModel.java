@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client.render;
 
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -13,12 +14,12 @@ import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.IBackpackWrapper;
 /**
  * Applies a backpack's own cloth and border colors to its item model.
  * <p>
- * 26.3 removed the item color registry; each model layer carries a resolved color list instead.
- * The delegate draws the shapes, then the first two layers are recolored from the stack.
+ * 26.3 removed the item color registry; a baked model carries one color per tint index instead.
+ * The delegate draws every quads batch into a single layer, so the colors are written into that layer.
  */
 public class BackpackTintItemModel implements ItemModel {
-	private static final int CLOTH_LAYER = 0;
-	private static final int BORDER_LAYER = 1;
+	private static final int CLOTH_TINT_INDEX = 0;
+	private static final int BORDER_TINT_INDEX = 1;
 
 	private final ItemModel delegate;
 
@@ -30,24 +31,21 @@ public class BackpackTintItemModel implements ItemModel {
 	public void update(ItemStackRenderState state, ItemStack stack, ItemModelResolver resolver, ItemDisplayContext context,
 			ClientLevel level, ItemOwner owner, int seed) {
 		delegate.update(state, stack, resolver, context, level, owner, seed);
-		if (state.isEmpty()) {
+		if (state.isEmpty() || state.layers == null || state.activeLayerCount < 1 || state.layers[0] == null) {
 			return;
 		}
 
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
-		applyTint(state, CLOTH_LAYER, wrapper.getMainColor());
-		applyTint(state, BORDER_LAYER, wrapper.getAccentColor());
+		IntList tints = state.layers[0].tintLayers();
+		tints.clear();
+		setTint(tints, CLOTH_TINT_INDEX, wrapper.getMainColor());
+		setTint(tints, BORDER_TINT_INDEX, wrapper.getAccentColor());
 	}
 
-	private static void applyTint(ItemStackRenderState state, int layerIndex, int color) {
-		ItemStackRenderState.LayerRenderState[] layers = state.layers;
-		if (layers == null || layerIndex >= state.activeLayerCount) {
-			return;
+	private static void setTint(IntList tints, int tintIndex, int color) {
+		while (tints.size() <= tintIndex) {
+			tints.add(-1);
 		}
-		ItemStackRenderState.LayerRenderState layer = layers[layerIndex];
-		if (layer == null || layer.tintLayers() == null || layer.tintLayers().size() <= layerIndex) {
-			return;
-		}
-		layer.tintLayers().set(layerIndex, color);
+		tints.set(tintIndex, color);
 	}
 }

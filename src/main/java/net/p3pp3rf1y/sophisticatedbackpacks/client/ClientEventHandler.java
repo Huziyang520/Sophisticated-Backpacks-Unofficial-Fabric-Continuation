@@ -67,6 +67,9 @@ public class ClientEventHandler {
 
 	private static void registerEntityRenderers() {
 		EntityRendererRegistry.register(EVERLASTING_BACKPACK_ITEM_ENTITY.get(), ItemEntityRenderer::new);
+		// 26.3 has no public BlockEntityRenderers.register; Fabric exposes the registry instead.
+		net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry
+				.register(BACKPACK_TILE_TYPE.get(), context -> new BackpackBlockEntityRenderer());
 	}
 
 	/**
