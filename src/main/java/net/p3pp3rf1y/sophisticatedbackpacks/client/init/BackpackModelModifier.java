@@ -1,13 +1,21 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client.init;
 
+import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
+import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.resources.Identifier;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.render.BackpackTintItemModel;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -25,10 +33,26 @@ public class BackpackModelModifier {
 	public static void init() {
 		ModelLoadingPlugin.register(context -> context.modifyItemModelAfterBake().register((model, ctx) -> {
 			if (isBackpackItem(ctx.itemId())) {
-				return new BackpackTintItemModel(model);
+				return new BackpackTintItemModel(model, bakeVariants(ctx.itemId(), ctx.bakingContext(), ctx.transformation()));
 			}
 			return model;
 		}));
+	}
+
+	private static Map<String, ItemModel> bakeVariants(Identifier itemId, ItemModel.BakingContext bakeContext, org.joml.Matrix4fc transformation) {
+		Map<String, ItemModel> variants = new HashMap<>();
+		String tier = itemId.getPath();
+		for (String left : List.of("pouch", "tank")) {
+			for (String right : List.of("pouch", "tank")) {
+				for (String battery : List.of("none", "battery")) {
+					String key = left + "_" + right + "_" + battery;
+					Identifier modelId = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "block/" + tier + "_" + key);
+					variants.put(key, new CuboidItemModelWrapper.Unbaked(modelId, Optional.<Transformation>empty(), List.<ItemTintSource>of())
+							.bake(bakeContext, transformation));
+				}
+			}
+		}
+		return variants;
 	}
 
 	private static boolean isBackpackItem(Identifier itemId) {
