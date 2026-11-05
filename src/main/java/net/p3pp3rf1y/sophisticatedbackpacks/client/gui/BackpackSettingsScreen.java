@@ -17,7 +17,7 @@ public class BackpackSettingsScreen extends SettingsScreen {
 
 	@Override
 	protected StorageSettingsTabControlBase initializeTabControl() {
-		return new BackpackSettingsTabControl(this, new Position(leftPos + imageWidth, topPos + 4));
+		return new BackpackSettingsTabControl(this, new Position(leftPos + guiWidth, topPos + 4));
 	}
 
 	public static BackpackSettingsScreen constructScreen(SettingsContainerMenu<?> settingsContainer, Inventory playerInventory, Component title) {

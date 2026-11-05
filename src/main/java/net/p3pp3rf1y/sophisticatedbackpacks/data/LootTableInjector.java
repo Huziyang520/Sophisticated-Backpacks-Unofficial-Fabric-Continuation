@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ConstantValue;
+import net.p3pp3rf1y.sophisticatedbackpacks.Config;
 import net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public final class LootTableInjector {
 
 	public static void register() {
 		LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-			if (!source.isBuiltin()) {
+			if (!source.isBuiltin() || !Config.COMMON.chestLootEnabled.get()) {
 				return;
 			}
 			for (Injection injection : INJECTIONS) {

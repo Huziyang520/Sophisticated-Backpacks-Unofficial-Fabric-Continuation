@@ -23,9 +23,6 @@
         "fabric-datagen": [
             "net.p3pp3rf1y.sophisticatedbackpacks.data.DataGenerators"
         ],
-        "emi": [
-            "net.p3pp3rf1y.sophisticatedbackpacks.compat.emi.EmiCompat"
-        ],
         "jei_mod_plugin": [
             "net.p3pp3rf1y.sophisticatedbackpacks.compat.jei.SBPPlugin"
         ],

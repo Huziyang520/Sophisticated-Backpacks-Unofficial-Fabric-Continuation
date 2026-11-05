@@ -179,20 +179,25 @@ public class BackpackBlock extends Block implements EntityBlock, SimpleWaterlogg
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (!stack.isEmpty() && FluidUtil.isFluidStorage(stack)) {
+			boolean[] transferred = {false};
 			WorldHelper.getBlockEntity(level, pos, BackpackBlockEntity.class)
 					.flatMap(be -> be.getBackpackWrapper().getFluidHandler()).ifPresent(backpackFluidHandler ->
 							CapabilityHelper.runOnItemHandler(player, inventoryHandler -> {
 								FluidActionResult resultOfEmptying = FluidUtil.tryEmptyContainerAndStow(stack, backpackFluidHandler, inventoryHandler, FluidConstants.BUCKET, player, true);
 								if (resultOfEmptying.isSuccess()) {
-									player.setItemInHand(InteractionHand.MAIN_HAND, resultOfEmptying.getResult());
+									player.setItemInHand(hand, resultOfEmptying.getResult());
+									transferred[0] = true;
 								} else {
 									FluidActionResult resultOfFilling = FluidUtil.tryFillContainerAndStow(stack, backpackFluidHandler, inventoryHandler, FluidConstants.BUCKET, player, true);
 									if (resultOfFilling.isSuccess()) {
-										player.setItemInHand(InteractionHand.MAIN_HAND, resultOfFilling.getResult());
+										player.setItemInHand(hand, resultOfFilling.getResult());
+										transferred[0] = true;
 									}
 								}
 							}));
-			return InteractionResult.SUCCESS;
+			if (transferred[0]) {
+				return InteractionResult.SUCCESS;
+			}
 		}
 		return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 	}

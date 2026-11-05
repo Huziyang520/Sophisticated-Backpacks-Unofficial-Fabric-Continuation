@@ -41,6 +41,7 @@ public class ClientEventHandler {
 
 	private static final String BACKPACK_REG_NAME = "backpack";
 	public static final ModelLayerLocation BACKPACK_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, BACKPACK_REG_NAME), "main");
+	private static boolean backpackLayerRegistered = false;
 
 	public static void registerHandlers() {
 		registerLayer();
@@ -85,6 +86,10 @@ public class ClientEventHandler {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static void registerBackpackLayer() {
+		if (backpackLayerRegistered) {
+			return;
+		}
+		backpackLayerRegistered = true;
 		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, livingEntityRenderer, registrationHelper, context) ->
 				registrationHelper.register(new BackpackLayerRenderer(livingEntityRenderer)));
 	}

@@ -31,7 +31,6 @@ import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -158,16 +157,13 @@ public class EntityBackpackAdditionHandler {
 	}
 
 	private static void equipBackpack(Monster monster, ItemStack backpack, int difficulty, boolean playMusicDisc, LevelAccessor level, RandomSource rnd) {
-		// 26.3 的刷怪蛋贴图已预上色，服务端不再暴露蛋的双色，布料配色沿用背包默认值。
-		if (SpawnEggItem.byId(monster.getType()).isPresent()) {
-			IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
-			setLoot(monster, wrapper, difficulty, level);
-			if (playMusicDisc) {
-				wrapper.getInventoryHandler(); //just to assign uuid and real upgrade handler
-				if (wrapper.getUpgradeHandler().getSlotCount() > 0) {
-					monster.addTag(SPAWNED_WITH_JUKEBOX_UPGRADE);
-					addJukeboxUpgradeAndRandomDisc(level.getRandom(), wrapper, rnd);
-				}
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+		setLoot(monster, wrapper, difficulty, level);
+		if (playMusicDisc) {
+			wrapper.getInventoryHandler(); //just to assign uuid and real upgrade handler
+			if (wrapper.getUpgradeHandler().getSlotCount() > 0) {
+				monster.addTag(SPAWNED_WITH_JUKEBOX_UPGRADE);
+				addJukeboxUpgradeAndRandomDisc(level.getRandom(), wrapper, rnd);
 			}
 		}
 		monster.setItemSlot(EquipmentSlot.CHEST, backpack);

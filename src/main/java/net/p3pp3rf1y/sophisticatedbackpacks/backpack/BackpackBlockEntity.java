@@ -61,6 +61,9 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 		});
 		backpackWrapper.setInventorySlotChangeHandler(this::setChanged);
 		backpackWrapper.setUpgradeCachesInvalidatedHandler(this::invalidateHandlers);
+		if (level != null && !level.isClientSide()) {
+			setChanged();
+		}
 	}
 
 	@Override
@@ -119,8 +122,10 @@ public class BackpackBlockEntity extends BlockEntity implements IControllableSto
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
 		CompoundTag ret = super.getUpdateTag(registries);
-		writeBackpack(ret);
-		ret.putBoolean("updateBlockRender", updateBlockRender);
+		CompoundTag data = new CompoundTag();
+		writeBackpack(data);
+		data.putBoolean("updateBlockRender", updateBlockRender);
+		ret.store("data", CompoundTag.CODEC, data);
 		updateBlockRender = true;
 		return ret;
 	}

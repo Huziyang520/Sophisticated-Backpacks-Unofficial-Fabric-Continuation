@@ -1,5 +1,6 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -29,8 +30,8 @@ public class BackpackScreen extends StorageScreenBase<BackpackContainer> {
 			return super.keyPressed(keyCode, scanCode, modifiers);
 		}*/
 		int keyCode = event.key();
-		if (keyCode == 256 || KeybindHandler.BACKPACK_OPEN_KEYBIND.matches(event)) {
-			if (getMenu().isFirstLevelStorage() && (keyCode == 256 || mouseNotOverBackpack())) {
+		if (keyCode == InputConstants.KEY_ESCAPE || KeybindHandler.BACKPACK_OPEN_KEYBIND.matches(event)) {
+			if (getMenu().isFirstLevelStorage() && (keyCode == InputConstants.KEY_ESCAPE || mouseNotOverBackpack())) {
 				if (getMenu().getBackpackContext().wasOpenFromInventory()) {
 					this.minecraft.player.closeContainer();
 					this.minecraft.gui.setScreen(new InventoryScreen(this.minecraft.player));

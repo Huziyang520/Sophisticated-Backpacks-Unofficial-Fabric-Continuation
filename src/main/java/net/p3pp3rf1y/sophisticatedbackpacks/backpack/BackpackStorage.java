@@ -44,9 +44,12 @@ public class BackpackStorage extends SavedData {
 			MinecraftServer server = SophisticatedCore.getCurrentServer();
 			if (server != null) {
 				ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-				//noinspection ConstantConditions - by this time overworld is loaded
-				SavedDataStorage storage = overworld.getDataStorage();
-				return storage.computeIfAbsent(TYPE);
+				if (overworld == null) {
+					SophisticatedBackpacks.LOGGER.error("Backpack storage requested before the overworld is available");
+				} else {
+					SavedDataStorage storage = overworld.getDataStorage();
+					return storage.computeIfAbsent(TYPE);
+				}
 			}
 		}
 		return clientStorageCopy;
@@ -124,6 +127,7 @@ public class BackpackStorage extends SavedData {
 		if (!backpackContents.containsKey(backpackUuid)) {
 			backpackContents.put(backpackUuid, contents);
 			updatedBackpackSettingsFlags.add(backpackUuid);
+			setDirty();
 		} else {
 			CompoundTag currentContents = backpackContents.get(backpackUuid);
 			for (String key : contents.keySet()) {

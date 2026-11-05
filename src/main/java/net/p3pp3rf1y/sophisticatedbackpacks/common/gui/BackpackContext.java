@@ -23,7 +23,6 @@ import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 public abstract class BackpackContext {
@@ -408,9 +407,10 @@ public abstract class BackpackContext {
 	}
 
 	public static class AnotherPlayer extends Item {
+		@Nullable
 		protected final Player otherPlayer;
 
-		public AnotherPlayer(String handlerName, String identifier, int backpackSlotIndex, Player otherPlayer) {
+		public AnotherPlayer(String handlerName, String identifier, int backpackSlotIndex, @Nullable Player otherPlayer) {
 			super(handlerName, identifier, backpackSlotIndex);
 			this.otherPlayer = otherPlayer;
 		}
@@ -422,7 +422,7 @@ public abstract class BackpackContext {
 
 		@Override
 		public IBackpackWrapper getBackpackWrapper(Player player) {
-			return super.getBackpackWrapper(otherPlayer);
+			return otherPlayer == null ? IBackpackWrapper.Noop.INSTANCE : super.getBackpackWrapper(otherPlayer);
 		}
 
 		@Override
@@ -432,7 +432,7 @@ public abstract class BackpackContext {
 
 		@Override
 		public void addToBuffer(FriendlyByteBuf buffer) {
-			buffer.writeInt(otherPlayer.getId());
+			buffer.writeInt(otherPlayer == null ? -1 : otherPlayer.getId());
 			buffer.writeUtf(handlerName);
 			buffer.writeUtf(identifier);
 			buffer.writeInt(backpackSlotIndex);
@@ -440,7 +440,7 @@ public abstract class BackpackContext {
 
 		@Override
 		public boolean canInteractWith(Player player) {
-			return player.distanceTo(otherPlayer) < 8;
+			return otherPlayer != null && player.distanceTo(otherPlayer) < 8;
 		}
 
 		@Override
@@ -450,14 +450,14 @@ public abstract class BackpackContext {
 
 		@Override
 		public Component getDisplayName(Player player) {
-			return super.getDisplayName(otherPlayer);
+			return otherPlayer == null ? Component.translatable("item.sophisticatedbackpacks.backpack") : super.getDisplayName(otherPlayer);
 		}
 
 		public static BackpackContext fromBuffer(FriendlyByteBuf buffer, Level level) {
 			int playerId = buffer.readInt();
-			Player otherPlayer = (Player) level.getEntity(playerId);
+			Player otherPlayer = level.getEntity(playerId) instanceof Player player ? player : null;
 
-			return new AnotherPlayer(buffer.readUtf(), buffer.readUtf(), buffer.readInt(), Objects.requireNonNull(otherPlayer));
+			return new AnotherPlayer(buffer.readUtf(), buffer.readUtf(), buffer.readInt(), otherPlayer);
 		}
 	}
 
@@ -509,9 +509,9 @@ public abstract class BackpackContext {
 
 		public static BackpackContext fromBuffer(FriendlyByteBuf buffer, Level level) {
 			int playerId = buffer.readInt();
-			Player otherPlayer = (Player) level.getEntity(playerId);
+			Player otherPlayer = level.getEntity(playerId) instanceof Player player ? player : null;
 
-			return new AnotherPlayerSubBackpack(Objects.requireNonNull(otherPlayer), buffer.readUtf(), buffer.readUtf(), buffer.readInt(), buffer.readInt());
+			return new AnotherPlayerSubBackpack(otherPlayer, buffer.readUtf(), buffer.readUtf(), buffer.readInt(), buffer.readInt());
 		}
 
 		@Override

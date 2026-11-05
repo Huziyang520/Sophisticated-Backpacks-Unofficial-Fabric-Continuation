@@ -9,12 +9,11 @@
           "name": "sophisticatedbackpacks:backpack"
         }
       ],
-      "functions": [
+      "modifier": [
         {
-          "function": "sophisticatedbackpacks:copy_backpack_data"
+          "type": "sophisticatedbackpacks:copy_backpack_data"
         }
       ],
-      "name": "main",
       "rolls": 1.0
     }
   ],

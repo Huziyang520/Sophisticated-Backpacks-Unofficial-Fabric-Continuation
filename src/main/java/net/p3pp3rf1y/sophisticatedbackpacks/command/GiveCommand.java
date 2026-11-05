@@ -76,10 +76,5 @@ public class GiveCommand {
 				itementity.setThrower(p);
 			}
 		}
-
-		ItemEntity itemEntity = p.drop(backpack, false, net.minecraft.util.Prediction.SERVER_ONLY);
-		if (itemEntity != null) {
-			itemEntity.makeFakeItem();
-		}
 	}
 }
