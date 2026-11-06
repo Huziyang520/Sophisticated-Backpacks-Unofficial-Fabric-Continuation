@@ -5,6 +5,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
@@ -13,6 +14,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.SavedDataStorage;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.SharedConstants;
+import net.minecraft.world.level.storage.LevelResource;
 import com.mojang.serialization.Codec;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.wrapper.BackpackSettingsHandler;
@@ -20,6 +24,8 @@ import net.p3pp3rf1y.sophisticatedcore.SophisticatedCore;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class BackpackStorage extends SavedData {
 	private static final Codec<BackpackStorage> CODEC = CompoundTag.CODEC.xmap(
@@ -30,7 +36,7 @@ public class BackpackStorage extends SavedData {
 			SophisticatedBackpacks.getRL("backpacks"),
 			BackpackStorage::new,
 			CODEC,
-			null);
+			DataFixTypes.LEVEL);
 
 	private final Map<UUID, CompoundTag> backpackContents = new HashMap<>();
 	private static final BackpackStorage clientStorageCopy = new BackpackStorage();
@@ -49,9 +55,38 @@ public class BackpackStorage extends SavedData {
 				return unavailableServerStorage;
 			}
 			SavedDataStorage storage = overworld.getDataStorage();
+			BackpackStorage cached = storage.get(TYPE);
+			if (cached != null) {
+				return cached;
+			}
+			BackpackStorage migrated = readLegacyStorage(storage, server);
+			if (migrated != null) {
+				storage.set(TYPE, migrated);
+				return migrated;
+			}
 			return storage.computeIfAbsent(TYPE);
 		}
 		return clientStorageCopy;
+	}
+
+	private static BackpackStorage readLegacyStorage(SavedDataStorage storage, MinecraftServer server) {
+		Path dataDir = server.getWorldPath(LevelResource.DATA);
+		Path currentFile = dataDir.resolve(SophisticatedBackpacks.MOD_ID).resolve("backpacks.dat");
+		Path legacyFile = dataDir.resolve(SophisticatedBackpacks.MOD_ID + ".dat");
+		if (Files.exists(currentFile) || !Files.exists(legacyFile)) {
+			return null;
+		}
+		try {
+			CompoundTag root = storage.readTagFromDisk(legacyFile, DataFixTypes.LEVEL,
+					SharedConstants.getCurrentVersion().dataVersion().version());
+			CompoundTag payload = root.getCompoundOrEmpty("data");
+			CompoundTag source = payload.isEmpty() ? root : payload;
+			return CODEC.parse(NbtOps.INSTANCE, source).resultOrPartial(
+					error -> SophisticatedBackpacks.LOGGER.error("Failed to migrate legacy backpack storage: {}", error)).orElse(null);
+		} catch (Exception e) {
+			SophisticatedBackpacks.LOGGER.error("Failed to migrate legacy backpack storage", e);
+			return null;
+		}
 	}
 
 	private static BackpackStorage load(CompoundTag nbt) {

@@ -481,6 +481,9 @@ public abstract class BackpackContext {
 
 		@Override
 		public IBackpackWrapper getBackpackWrapper(Player player) {
+			if (otherPlayer == null) {
+				return IBackpackWrapper.Noop.INSTANCE;
+			}
 			return getParentBackpackWrapper(otherPlayer)
 					.map(parent -> BackpackWrapper.fromExistingData(parent.getInventoryHandler().getStackInSlot(subBackpackSlotIndex))
 							.orElse(IBackpackWrapper.Noop.INSTANCE)).orElse(IBackpackWrapper.Noop.INSTANCE);

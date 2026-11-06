@@ -188,8 +188,11 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 		}
 
 		public void setSelectedRecipe(Identifier recipeId) {
+			if (player.level().isClientSide()) {
+				return;
+			}
 			SmithingRecipeInput smithingRecipeInput = new SmithingRecipeInput(getTemplateSlot().getItem(), getBaseSlot().getItem(), getAdditionalSlot().getItem());
-			// 26.3 去掉了 SmithingMenu.selectedRecipe，配方改用 ResultContainer 记录。
+			// 26.3 tracks the used recipe on the ResultContainer instead of SmithingMenu.selectedRecipe.
 			RecipeHelper.safeGetRecipeFor(RecipeType.SMITHING, smithingRecipeInput, recipeId).ifPresent(resultSlots::setRecipeUsed);
 		}
 	}
