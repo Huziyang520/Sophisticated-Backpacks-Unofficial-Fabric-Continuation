@@ -34,6 +34,7 @@ public class BackpackStorage extends SavedData {
 
 	private final Map<UUID, CompoundTag> backpackContents = new HashMap<>();
 	private static final BackpackStorage clientStorageCopy = new BackpackStorage();
+	private static final BackpackStorage unavailableServerStorage = new BackpackStorage();
 	private final Map<UUID, AccessLogRecord> accessLogRecords = new HashMap<>();
 
 	private BackpackStorage() {
@@ -42,15 +43,13 @@ public class BackpackStorage extends SavedData {
 	public static BackpackStorage get() {
 		if (SophisticatedCore.isLogicalServerThread()) {
 			MinecraftServer server = SophisticatedCore.getCurrentServer();
-			if (server != null) {
-				ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-				if (overworld == null) {
-					SophisticatedBackpacks.LOGGER.error("Backpack storage requested before the overworld is available");
-				} else {
-					SavedDataStorage storage = overworld.getDataStorage();
-					return storage.computeIfAbsent(TYPE);
-				}
+			ServerLevel overworld = server == null ? null : server.getLevel(Level.OVERWORLD);
+			if (overworld == null) {
+				SophisticatedBackpacks.LOGGER.error("Backpack storage requested before the overworld is available");
+				return unavailableServerStorage;
 			}
+			SavedDataStorage storage = overworld.getDataStorage();
+			return storage.computeIfAbsent(TYPE);
 		}
 		return clientStorageCopy;
 	}

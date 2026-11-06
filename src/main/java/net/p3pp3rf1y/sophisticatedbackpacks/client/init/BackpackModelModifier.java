@@ -33,10 +33,25 @@ public class BackpackModelModifier {
 	public static void init() {
 		ModelLoadingPlugin.register(context -> context.modifyItemModelAfterBake().register((model, ctx) -> {
 			if (isBackpackItem(ctx.itemId())) {
-				return new BackpackTintItemModel(model, bakeVariants(ctx.itemId(), ctx.bakingContext(), ctx.transformation()));
+				ItemModel.BakingContext bakeContext = ctx.bakingContext();
+				org.joml.Matrix4fc transformation = ctx.transformation();
+				return new BackpackTintItemModel(model, bakeVariants(ctx.itemId(), bakeContext, transformation),
+						bakeOverlayModels("backpack_fluid_left_", bakeContext, transformation),
+						bakeOverlayModels("backpack_fluid_right_", bakeContext, transformation),
+						bakeOverlayModels("backpack_charge_", bakeContext, transformation));
 			}
 			return model;
 		}));
+	}
+
+	private static ItemModel[] bakeOverlayModels(String prefix, ItemModel.BakingContext bakeContext, org.joml.Matrix4fc transformation) {
+		ItemModel[] models = new ItemModel[4];
+		for (int level = 1; level <= 4; level++) {
+			Identifier modelId = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "block/" + prefix + level);
+			models[level - 1] = new CuboidItemModelWrapper.Unbaked(modelId, Optional.<Transformation>empty(), List.<ItemTintSource>of())
+					.bake(bakeContext, transformation);
+		}
+		return models;
 	}
 
 	private static Map<String, ItemModel> bakeVariants(Identifier itemId, ItemModel.BakingContext bakeContext, org.joml.Matrix4fc transformation) {
