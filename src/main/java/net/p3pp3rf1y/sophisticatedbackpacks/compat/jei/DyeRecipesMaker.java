@@ -19,6 +19,7 @@ import net.p3pp3rf1y.sophisticatedcore.util.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -60,7 +61,11 @@ public class DyeRecipesMaker {
 
 		// 3x2 grid: six slots, matching the ingredient order above. 26.3 validates width * height
 		// against the slot list when a recipe display is built, so the old 3x1 claim now throws.
-		ShapedRecipePattern pattern = new ShapedRecipePattern(3, 2, ingredients, Optional.empty());
+		ShapedRecipePattern pattern = new ShapedRecipePattern(3, 2, ingredients, Optional.of(new ShapedRecipePattern.Data(
+				Map.of('Y', ofTag(ConventionalItemTags.YELLOW_DYES), 'B', Ingredient.of(ModItems.BACKPACK.get()),
+						'L', ofTag(ConventionalItemTags.LIME_DYES), 'U', ofTag(ConventionalItemTags.BLUE_DYES),
+						'K', ofTag(ConventionalItemTags.BLACK_DYES)),
+				List.of("YB ", "LUK"))));
 		Identifier id = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "multiple_colors");
 		recipes.add(new RecipeHolder<>(net.minecraft.resources.ResourceKey.create(Registries.RECIPE, id), new ShapedRecipe(
 				net.minecraft.data.recipes.RecipeBuilder.createCraftingCommonInfo(true),
@@ -77,7 +82,10 @@ public class DyeRecipesMaker {
 			ingredients.add(Optional.of(Ingredient.of(ModItems.BACKPACK.get())));
 			ingredients.add(Optional.of(ofTag(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())))));
 
-			ShapedRecipePattern pattern = new ShapedRecipePattern(1, 2, ingredients, Optional.empty());
+			ShapedRecipePattern pattern = new ShapedRecipePattern(1, 2, ingredients, Optional.of(new ShapedRecipePattern.Data(
+					Map.of('B', Ingredient.of(ModItems.BACKPACK.get()),
+							'D', ofTag(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())))),
+					List.of("B", "D"))));
 			Identifier id = Identifier.fromNamespaceAndPath(SophisticatedBackpacks.MOD_ID, "single_color_" + color.getSerializedName());
 			recipes.add(new RecipeHolder<>(net.minecraft.resources.ResourceKey.create(Registries.RECIPE, id), new ShapedRecipe(
 					net.minecraft.data.recipes.RecipeBuilder.createCraftingCommonInfo(true),

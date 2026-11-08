@@ -214,5 +214,13 @@
     "commands.sophisticatedbackpacks.list.trim_color": "接缝",
     "commands.sophisticatedbackpacks.give.success": "已将背包给予%s",
     "commands.sophisticatedbackpacks.remove_non_player.success": "已删除%s个非玩家背包",
-    "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "点击获取背包UUID：%s"
+    "chat.sophisticatedbackpacks.backpack_uuid.tooltip": "点击获取背包UUID：%s",
+  "item.sophisticatedbackpacks.stack_upgrade_omega_tier": "堆叠升级终极版",
+  "item.sophisticatedbackpacks.stack_upgrade_omega_tier.tooltip": "物品堆叠上限提升至 2,147,483,647",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_1": "堆叠降级T1",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_1.tooltip": "一个槽位可容纳的堆叠数÷8",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_2": "堆叠降级T2",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_2.tooltip": "一个槽位可容纳的堆叠数÷16",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_3": "堆叠降级T3",
+  "item.sophisticatedbackpacks.stack_downgrade_tier_3.tooltip": "一个槽位可容纳的堆叠数÷32"
 }

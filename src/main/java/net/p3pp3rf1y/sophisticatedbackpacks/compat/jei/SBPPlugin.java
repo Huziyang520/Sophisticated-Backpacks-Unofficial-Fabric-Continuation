@@ -85,6 +85,8 @@ public class SBPPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
 		registration.addRecipes(RecipeTypes.CRAFTING, DyeRecipesMaker.getRecipes());
+		registration.addRecipes(RecipeTypes.CRAFTING, BackpackUpgradeRecipesMaker.getRecipes());
+		registration.addRecipes(RecipeTypes.CRAFTING, UpgradeNextTierRecipesMaker.getRecipes());
 	}
 
 	@Override

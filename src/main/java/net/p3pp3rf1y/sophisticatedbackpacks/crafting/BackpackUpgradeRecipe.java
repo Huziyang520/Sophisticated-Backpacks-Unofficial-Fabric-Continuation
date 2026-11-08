@@ -34,7 +34,7 @@ public class BackpackUpgradeRecipe extends ShapedRecipe implements IWrapperRecip
 	@Override
 	public ItemStack assemble(CraftingInput inv) {
 		ItemStack upgradedBackpack = super.assemble(inv);
-		getBackpack(inv).map(ItemStack::getComponents).ifPresent(upgradedBackpack::applyComponents);
+		getBackpack(inv).map(ItemStack::getComponentsPatch).ifPresent(upgradedBackpack::applyComponents);
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(upgradedBackpack);
 
 		BackpackItem backpackItem = ((BackpackItem) upgradedBackpack.getItem());

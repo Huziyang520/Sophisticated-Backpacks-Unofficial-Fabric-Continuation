@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
@@ -37,6 +36,7 @@ import org.joml.Matrix4f;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.FluidSprites;
 
 public class BackpackModel extends EntityModel<LivingEntityRenderState> implements IBackpackModel {
 	private static final Map<EntityType<?>, Vec3> entityTranslations;
@@ -51,7 +51,7 @@ public class BackpackModel extends EntityModel<LivingEntityRenderState> implemen
 	private static final RenderType BACKPACK_RENDER_TYPE = RenderTypes.entityCutout(BACKPACK_ENTITY_TEXTURE);
 	private static final RenderType TANK_GLASS_RENDER_TYPE = RenderTypes.entityCutout(TANK_GLASS_TEXTURE);
 	private static final RenderType BATTERY_RENDER_TYPE = RenderTypes.entityTranslucent(BACKPACK_ENTITY_TEXTURE);
-	private static final RenderType FLUID_RENDER_TYPE = RenderTypes.entityTranslucent(AtlasIds.BLOCKS);
+	private static final RenderType FLUID_RENDER_TYPE = RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS);
 	public static final float CHILD_Y_OFFSET = 0.3F;
 	public static final float CHILD_Z_OFFSET = 0.1F;
 	public static final float CHILD_SCALE = 0.55F;
@@ -415,20 +415,20 @@ public class BackpackModel extends EntityModel<LivingEntityRenderState> implemen
 			return;
 		}
 
-		// 26.3 dropped FluidVariantRendering; the still sprite and tint come from the baked fluid model.
+		// 26.3 dropped FluidVariantRendering; fall back to the atlas sprite when the baked model is absent.
 		FluidModel fluidModel = Minecraft.getInstance().getModelManager()
 				.getFluidStateModelSet().get(fluidStack.getFluid().defaultFluidState());
-		if (fluidModel == null || fluidModel.stillMaterial() == null) {
-			return;
-		}
-		TextureAtlasSprite still = fluidModel.stillMaterial().sprite();
+		TextureAtlasSprite still = fluidModel != null && fluidModel.stillMaterial() != null
+				? fluidModel.stillMaterial().sprite()
+				: FluidSprites.getStillSprite(fluidStack.getFluid());
 		if (still == null) {
 			return;
 		}
 
 		ModelPart fluidBox = getFluidBar(still, (int) (fill * 10), left);
-		// The block-state-less tint keeps water's biome tint out of the item-free entity pass; -1 means "no tint".
-		int color = fluidModel.tintSource() == null ? -1 : fluidModel.tintSource().color(Blocks.AIR.defaultBlockState());
+		// A null tint source means no tint; -1 keeps the fluid visible without a block state.
+		int color = fluidModel == null || fluidModel.tintSource() == null
+				? -1 : fluidModel.tintSource().color(Blocks.AIR.defaultBlockState());
 		ColoredModelRenderer.submitColoredModelPart(collector, fluidBox, matrixStack, FLUID_RENDER_TYPE, packedLight, color);
 	}
 

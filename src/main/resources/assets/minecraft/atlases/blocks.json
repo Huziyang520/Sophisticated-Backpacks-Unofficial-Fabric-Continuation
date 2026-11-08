@@ -1,0 +1,28 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_axe_slot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_hammer_slot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_hoe_slot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_pickaxe_slot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_shovel_slot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "sophisticatedbackpacks:item/empty_weapon_slot"
+    }
+  ]
+}
