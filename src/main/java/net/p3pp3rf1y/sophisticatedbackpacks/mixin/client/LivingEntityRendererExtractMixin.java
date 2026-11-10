@@ -32,9 +32,19 @@ public class LivingEntityRendererExtractMixin {
 
 		PlayerInventoryProvider.RenderedBackpack rendered = PlayerInventoryProvider.get().getBackpackFromRendered(player).orElse(null);
 		if (rendered == null) {
-			BackpackRenderStateData.setBackpack(state, ItemStack.EMPTY, false);
+			BackpackRenderStateData.setBackpack(state, findInventoryBackpack(player), false);
 			return;
 		}
 		BackpackRenderStateData.setBackpack(state, rendered.backpack(), rendered.isArmorSlot());
+	}
+
+	// Inventory slots are not registered as rendered handlers on this version, so scan them directly.
+	private static ItemStack findInventoryBackpack(Player player) {
+		for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
+			if (stack.getItem() instanceof BackpackItem) {
+				return stack;
+			}
+		}
+		return ItemStack.EMPTY;
 	}
 }

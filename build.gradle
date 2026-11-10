@@ -274,7 +274,7 @@ processResources {
             mod_id              : project.mod_id,
             mod_name            : project.mod_name,
             mod_license         : project.mod_license,
-            mod_version         : version.replace(getStable(), ""), // remove the getStable string so that fabric loader can catch version mismatches, only important for snapshots
+            mod_version         : project.mod_version,
             mod_issue_tracker_url: project.mod_issue_tracker_url,
             mod_sources_url     : project.mod_sources_url,
             mod_logo_file       : project.mod_logo_file,
@@ -284,7 +284,7 @@ processResources {
             minecraft_version   : project.minecraft_version,
             loader_version      : project.loader_version,
             fabric_version      : project.fabric_version,
-            sc_version          : mavenVersionToFabric(project.sc_version),
+            sc_version          : ">=${project.core_version} <2.0.0",
         ]
 
     inputs.properties replaceProperties

@@ -46,7 +46,7 @@ public class ClientEventHandler {
 	public static void registerHandlers() {
 		registerLayer();
 		registerEntityRenderers();
-		registerReloadListener();
+		registerBackpackLayer();
 		registerModelLayers();
 		registerBackpackClientExtension();
 		net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModBlockColors.registerBlockColorHandlers();
