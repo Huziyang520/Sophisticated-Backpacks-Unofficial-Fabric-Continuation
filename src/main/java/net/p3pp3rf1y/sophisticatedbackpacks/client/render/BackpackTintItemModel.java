@@ -63,13 +63,8 @@ public class BackpackTintItemModel implements ItemModel {
 
 		IntList baseTints = state.layers[baseLayer].tintLayers();
 		baseTints.clear();
-		int mainColor = wrapper.getMainColor();
-		int accentColor = wrapper.getAccentColor();
-		setTint(baseTints, CLOTH_TINT_INDEX, mainColor);
-		setTint(baseTints, BORDER_TINT_INDEX, accentColor);
-		// GUI item rendering caches extract results by model identity; colors must be part of it.
-		state.appendModelIdentityElement(mainColor);
-		state.appendModelIdentityElement(accentColor);
+		setTint(baseTints, CLOTH_TINT_INDEX, wrapper.getMainColor());
+		setTint(baseTints, BORDER_TINT_INDEX, wrapper.getAccentColor());
 		addFluidLayer(state, stack, resolver, context, level, owner, seed, renderInfo, TankPosition.LEFT, leftFluidModels);
 		addFluidLayer(state, stack, resolver, context, level, owner, seed, renderInfo, TankPosition.RIGHT, rightFluidModels);
 		addChargeLayer(state, stack, resolver, context, level, owner, seed, renderInfo, chargeModels);
@@ -95,7 +90,6 @@ public class BackpackTintItemModel implements ItemModel {
 		if (state.activeLayerCount > layer && state.layers[layer] != null) {
 			int color = FluidVariantRendering.getColor(fluid.get().getVariant());
 			setTint(state.layers[layer].tintLayers(), OVERLAY_TINT_INDEX, color | 0xFF000000);
-			state.appendModelIdentityElement(color);
 		}
 	}
 
@@ -113,7 +107,6 @@ public class BackpackTintItemModel implements ItemModel {
 		models[modelIndex].update(state, stack, resolver, context, level, owner, seed);
 		if (state.activeLayerCount > layer && state.layers[layer] != null) {
 			setTint(state.layers[layer].tintLayers(), OVERLAY_TINT_INDEX, CHARGE_COLOR);
-			state.appendModelIdentityElement(modelIndex);
 		}
 	}
 
