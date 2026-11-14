@@ -31,7 +31,7 @@ public class SmithingBackpackUpgradeRecipe extends SmithingTransformRecipe imple
 	public ItemStack assemble(SmithingRecipeInput inv) {
 		ItemStack upgradedBackpack = result.create();
 		if (SophisticatedCore.isLogicalServerThread()) {
-			getBackpack(inv).map(ItemStack::getComponents).ifPresent(upgradedBackpack::applyComponents);
+			getBackpack(inv).map(ItemStack::getComponentsPatch).ifPresent(upgradedBackpack::applyComponents);
 			IBackpackWrapper wrapper = BackpackWrapper.fromStack(upgradedBackpack);
 			BackpackItem backpackItem = ((BackpackItem) upgradedBackpack.getItem());
 			wrapper.setSlotNumbers(backpackItem.getNumberOfSlots(), backpackItem.getNumberOfUpgradeSlots());
