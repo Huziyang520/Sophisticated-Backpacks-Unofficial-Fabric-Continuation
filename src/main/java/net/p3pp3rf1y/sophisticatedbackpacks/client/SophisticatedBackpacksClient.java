@@ -6,6 +6,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.p3pp3rf1y.sophisticatedbackpacks.compat.trashslot.TrashSlotLayoutCompat;
 import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackItem;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.init.ModItemsClient;
 import net.p3pp3rf1y.sophisticatedbackpacks.client.render.ClientBackpackContentsTooltip;
@@ -25,6 +27,8 @@ public class SophisticatedBackpacksClient implements ClientModInitializer {
 		ModItemsClient.registerScreens();
 
 		ClientTooltipComponentCallback.EVENT.register(SophisticatedBackpacksClient::registerTooltipComponent);
+
+		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> TrashSlotLayoutCompat.onScreenInit(screen));
 	}
 	@Nullable
 	private static ClientTooltipComponent registerTooltipComponent(TooltipComponent data) {

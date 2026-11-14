@@ -44,7 +44,8 @@
         "sophisticatedcore": "${sc_version}"
     },
     "suggests": {
-        "modmenu": "*"
+        "modmenu": "*",
+        "trashslot": "*"
     },
     "custom": {
         "modmenu": {

@@ -1,8 +1,11 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.backpack;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AccessLogRecord {
@@ -71,10 +74,26 @@ public class AccessLogRecord {
 		return ret;
 	}
 
+	@Nullable
 	public static AccessLogRecord deserializeFromNBT(CompoundTag nbt) {
+		Tag uuidTag = nbt.get("backpackUuid");
+		String itemId = nbt.getString("backpackItemRegistryName").orElse("");
+		if (uuidTag == null || itemId.isEmpty()) {
+			return null;
+		}
+		Optional<UUID> uuid = net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, uuidTag).result();
+		if (uuid.isEmpty()) {
+			return null;
+		}
+		Identifier item;
+		try {
+			item = Identifier.parse(itemId);
+		} catch (RuntimeException e) {
+			return null;
+		}
 		return new AccessLogRecord(
-				Identifier.parse(nbt.getString("backpackItemRegistryName").orElse("")),
-				net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, nbt.get("backpackUuid")).getOrThrow(),
+				item,
+				uuid.get(),
 				nbt.getString("playerName").orElse(""),
 				nbt.getString("backpackName").orElse(""),
 				nbt.getInt("clothColor").orElse(0),

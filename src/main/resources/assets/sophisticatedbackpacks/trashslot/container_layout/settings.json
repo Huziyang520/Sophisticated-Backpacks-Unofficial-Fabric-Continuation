@@ -1,4 +1,16 @@
 {
   "availability": "default",
-  "defaultSnap": "top_left"
+  "defaultSnap": "top_left",
+  "snaps": {
+    "top_left": {
+      "x": { "type": "left", "offset": 8 },
+      "y": { "type": "top", "offset": -15 },
+      "visual": "attach_top_left"
+    },
+    "left_top": {
+      "x": { "type": "left", "offset": -15 },
+      "y": { "type": "top", "offset": 7 },
+      "visual": "attach_left_top"
+    }
+  }
 }

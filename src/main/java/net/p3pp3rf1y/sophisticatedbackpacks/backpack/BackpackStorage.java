@@ -100,7 +100,9 @@ public class BackpackStorage extends SavedData {
 		ListTag accessLogsTag = nbt.getListOrEmpty("accessLogRecords");
 		for (int i = 0; i < accessLogsTag.size(); i++) {
 			AccessLogRecord alr = AccessLogRecord.deserializeFromNBT(accessLogsTag.getCompoundOrEmpty(i));
-			storage.accessLogRecords.put(alr.getBackpackUuid(), alr);
+			if (alr != null) {
+				storage.accessLogRecords.put(alr.getBackpackUuid(), alr);
+			}
 		}
 	}
 
@@ -108,9 +110,17 @@ public class BackpackStorage extends SavedData {
 		ListTag contentsTag = nbt.getListOrEmpty("backpackContents");
 		for (int i = 0; i < contentsTag.size(); i++) {
 			CompoundTag uuidContentsPair = contentsTag.getCompoundOrEmpty(i);
-			UUID uuid = net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, Objects.requireNonNull(uuidContentsPair.get("uuid"))).getOrThrow();
-			CompoundTag contents = uuidContentsPair.getCompoundOrEmpty("contents");
-			storage.backpackContents.put(uuid, contents);
+			Tag uuidTag = uuidContentsPair.get("uuid");
+			if (uuidTag == null) {
+				SophisticatedBackpacks.LOGGER.warn("Skipping backpack contents entry {} without uuid", i);
+				continue;
+			}
+			Optional<UUID> uuid = net.minecraft.core.UUIDUtil.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, uuidTag).result();
+			if (uuid.isEmpty()) {
+				SophisticatedBackpacks.LOGGER.warn("Skipping backpack contents entry {} with invalid uuid", i);
+				continue;
+			}
+			storage.backpackContents.put(uuid.get(), uuidContentsPair.getCompoundOrEmpty("contents"));
 		}
 	}
 
