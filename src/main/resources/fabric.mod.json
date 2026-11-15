@@ -31,6 +31,9 @@
         ],
         "rei_client": [
             "net.p3pp3rf1y.sophisticatedbackpacks.compat.rei.REIClientCompat"
+        ],
+        "modmenu": [
+            "net.p3pp3rf1y.sophisticatedbackpacks.client.ModMenuIntegration"
         ]
     },
     "mixins": [

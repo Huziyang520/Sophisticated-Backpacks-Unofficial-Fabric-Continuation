@@ -4,6 +4,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.p3pp3rf1y.sophisticatedbackpacks.SophisticatedBackpacks;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.SettingsScreen;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
@@ -19,6 +21,7 @@ import java.util.Optional;
  * The host only exposes a fixed screen rectangle, so this is wired reflectively.
  */
 public final class TrashSlotLayoutCompat {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TrashSlotLayoutCompat.class);
 	private static final String API = "net.blay09.mods.trashslot.api.TrashSlotAPI";
 	private static final String LAYOUT = "net.blay09.mods.trashslot.api.layout.TrashContainerLayout";
 	private static final String CONTEXT = "net.blay09.mods.trashslot.api.layout.TrashSlotContainerContext";
@@ -81,6 +84,7 @@ public final class TrashSlotLayoutCompat {
 	}
 
 	private static Object createLayout(AbstractContainerScreen<?> screen) {
+		final boolean[] logged = {false};
 		InvocationHandler handler = (proxy, method, args) -> {
 			switch (method.getName()) {
 				case "getBounds":
@@ -91,8 +95,19 @@ public final class TrashSlotLayoutCompat {
 				}
 				case "createContext":
 					return createContext(screen, proxy);
-				case "getSnap":
-					return getSnap.invoke(defaultLayout, args[0], args[1]);
+				case "getSnap": {
+					Optional<?> snap = (Optional<?>) getSnap.invoke(defaultLayout, args[0], args[1]);
+					if (snap.isPresent()) {
+						return snap;
+					}
+					// Unmatched ids must not fall through to the host's DEFAULT visual; it has no attach border.
+					if (!logged[0]) {
+						logged[0] = true;
+						LOGGER.warn("TrashSlot snap {} not in host layout, available: {}; using default snap",
+								args[1], getSnaps.invoke(defaultLayout, args[0]));
+					}
+					return getDefaultSnap.invoke(defaultLayout, args[0]);
+				}
 				case "getSnaps":
 					return getSnaps.invoke(defaultLayout, args[0]);
 				case "getDefaultSnap":
