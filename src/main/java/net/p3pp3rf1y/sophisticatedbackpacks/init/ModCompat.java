@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedbackpacks.init;
 
 import net.p3pp3rf1y.sophisticatedbackpacks.compat.CompatModIds;
+import net.p3pp3rf1y.sophisticatedbackpacks.compat.trinkets.TrinketsCompat;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatInfo;
 import net.p3pp3rf1y.sophisticatedcore.compat.CompatRegistry;
 
@@ -13,5 +14,6 @@ public class ModCompat {
 
 	public static void register() {
 		CompatRegistry registry = CompatRegistry.getRegistry(MOD_ID);
+		registry.registerCompat(new CompatInfo(CompatModIds.TRINKETS, null), () -> new TrinketsCompat());
 	}
 }

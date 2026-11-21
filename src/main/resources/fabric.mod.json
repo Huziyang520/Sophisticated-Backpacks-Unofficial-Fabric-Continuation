@@ -48,7 +48,8 @@
     },
     "suggests": {
         "modmenu": "*",
-        "trashslot": "*"
+        "trashslot": "*",
+        "trinkets_updated": "*"
     },
     "custom": {
         "modmenu": {

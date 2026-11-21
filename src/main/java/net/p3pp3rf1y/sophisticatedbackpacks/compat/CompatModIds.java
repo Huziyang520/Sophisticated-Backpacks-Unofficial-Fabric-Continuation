@@ -4,7 +4,7 @@ public class CompatModIds {
 	private CompatModIds() {}
 
 	public static final String BOTANIA = "botania";
-	public static final String TRINKETS = "trinkets";
+	public static final String TRINKETS = "trinkets_updated";
 	public static final String QUARK = "quark";
 	public static final String CHIPPED = "chipped";
 	public static final String MKB = "mkb";

@@ -73,6 +73,7 @@ repositories {
 
     // maven { url = 'https://maven.blamejared.com' } // Botania
     maven { url = "https://maven.ladysnake.org/releases" } // CCA, for Trinkets
+    maven { url = "https://maven.nucleoid.xyz/releases" } // Trinkets Updated
     maven { url = "https://www.cursemaven.com" } // Balm, CraftingTweaks
     maven { url = "https://modmaven.dev" } // Jei
     // maven { url = "https://maven.resourcefulbees.com/repository/maven-public/" } // Chipped, resourcefullib, athena
@@ -215,6 +216,8 @@ dependencies {
 
     compileOnly("maven.modrinth:crafting-tweaks:26.3.0.1+fabric-26.3")
     compileOnly("maven.modrinth:balm:26.3.0.3+fabric-26.3")
+
+    compileOnly("eu.pb4:trinkets:${project.trinkets_version}") { transitive = false }
 
 
     /*compileOnly("vazkii.botania:Botania:${project.botania_version}") {
